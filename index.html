@@ -1,0 +1,2747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover, user-scalable=no">
+    <title>ManifestoShop – Your Premium Shopping Destination</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* ── ROOT VARIABLES ── */
+        :root {
+            --primary: #667eea;
+            --primary-dark: #764ba2;
+            --primary-grad: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent: #ff6b35;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --bg: #f5f6fa;
+            --white: #ffffff;
+            --card-shadow: 0 2px 12px rgba(102,126,234,0.10);
+            --nav-h: 64px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .wrapper {
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--white);
+            min-height: 100vh;
+            box-shadow: 0 0 40px rgba(102,126,234,0.15);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ── LIVE TICKER ── */
+        .transaction-ticker {
+            background: var(--primary-grad);
+            color: white;
+            padding: 10px 16px;
+            overflow: hidden;
+            font-size: 13px;
+        }
+        .ticker-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: tickerSlide 0.4s ease-out;
+        }
+        @keyframes tickerSlide { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        .ticker-icon { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        .ticker-amount { font-weight: 700; color: #fef08a; margin-left: 4px; }
+
+        /* ── HEADER ── */
+        .header {
+            background: var(--primary-grad);
+            color: white;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .logo-icon {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        .header-actions { display: flex; gap: 14px; }
+        .header-btn {
+            background: rgba(255,255,255,0.18);
+            border: none; color: white;
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 17px;
+            transition: background 0.2s;
+        }
+        .header-btn:hover { background: rgba(255,255,255,0.3); }
+
+        /* ── PAGE SECTIONS ── */
+        .page-section { display: none; padding-bottom: calc(var(--nav-h) + 16px); }
+        .page-section.active { display: block; }
+
+        /* ── BALANCE CARD ── */
+        .balance-card {
+            background: var(--primary-grad);
+            color: white;
+            margin: 16px;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(102,126,234,0.35);
+        }
+        .balance-lbl { font-size: 13px; opacity: 0.85; margin-bottom: 6px; }
+        .balance-amt {
+            font-family: 'Outfit', sans-serif;
+            font-size: 38px; font-weight: 800;
+            letter-spacing: -1px; margin-bottom: 20px;
+        }
+        .balance-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .bal-btn {
+            padding: 11px;
+            border: 2px solid rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px; font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .bal-btn:hover { background: rgba(255,255,255,0.3); border-color: white; }
+
+        /* ── QUICK ACTIONS ── */
+        .section-wrap { padding: 16px; }
+        .section-head {
+            font-family: 'Outfit', sans-serif;
+            font-size: 17px; font-weight: 700;
+            color: var(--text); margin-bottom: 14px;
+        }
+        .action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .action-item {
+            background: var(--bg);
+            border-radius: 14px;
+            padding: 14px 8px;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .action-item:hover {
+            background: var(--primary-grad);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.3);
+        }
+        .action-icon { font-size: 26px; margin-bottom: 6px; color: var(--primary); }
+        .action-item:hover .action-icon { color: white; }
+        .action-lbl { font-size: 11px; font-weight: 600; }
+
+        /* ── TRANSACTION ITEMS ── */
+        .tx-list { padding: 0 16px 16px; }
+        .tx-item {
+            background: white;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+            display: flex; align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--card-shadow);
+        }
+        .tx-left { display: flex; align-items: center; gap: 12px; }
+        .tx-icon {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        .tx-icon.in { background: #d1fae5; color: var(--success); }
+        .tx-icon.out { background: #fee2e2; color: var(--danger); }
+        .tx-icon.pend { background: #fef3c7; color: var(--warning); }
+        .tx-name { font-weight: 600; font-size: 14px; }
+        .tx-date { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .tx-amt { font-size: 15px; font-weight: 700; }
+        .tx-amt.pos { color: var(--success); }
+        .tx-amt.neg { color: var(--danger); }
+
+        /* ── CARDS (generic) ── */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 14px;
+            box-shadow: var(--card-shadow);
+        }
+        .card-head {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 14px;
+        }
+        .card-icon {
+            width: 46px; height: 46px;
+            background: var(--primary-grad);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 20px;
+        }
+        .card-title { font-weight: 700; font-size: 15px; }
+        .card-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .card-body { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+
+        /* ── FORMS ── */
+        .form-grp { margin-bottom: 18px; }
+        .form-lbl { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7px; }
+        .form-inp, .form-sel, .form-ta {
+            width: 100%;
+            padding: 13px 14px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+        .form-inp:focus, .form-sel:focus, .form-ta:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102,126,234,0.12);
+        }
+        .form-ta { resize: vertical; min-height: 80px; }
+
+        /* ── BUTTONS ── */
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-grad);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 16px rgba(102,126,234,0.35);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(102,126,234,0.45); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-secondary {
+            padding: 10px 18px;
+            background: var(--bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* ── PAGE TITLE BAR ── */
+        .page-title-bar {
+            display: flex; align-items: center; gap: 12px;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .back-btn {
+            width: 36px; height: 36px;
+            background: var(--bg);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: none;
+            color: var(--text); font-size: 18px;
+            transition: all 0.2s;
+        }
+        .back-btn:hover { background: var(--primary); color: white; }
+        .page-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px; font-weight: 700;
+        }
+
+        /* ══════════════════════════════
+           RECHARGE PAGE
+        ══════════════════════════════ */
+        .amount-label { text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 10px; padding: 0 16px; }
+        .amount-input-wrap { position: relative; margin: 0 16px 16px; }
+        .amount-input {
+            width: 100%;
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 50px 16px 18px;
+            font-size: 22px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: var(--text);
+            outline: none;
+            background: white;
+            transition: border-color 0.2s;
+        }
+        .amount-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(102,126,234,0.12); }
+        .amount-input::placeholder { color: #c4c9d4; font-size: 20px; }
+        .amount-spinners {
+            position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 3px;
+        }
+        .amount-spinners button {
+            background: none; border: none; cursor: pointer;
+            color: var(--text-muted); font-size: 11px; line-height: 1;
+            padding: 2px 4px; transition: color 0.15s;
+        }
+        .amount-spinners button:hover { color: var(--primary); }
+        .error-msg { color: var(--danger); font-size: 12px; padding: 0 16px; margin-bottom: 12px; display: none; }
+
+        .quick-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px; padding: 0 16px; margin-bottom: 20px;
+        }
+        .quick-btn {
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: white;
+            padding: 13px 10px;
+            font-size: 15px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.18s;
+            text-align: center;
+        }
+        .quick-btn:hover, .quick-btn.active {
+            border-color: var(--primary);
+            background: rgba(102,126,234,0.08);
+            color: var(--primary-dark);
+        }
+
+        .pm-section-title {
+            font-size: 12px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding: 0 16px; margin-bottom: 12px;
+        }
+        .payment-cards {
+            display: flex; gap: 12px; overflow-x: auto;
+            padding: 4px 16px 10px; margin-bottom: 0;
+            scrollbar-width: none;
+        }
+        .payment-cards::-webkit-scrollbar { display: none; }
+        .payment-card {
+            min-width: 190px; flex-shrink: 0;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            background: var(--primary-grad);
+            color: white; padding: 16px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .payment-card.active, .payment-card:hover {
+            box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,0.5);
+        }
+        .payment-card-top {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: rgba(255,255,255,0.18);
+            border-radius: 10px; padding: 9px 12px;
+            font-size: 14px; font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .payment-card h5 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+        .payment-card p { font-size: 12px; opacity: 0.85; }
+
+        .swiper-dots { display: flex; justify-content: center; gap: 6px; margin: 10px 0 20px; }
+        .swiper-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: background 0.2s; cursor: pointer; }
+        .swiper-dot.active { background: var(--primary); }
+
+        .notes-card {
+            background: rgba(102,126,234,0.06);
+            border-left: 4px solid var(--primary);
+            border-radius: 12px;
+            padding: 14px 16px; margin: 0 16px 20px;
+        }
+        .notes-card p { font-size: 12.5px; color: var(--text-muted); line-height: 1.7; margin-bottom: 5px; }
+        .notes-card p:last-child { margin-bottom: 0; }
+        .notes-card span { color: var(--primary); font-weight: 700; }
+        .recharge-submit { margin: 0 16px 16px; }
+
+        /* ══════════════════════════════
+           WITHDRAWAL PAGE
+        ══════════════════════════════ */
+        .wd-balance-card {
+            background: var(--primary-grad);
+            color: white; border-radius: 20px;
+            margin: 16px; padding: 22px;
+            box-shadow: 0 8px 32px rgba(102,126,234,0.3);
+        }
+        .wd-bal-lbl { font-size: 13px; opacity: 0.85; margin-bottom: 5px; }
+        .wd-bal-amt { font-family: 'Outfit', sans-serif; font-size: 34px; font-weight: 800; margin-bottom: 6px; }
+        .wd-bal-sub { font-size: 13px; opacity: 0.85; }
+
+        .tab-bar {
+            display: flex; border-bottom: 2px solid var(--border);
+            margin: 0 16px 16px; gap: 4px;
+        }
+        .tab-btn {
+            flex: 1; padding: 10px 4px;
+            background: none; border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-muted); font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+        }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-content { display: none; padding: 0 16px; }
+        .tab-content.active { display: block; }
+
+        .bank-display-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white; border-radius: 16px;
+            padding: 18px; margin-bottom: 14px; position: relative; overflow: hidden;
+        }
+        .bank-display-card::before {
+            content: '';
+            position: absolute; width: 160px; height: 160px;
+            background: rgba(255,255,255,0.1); border-radius: 50%;
+            top: -80px; right: -80px;
+        }
+        .bdc-info { position: relative; z-index: 1; }
+        .bdc-name { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+        .bdc-number { font-size: 18px; letter-spacing: 2px; margin-bottom: 6px; }
+        .bdc-holder { font-size: 13px; opacity: 0.9; }
+
+        .wd-info-box {
+            background: rgba(102,126,234,0.06);
+            border-left: 4px solid var(--primary);
+            border-radius: 12px; padding: 14px;
+            margin-bottom: 18px;
+        }
+        .wd-info-box strong { font-size: 14px; display: block; margin-bottom: 8px; color: var(--text); }
+        .wd-info-box ul { padding-left: 18px; }
+        .wd-info-box li { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+
+        .quick-amounts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+        .qa-btn {
+            padding: 10px 4px;
+            border: 2px solid var(--primary);
+            background: white; color: var(--primary);
+            border-radius: 10px; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .qa-btn:hover, .qa-btn.active { background: var(--primary); color: white; }
+
+        .wd-summary {
+            background: var(--bg); border-radius: 12px;
+            padding: 14px; margin-bottom: 16px; display: none;
+        }
+        .wd-summary-title { font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+        .wd-summary-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; }
+        .wd-summary-row.total { border-top: 1px solid var(--border); padding-top: 8px; font-weight: 700; color: var(--success); }
+
+        .wd-record {
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
+        }
+        .wd-record:last-child { border-bottom: none; }
+        .wd-record-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .wd-record-amt { font-size: 17px; font-weight: 700; color: var(--danger); }
+        .wd-record-status {
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+        }
+        .s-pending { background: #fef3c7; color: #92400e; }
+        .s-completed { background: #d1fae5; color: #065f46; }
+        .s-failed { background: #fee2e2; color: #991b1b; }
+        .wd-record-detail { font-size: 12px; color: var(--text-muted); }
+
+        .no-data { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+        .no-data i { font-size: 48px; margin-bottom: 14px; display: block; opacity: 0.3; }
+
+        /* ══════════════════════════════
+           POPULAR ITEMS PAGE
+        ══════════════════════════════ */
+        .search-bar {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; background: white; z-index: 50;
+        }
+        .search-inner {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--bg); border-radius: 12px; padding: 10px 14px;
+        }
+        .search-inner i { color: var(--text-muted); }
+        .search-inner input {
+            flex: 1; border: none; background: transparent;
+            outline: none; font-size: 14px; font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+        }
+        .search-inner button {
+            background: none; border: none;
+            color: var(--primary); font-size: 14px; font-weight: 600; cursor: pointer;
+        }
+
+        .products-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 14px; padding: 14px 14px 0;
+        }
+        .product-card {
+            background: white; border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+        .product-img {
+            width: 100%; aspect-ratio: 1;
+            object-fit: cover; background: var(--bg);
+            display: block;
+        }
+        .product-info { padding: 10px 12px 12px; }
+        .product-title {
+            font-size: 12.5px; color: var(--primary-dark);
+            line-height: 1.45; margin-bottom: 7px;
+            height: 3.6em; overflow: hidden;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+        }
+        .product-price { font-size: 11.5px; color: var(--text-muted); margin-bottom: 5px; }
+        .price-val { color: #ef4444; font-weight: 700; font-size: 15px; }
+        .stars { display: flex; gap: 1px; }
+        .star { color: #fbbf24; font-size: 13px; }
+        .star.empty { color: var(--border); }
+
+        .pop-footer { padding: 16px; text-align: center; }
+        .no-results { text-align: center; padding: 40px; color: var(--text-muted); display: none; }
+
+        /* ══════════════════════════════
+           ABOUT PAGE
+        ══════════════════════════════ */
+        .about-hero {
+            background: var(--primary-grad);
+            color: white; padding: 40px 20px 32px;
+            text-align: center;
+        }
+        .about-logo-circle {
+            width: 90px; height: 90px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 44px;
+        }
+        .about-brand { font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+        .about-tagline { font-size: 14px; opacity: 0.9; }
+
+        .about-body { padding: 16px; }
+        .about-card {
+            background: white; border-radius: 16px;
+            padding: 20px; margin-bottom: 14px;
+            box-shadow: var(--card-shadow);
+        }
+        .about-card h3 { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; color: var(--primary-dark); margin-bottom: 10px; }
+        .about-card p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+        .feature-list { list-style: none; padding: 0; }
+        .feature-list li {
+            padding: 10px 0; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px;
+            font-size: 14px; color: var(--text-muted);
+        }
+        .feature-list li:last-child { border-bottom: none; }
+        .feature-list i { color: var(--success); font-size: 18px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 14px; }
+        .stat-card {
+            background: white; border-radius: 16px;
+            padding: 20px; text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+        .stat-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px; font-weight: 800;
+            background: var(--primary-grad);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; margin-bottom: 4px;
+        }
+        .stat-lbl { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+        .contact-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text-muted); }
+        .contact-row:last-child { border-bottom: none; }
+        .contact-row i { color: var(--primary); font-size: 18px; width: 24px; text-align: center; }
+
+        /* ══════════════════════════════
+           BOTTOM NAV
+        ══════════════════════════════ */
+        /* ── BOTTOM NAV ── */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 500px;
+            height: var(--nav-h);
+            background: white;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            z-index: 200;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #aaa;
+            font-size: 10.5px;
+            font-weight: 600;
+            flex: 1;
+            padding: 6px 0;
+            transition: color 0.15s;
+        }
+        .nav-item.active, .nav-item:hover { color: #0bb1b3; }
+        .nav-item i { font-size: 21px; }
+        .nav-start-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        .nav-start-btn {
+            width: 58px; height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(138deg, rgba(0,0,0,.15) 0%, transparent 70%), #0bb1b3;
+            border: 4px solid white;
+            outline: 3px solid #0bb1b3;
+            box-shadow: 0 4px 16px rgba(11,177,179,0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-top: -28px;
+            transition: all 0.2s;
+            color: white;
+            font-size: 24px;
+            text-decoration: none;
+        }
+        .nav-start-btn:hover { transform: scale(1.08); box-shadow: 0 8px 24px rgba(11,177,179,0.55); }
+        .nav-start-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #0bb1b3;
+        }
+
+        /* ══════════════════════════════
+           MODALS
+        ══════════════════════════════ */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000; display: none;
+            align-items: flex-end; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-sheet {
+            background: white; border-radius: 24px 24px 0 0;
+            padding: 24px; width: 100%; max-width: 500px;
+            animation: slideUp 0.3s cubic-bezier(0.22,1,0.36,1);
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-title { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+        .modal-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+        .modal-row {
+            display: flex; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        .modal-row:last-of-type { border-bottom: none; }
+        .modal-row span:first-child { color: var(--text-muted); }
+        .modal-row span:last-child { font-weight: 600; }
+        .modal-highlight { color: var(--primary); font-size: 18px !important; font-weight: 800 !important; }
+        .modal-cancel { display: block; text-align: center; margin-top: 12px; color: var(--text-muted); font-size: 14px; cursor: pointer; }
+
+        /* Generic centered modal */
+        .modal-centered {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000; display: none;
+            align-items: center; justify-content: center; padding: 16px;
+        }
+        .modal-centered.open { display: flex; }
+        .modal-box {
+            background: white; border-radius: 20px;
+            padding: 24px; width: 100%; max-width: 440px;
+            animation: fadeIn 0.25s ease;
+            max-height: 90vh; overflow-y: auto;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-box-head {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-box-title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 700; }
+        .modal-close-btn {
+            background: var(--bg); border: none; border-radius: 8px;
+            width: 32px; height: 32px; cursor: pointer;
+            font-size: 20px; color: var(--text-muted);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-close-btn:hover { background: var(--danger); color: white; }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed; bottom: calc(var(--nav-h) + 16px); left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #1f2937; color: white;
+            padding: 12px 24px; border-radius: 100px;
+            font-size: 14px; font-weight: 500;
+            opacity: 0; transition: all 0.3s;
+            z-index: 3000; white-space: nowrap;
+            max-width: 90%;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ── ALERT BOXES ── */
+        .alert-info { background: rgba(102,126,234,0.08); border-left: 4px solid var(--primary); border-radius: 10px; padding: 12px 14px; font-size: 13px; color: var(--text); margin-bottom: 14px; }
+        .alert-warn { background: #fef3c7; border-left: 4px solid var(--warning); border-radius: 10px; padding: 12px 14px; font-size: 13px; color: var(--text); margin-bottom: 14px; }
+        .alert-success { background: #d1fae5; border-left: 4px solid var(--success); border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #065f46; margin-bottom: 14px; }
+
+        /* ── ERROR MSG ── */
+        .field-err { font-size: 12px; color: var(--danger); margin-top: -10px; margin-bottom: 12px; display: none; }
+        .inp-error { border-color: var(--danger) !important; }
+        .shake { animation: shake 0.3s; }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+        /* ── SUCCESS MODAL ── */
+        .success-modal-body { text-align: center; padding: 10px 0; }
+        .success-icon { font-size: 64px; color: var(--success); margin-bottom: 16px; display: block; }
+        .success-title { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+        .success-msg { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+
+        /* ── REFERRAL CARD ── */
+        .referral-card {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white; margin: 0 16px 16px;
+            border-radius: 20px; padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+        }
+        .ref-card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px; font-weight: 700;
+            opacity: 0.6; text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 14px;
+        }
+        .ref-stats-row {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 12px; margin-bottom: 16px;
+        }
+        .ref-stat {
+            background: rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 14px 12px; text-align: center;
+        }
+        .ref-stat-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px; font-weight: 800;
+            color: #a78bfa; margin-bottom: 4px;
+        }
+        .ref-stat-lbl { font-size: 11px; opacity: 0.65; }
+        .ref-code-box {
+            background: rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 14px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .ref-code-left { }
+        .ref-code-label { font-size: 11px; opacity: 0.6; margin-bottom: 4px; }
+        .ref-code-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px; font-weight: 800;
+            letter-spacing: 3px; color: #fbbf24;
+        }
+        .ref-copy-btn {
+            background: rgba(251,191,36,0.2);
+            border: 1.5px solid rgba(251,191,36,0.4);
+            color: #fbbf24; border-radius: 10px;
+            padding: 8px 14px; font-size: 13px;
+            font-weight: 700; cursor: pointer;
+            transition: all 0.2s; display: flex;
+            align-items: center; gap: 6px;
+            white-space: nowrap;
+        }
+        .ref-copy-btn:hover { background: rgba(251,191,36,0.35); }
+        .ref-share-btn {
+            width: 100%; margin-top: 12px;
+            padding: 12px; border-radius: 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none; color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px; font-weight: 700;
+            cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center;
+            justify-content: center; gap: 8px;
+        }
+        .ref-share-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102,126,234,0.4); }
+
+        /* ── REFERRED USERS LIST ── */
+        .ref-users-section {
+            margin-top: 14px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .ref-users-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 11px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .ref-users-title {
+            font-size: 12px; font-weight: 700;
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase; letter-spacing: 0.8px;
+        }
+        .ref-users-badge {
+            background: rgba(167,139,250,0.25);
+            color: #a78bfa;
+            font-size: 11px; font-weight: 700;
+            padding: 2px 8px; border-radius: 20px;
+        }
+        .ref-user-row {
+            display: flex; align-items: center;
+            padding: 10px 14px; gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.2s;
+        }
+        .ref-user-row:last-child { border-bottom: none; }
+        .ref-user-row:hover { background: rgba(255,255,255,0.05); }
+        .ref-user-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; color: white;
+            flex-shrink: 0;
+        }
+        .ref-user-info { flex: 1; min-width: 0; }
+        .ref-user-phone {
+            font-size: 13px; font-weight: 600; color: white;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .ref-user-date { font-size: 10px; color: rgba(255,255,255,0.45); margin-top: 1px; }
+        .ref-user-balance {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px; font-weight: 700; color: #34d399;
+            white-space: nowrap;
+        }
+        .ref-users-empty {
+            text-align: center; padding: 20px;
+            font-size: 13px; color: rgba(255,255,255,0.4);
+        }
+        .ref-users-loading {
+            padding: 16px; display: flex; flex-direction: column; gap: 8px;
+        }
+        .ref-skel {
+            height: 40px; border-radius: 10px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+        }
+        .ref-code-loading {
+            display: inline-block;
+            width: 80px; height: 22px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+            border-radius: 6px;
+            vertical-align: middle;
+        }
+
+        /* ── DESKTOP ADAPTATION ── */
+        @media (min-width: 501px) {
+            body { background: #1a1a2e; }
+        }
+        @media (max-width: 380px) {
+            .action-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+            .action-icon { font-size: 22px; }
+        }
+
+        /* ── TRANSACTION PRO STYLES ── */
+        .tx-item-pro { border-radius: 16px; padding: 15px 16px; transition: background 0.15s; }
+        .tx-item-pro:hover { background: var(--bg); }
+        .tx-icon-pro {
+            width: 44px; height: 44px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 17px; flex-shrink: 0;
+        }
+        .tx-status-badge {
+            display: inline-block;
+            font-size: 10px; font-weight: 700;
+            padding: 2px 7px; border-radius: 20px;
+            vertical-align: middle; margin-left: 5px;
+            text-transform: capitalize;
+        }
+        .s-pending { background: #fef3c7; color: #92400e; }
+        .s-completed { background: #d1fae5; color: #065f46; }
+        .s-failed { background: #fee2e2; color: #991b1b; }
+        .s-processing { background: #dbeafe; color: #1e40af; }
+
+        /* Skeleton loader */
+        .tx-loading { padding: 0 16px; }
+        .tx-skeleton {
+            height: 68px; border-radius: 16px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+            margin-bottom: 10px;
+        }
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+        /* Empty state */
+        .tx-empty {
+            text-align: center; padding: 36px 24px;
+        }
+        .tx-empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+        .tx-empty-title { font-family:'Outfit',sans-serif; font-weight:700; font-size:16px; color:var(--text); margin-bottom:6px; }
+        .tx-empty-sub { font-size:13px; color:var(--text-muted); }
+
+        /* ── LIVE WITHDRAWAL FEED ── */
+        .live-feed-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .live-dot-wrap {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #ff3b3b;
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+        .live-dot {
+            width: 6px; height: 6px;
+            background: white;
+            border-radius: 50%;
+            animation: livePulse 1s infinite;
+        }
+        @keyframes livePulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+        .live-feed-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: 0.3px;
+        }
+
+        .live-feed-scroll {
+            padding: 0 16px;
+            overflow: hidden;
+        }
+        .live-feed-inner {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+        .feed-card {
+            background: white;
+            border-radius: 14px;
+            border: 1.5px solid var(--border);
+            padding: 13px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 3.5px solid #10b981;
+        }
+        .feed-left {
+            display: flex; align-items: center; gap: 10px; min-width: 0;
+        }
+        .feed-avatar {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: var(--primary-grad);
+            color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px; font-weight: 700;
+            flex-shrink: 0;
+        }
+        .feed-phone {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: 0.2px;
+        }
+        .feed-center {
+            flex: 1; text-align: center;
+        }
+        .feed-amount {
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            color: #059669;
+        }
+        .feed-currency {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .feed-date {
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* ── PARTNERS ── */
+        .partners-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 0 16px;
+        }
+        .partner-logo {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 64px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            overflow: hidden;
+        }
+        .partner-logo:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 14px rgba(102,126,234,0.18);
+            transform: translateY(-2px);
+        }
+        .partner-logo img {
+            max-width: 90px;
+            max-height: 36px;
+            object-fit: contain;
+            filter: grayscale(30%);
+            transition: filter 0.2s;
+        }
+        .partner-logo:hover img { filter: grayscale(0%); }
+        .partner-logo-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text);
+            text-align: center;
+            letter-spacing: -0.3px;
+        }
+    </style>
+</head>
+<body>
+<!-- Auth Loading Overlay -->
+<div id="authLoadingOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#f5f6fa;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+    <div style="width:60px;height:60px;border:4px solid #e5e7eb;border-top-color:#667eea;border-radius:50%;animation:spin 1s linear infinite;"></div>
+    <div style="margin-top:20px;color:#667eea;font-family:'DM Sans',sans-serif;font-weight:600;">Verifying authentication...</div>
+</div>
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<div class="wrapper" style="display:none;" id="mainWrapper">
+
+    <!-- ── LIVE TICKER ── -->
+    <div class="transaction-ticker" id="transactionTicker">
+        <div class="ticker-content">
+            <i class="fas fa-chart-line ticker-icon"></i>
+            <span id="tickerName">Sarah M.</span> just
+            <span id="tickerAction">deposited</span>
+            <span class="ticker-amount" id="tickerAmount">$500</span>
+        </div>
+    </div>
+
+    <!-- ── HEADER ── -->
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">🛍️</div>
+            ManifestoShop
+        </div>
+        <div class="header-actions">
+            <button class="header-btn" onclick="openTawkChat()" title="Live Support"><i class="fas fa-headset"></i></button>
+            <button class="header-btn" onclick="showToast('🔔 No new notifications')"><i class="fas fa-bell"></i></button>
+            <button class="header-btn" onclick="handleLogout()" title="Logout" style="background:rgba(239,68,68,0.25);"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════
+         HOME PAGE
+    ════════════════════════════ -->
+    <div id="homePage" class="page-section active">
+
+        <!-- Balance Card -->
+        <div class="balance-card">
+            <div class="balance-lbl">Total Balance</div>
+            <div class="balance-amt" id="homeBalAmt">$0.00</div>
+            <div class="balance-btns">
+                <button class="bal-btn" onclick="window.location.href='withdrawal_record.html'">
+                    <i class="fas fa-arrow-up"></i> Withdraw
+                </button>
+                <button class="bal-btn" onclick="window.location.href='recharge.html'">
+                    <i class="fas fa-arrow-down"></i> Recharge
+                </button>
+            </div>
+        </div>
+
+        <!-- Referral Card -->
+        <div class="referral-card">
+            <div class="ref-card-title">🔗 My Referral Dashboard</div>
+            <div class="ref-stats-row">
+                <div class="ref-stat">
+                    <div class="ref-stat-num" id="refTotalCount"><span class="ref-code-loading" style="width:40px;height:28px;display:inline-block;"></span></div>
+                    <div class="ref-stat-lbl">Total Referrals</div>
+                </div>
+                <div class="ref-stat">
+                    <div class="ref-stat-num" id="refBalDisplay"><span class="ref-code-loading" style="width:60px;height:28px;display:inline-block;"></span></div>
+                    <div class="ref-stat-lbl">My Balance</div>
+                </div>
+            </div>
+            <div class="ref-code-box">
+                <div class="ref-code-left">
+                    <div class="ref-code-label">Your Invite Code</div>
+                    <div class="ref-code-value" id="myInviteCode"><span class="ref-code-loading"></span></div>
+                </div>
+                <button class="ref-copy-btn" onclick="copyInviteCode()">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+            </div>
+            <button class="ref-share-btn" onclick="shareInviteLink()">
+                <i class="fas fa-share-alt"></i> Share My Invite Link
+            </button>
+
+            <!-- Referred Users Performance -->
+            <div class="ref-users-section">
+                <div class="ref-users-header">
+                    <span class="ref-users-title">👥 My Referred Users</span>
+                    <span class="ref-users-badge" id="refUsersBadge">0</span>
+                </div>
+                <div id="refUsersList">
+                    <div class="ref-users-loading">
+                        <div class="ref-skel"></div>
+                        <div class="ref-skel"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section-wrap">
+            <div class="section-head">Quick Actions</div>
+            <div class="action-grid">
+                <a class="action-item" onclick="goTo('withdrawPage','navWithdraw'); return false;" href="#">
+                    <div class="action-icon"><i class="fas fa-arrow-circle-up"></i></div>
+                    <div class="action-lbl">Withdraw</div>
+                </a>
+                <a class="action-item" href="recharge.html">
+                    <div class="action-icon"><i class="fas fa-arrow-circle-down"></i></div>
+                    <div class="action-lbl">Recharge</div>
+                </a>
+                <a class="action-item" href="grab_an_order.html">
+                    <div class="action-icon"><i class="fas fa-rocket"></i></div>
+                    <div class="action-lbl">Orders</div>
+                </a>
+                <a class="action-item" onclick="goTo('popularPage','navPopular'); return false;" href="#">
+                    <div class="action-icon"><i class="fas fa-fire"></i></div>
+                    <div class="action-lbl">Popular</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="section-wrap" style="padding-top: 0;">
+            <!-- Orders Promo Banner -->
+            <a href="grab_an_order.html" style="text-decoration:none; display:block; margin-bottom:16px;">
+                <div style="
+                    background: linear-gradient(138deg, rgba(0,0,0,.18) 0%, transparent 70%), #0bb1b3;
+                    border-radius: 16px;
+                    padding: 16px 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    box-shadow: 0 6px 20px rgba(11,177,179,0.35);
+                ">
+                    <div>
+                        <div style="color:white; font-family:'Outfit',sans-serif; font-size:16px; font-weight:800; margin-bottom:4px;">🚀 Grab Orders & Earn!</div>
+                        <div style="color:rgba(255,255,255,0.88); font-size:12.5px;">Complete orders and earn daily commission</div>
+                    </div>
+                    <div style="
+                        background: rgba(255,255,255,0.22);
+                        border-radius: 12px;
+                        padding: 10px 14px;
+                        color: white;
+                        font-family: 'Outfit', sans-serif;
+                        font-size: 13px;
+                        font-weight: 700;
+                        white-space: nowrap;
+                    ">Start Now →</div>
+                </div>
+            </a>
+            <div class="section-head">Recent Transactions</div>
+        </div>
+        <div class="tx-list" id="homeTxList">
+            <!-- populated by JS -->
+        </div>
+
+        <!-- ── LIVE WITHDRAWAL FEED ── -->
+        <div class="section-wrap" style="padding-top:0;">
+            <div class="live-feed-header">
+                <span class="live-dot-wrap"><span class="live-dot"></span>LIVE</span>
+                <span class="live-feed-title">WITHDRAWAL INFORMATION</span>
+            </div>
+        </div>
+        <div class="live-feed-scroll" id="liveFeedScroll">
+            <div class="live-feed-inner" id="liveFeedInner">
+                <!-- populated by JS -->
+            </div>
+        </div>
+
+        <!-- ── PARTNERS ── -->
+        <div class="section-wrap" style="padding-top:20px; padding-bottom:0;">
+            <div class="section-head">Partner Brands</div>
+        </div>
+        <div class="partners-grid">
+            <div class="partner-logo"><div class="partner-logo-text" style="color:#000; font-style:italic; font-size:17px; font-weight:900;">ZARA</div></div>
+            <div class="partner-logo"><div class="partner-logo-text" style="color:#e22222; font-size:16px; font-weight:900; letter-spacing:-0.5px;">H&amp;M</div></div>
+            <div class="partner-logo"><div class="partner-logo-text" style="color:#000; font-size:14px; letter-spacing:2px; font-weight:900;">ADIDAS</div></div>
+            <div class="partner-logo"><div class="partner-logo-text" style="color:#f97316; font-size:14px; letter-spacing:1px; font-weight:900;">UNIQLO</div></div>
+            <div class="partner-logo"><div class="partner-logo-text" style="color:#e91e8c; font-size:13px; font-weight:900; letter-spacing:0.5px;">SEPHORA</div></div>
+            <div class="partner-logo"><div class="partner-logo-text" style="color:#ee4d2d; font-size:13px; font-weight:900;">Shopee</div></div>
+            <div class="partner-logo"><div class="partner-logo-text" style="color:#00aaec; font-size:13px; font-weight:900; letter-spacing:0.5px;">ZALORA</div></div>
+            <div class="partner-logo"><div class="partner-logo-text" style="color:#5b2d8e; font-size:11px; font-weight:900; letter-spacing:1px;">FARFETCH</div></div>
+            <div class="partner-logo"><div class="partner-logo-text" style="color:#d4aa70; font-size:11px; font-weight:900; letter-spacing:1.5px;">CHARLES &amp; KEITH</div></div>
+        </div>
+        <div style="height:16px;"></div>
+    </div>
+
+    <!-- ════════════════════════════
+         RECHARGE PAGE
+    ════════════════════════════ -->
+    <div id="rechargePage" class="page-section">
+        <div class="page-title-bar">
+            <button class="back-btn" onclick="goTo('homePage','navHome')"><i class="fas fa-arrow-left"></i></button>
+            <div class="page-title">Recharge Account</div>
+        </div>
+
+        <p class="amount-label" style="margin-top:18px;">Enter recharge amount</p>
+
+        <div class="amount-input-wrap">
+            <input id="rechargeAmtInput" class="amount-input" type="number"
+                   placeholder="0.00" min="50" step="0.01" oninput="onRechargeAmtType()">
+            <div class="amount-spinners">
+                <button onclick="stepRecharge(100)" title="Increase">▲</button>
+                <button onclick="stepRecharge(-100)" title="Decrease">▼</button>
+            </div>
+        </div>
+        <div class="error-msg" id="rechargeAmtErr">Please enter a valid amount (min $50)</div>
+
+        <div class="quick-grid">
+            <button class="quick-btn" onclick="selectRecharge(100)">$100.00</button>
+            <button class="quick-btn" onclick="selectRecharge(200)">$200.00</button>
+            <button class="quick-btn" onclick="selectRecharge(500)">$500.00</button>
+            <button class="quick-btn" onclick="selectRecharge(1000)">$1,000.00</button>
+            <button class="quick-btn" onclick="selectRecharge(2000)">$2,000.00</button>
+            <button class="quick-btn" onclick="selectRecharge(5000)">$5,000.00</button>
+        </div>
+
+        <p class="pm-section-title">Select Payment Method</p>
+        <div class="payment-cards" id="rechargePayCards">
+            <div class="payment-card active" data-method="USDT" onclick="selectPayMethod(this)">
+                <div class="payment-card-top"><i class="fas fa-credit-card"></i> RECHARGE</div>
+                <h5>USDT</h5>
+                <p>$50 ~ $1,000,000</p>
+            </div>
+            <div class="payment-card" data-method="BTC" onclick="selectPayMethod(this)">
+                <div class="payment-card-top"><i class="fab fa-bitcoin"></i> RECHARGE</div>
+                <h5>Bitcoin</h5>
+                <p>$100 ~ $1,000,000</p>
+            </div>
+            <div class="payment-card" data-method="ETH" onclick="selectPayMethod(this)">
+                <div class="payment-card-top"><i class="fas fa-coins"></i> RECHARGE</div>
+                <h5>Ethereum</h5>
+                <p>$50 ~ $1,000,000</p>
+            </div>
+        </div>
+        <div class="swiper-dots">
+            <div class="swiper-dot active" id="rdot0"></div>
+            <div class="swiper-dot" id="rdot1"></div>
+            <div class="swiper-dot" id="rdot2"></div>
+        </div>
+
+        <div class="notes-card">
+            <p><span>*1.</span> The payment amount must match the order amount exactly, otherwise it will not arrive automatically.</p>
+            <p><span>*2.</span> If you do not receive your recharge within 15 minutes, please contact customer support.</p>
+        </div>
+
+        <div class="recharge-submit">
+            <button class="btn-primary" onclick="handleRechargeSubmit()">
+                <i class="fas fa-bolt"></i> Recharge Now
+            </button>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════
+         WITHDRAWAL PAGE
+    ════════════════════════════ -->
+    <div id="withdrawPage" class="page-section">
+        <div class="page-title-bar">
+            <button class="back-btn" onclick="goTo('homePage','navHome')"><i class="fas fa-arrow-left"></i></button>
+            <div class="page-title">Withdrawal</div>
+        </div>
+
+        <!-- Balance display -->
+        <div class="wd-balance-card">
+            <div class="wd-bal-lbl">Available Balance</div>
+            <div class="wd-bal-amt">$<span id="wdBalAmt">0.00</span></div>
+            <div class="wd-bal-sub">Total Withdrawn: $<span id="wdTotalWithdrawn">0.00</span></div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchWdTab('wdTabWithdraw', this)" id="wdBtnWithdraw">
+                <i class="material-icons" style="font-size:18px;">account_balance_wallet</i>
+                Withdraw
+            </button>
+            <button class="tab-btn" onclick="switchWdTab('wdTabHistory', this)" id="wdBtnHistory">
+                <i class="material-icons" style="font-size:18px;">history</i>
+                History
+            </button>
+            <button class="tab-btn" onclick="switchWdTab('wdTabBank', this)" id="wdBtnBank">
+                <i class="material-icons" style="font-size:18px;">credit_card</i>
+                Bank
+            </button>
+        </div>
+
+        <!-- Withdraw Tab -->
+        <div id="wdTabWithdraw" class="tab-content active">
+            <div id="wdBankDisplay"></div>
+
+            <div class="wd-info-box">
+                <strong><i class="fas fa-info-circle"></i> Important Information</strong>
+                <ul>
+                    <li>Minimum withdrawal: $50</li>
+                    <li>Maximum per transaction: $10,000</li>
+                    <li>Processing time: 1–3 business days</li>
+                    <li>Fee: 2% (minimum $2)</li>
+                </ul>
+            </div>
+
+            <div class="section-head" style="margin-bottom:10px;">Quick Amount</div>
+            <div class="quick-amounts-grid">
+                <button class="qa-btn" onclick="selectWdAmt(100, this)">$100</button>
+                <button class="qa-btn" onclick="selectWdAmt(500, this)">$500</button>
+                <button class="qa-btn" onclick="selectWdAmt(1000, this)">$1,000</button>
+                <button class="qa-btn" onclick="selectWdAmt(2000, this)">$2,000</button>
+                <button class="qa-btn" onclick="selectWdAmt(5000, this)">$5,000</button>
+                <button class="qa-btn" onclick="selectWdAmtAll(this)">All</button>
+            </div>
+
+            <div class="form-grp">
+                <label class="form-lbl">Withdrawal Amount (USD)</label>
+                <input type="number" class="form-inp" id="wdAmtInput"
+                       placeholder="Enter amount" min="50" max="10000" step="0.01"
+                       oninput="calcWdFee()">
+                <div class="field-err" id="wdAmtErr"></div>
+                <small id="wdFeeInfo" style="color:var(--text-muted); font-size:12px; display:block; margin-top:6px;"></small>
+            </div>
+
+            <div id="wdSummary" class="wd-summary">
+                <div class="wd-summary-title">Withdrawal Summary</div>
+                <div class="wd-summary-row"><span>Amount:</span><span id="wdSumAmt">$0.00</span></div>
+                <div class="wd-summary-row"><span>Fee (2%):</span><span id="wdSumFee">$0.00</span></div>
+                <div class="wd-summary-row total"><span>You will receive:</span><span id="wdSumNet">$0.00</span></div>
+            </div>
+
+            <div class="form-grp">
+                <label class="form-lbl">Transaction Password</label>
+                <input type="password" class="form-inp" id="wdPassword" placeholder="Enter your account password">
+                <small style="color:var(--text-muted); font-size:12px; margin-top:6px; display:block;">Enter your account password to confirm</small>
+            </div>
+
+            <div class="form-grp">
+                <label class="form-lbl">Note (Optional)</label>
+                <textarea class="form-ta" id="wdNote" placeholder="Add a note for this withdrawal"></textarea>
+            </div>
+
+            <button class="btn-primary" onclick="submitWithdrawal()" style="margin-bottom:20px;">
+                <i class="fas fa-paper-plane"></i> Submit Withdrawal Request
+            </button>
+        </div>
+
+        <!-- History Tab -->
+        <div id="wdTabHistory" class="tab-content">
+            <div id="wdHistoryList"></div>
+        </div>
+
+        <!-- Bank Tab -->
+        <div id="wdTabBank" class="tab-content">
+            <div id="wdBankManage"></div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════
+         POPULAR ITEMS PAGE
+    ════════════════════════════ -->
+    <div id="popularPage" class="page-section">
+        <div class="page-title-bar">
+            <button class="back-btn" onclick="goTo('homePage','navHome')"><i class="fas fa-arrow-left"></i></button>
+            <div class="page-title">🔥 Popular Items</div>
+        </div>
+
+        <div class="search-bar">
+            <div class="search-inner">
+                <i class="fas fa-search"></i>
+                <input type="text" id="productSearch" placeholder="Search products..."
+                       onkeypress="if(event.key==='Enter') searchProducts()">
+                <button onclick="searchProducts()">Search</button>
+            </div>
+        </div>
+
+        <div class="products-grid" id="productsGrid"></div>
+        <div class="no-results" id="noResults">
+            <i class="fas fa-search" style="font-size:48px; color:var(--border); display:block; margin-bottom:14px;"></i>
+            No products found
+        </div>
+        <div class="pop-footer">
+            <button class="btn-secondary" id="loadMoreBtn" onclick="loadMoreProducts()" style="padding:12px 32px;">
+                <i class="fas fa-plus"></i> Load More
+            </button>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════
+         ABOUT PAGE
+    ════════════════════════════ -->
+    <div id="aboutPage" class="page-section">
+        <div class="about-hero">
+            <div class="about-logo-circle">🛍️</div>
+            <div class="about-brand">ManifestoShop</div>
+            <div class="about-tagline">Your Premium Shopping Destination</div>
+        </div>
+
+        <div class="about-body">
+            <div class="about-card">
+                <h3>Who We Are</h3>
+                <p>ManifestoShop is a premium digital shopping platform dedicated to bringing you the best products from around the world. Since 2020, we've been committed to making luxury shopping simple, secure, and accessible to everyone.</p>
+            </div>
+
+            <div class="about-card">
+                <h3>Our Mission</h3>
+                <p>To revolutionize the way people shop by providing an innovative, secure, and user-friendly marketplace that empowers individuals to discover and purchase premium products with confidence.</p>
+            </div>
+
+            <div class="about-card">
+                <h3>Key Features</h3>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check-circle"></i> Curated premium product catalog</li>
+                    <li><i class="fas fa-check-circle"></i> Bank-level security & encryption</li>
+                    <li><i class="fas fa-check-circle"></i> 24/7 customer support</li>
+                    <li><i class="fas fa-check-circle"></i> Multi-currency payment support</li>
+                    <li><i class="fas fa-check-circle"></i> Fast, secure withdrawals</li>
+                    <li><i class="fas fa-check-circle"></i> Mobile & web access</li>
+                </ul>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-num">5M+</div><div class="stat-lbl">Happy Customers</div></div>
+                <div class="stat-card"><div class="stat-num">$2B+</div><div class="stat-lbl">Total Transactions</div></div>
+                <div class="stat-card"><div class="stat-num">150+</div><div class="stat-lbl">Countries Served</div></div>
+                <div class="stat-card"><div class="stat-num">99.9%</div><div class="stat-lbl">Platform Uptime</div></div>
+            </div>
+
+            <div class="about-card">
+                <h3>Contact Us</h3>
+                <div class="contact-row"><i class="fas fa-envelope"></i> support@manifestoshop.app</div>
+                <div class="contact-row"><i class="fas fa-phone"></i> +1 (800) 123-4567</div>
+                <div class="contact-row"><i class="fas fa-globe"></i> www.manifestoshop.app</div>
+                <div class="contact-row"><i class="fas fa-map-marker-alt"></i> 123 Commerce Avenue, New York, NY 10001</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── BOTTOM NAV ── -->
+    <nav class="bottom-nav">
+        <a href="#" id="navHome" class="nav-item active" onclick="goTo('homePage','navHome'); return false;">
+            <i class="fas fa-home"></i><span>Home</span>
+        </a>
+        <a href="recharge.html" class="nav-item">
+            <i class="fas fa-plus-circle"></i><span>Recharge</span>
+        </a>
+        <div class="nav-start-wrap">
+            <a class="nav-start-btn" href="grab_an_order.html" title="Start Grabbing Orders">
+                <i class="fas fa-rocket"></i>
+            </a>
+            <span class="nav-start-label">Start</span>
+        </div>
+        <a href="grab_an_order.html" class="nav-item">
+            <i class="fas fa-clipboard-list"></i><span>Order</span>
+        </a>
+        <a href="my.html" class="nav-item">
+            <i class="fas fa-user-circle"></i><span>My</span>
+        </a>
+    </nav>
+</div>
+
+<!-- ── RECHARGE CONFIRMATION MODAL ── -->
+<div class="modal-overlay" id="rechargeModal">
+    <div class="modal-sheet">
+        <div class="modal-title">Confirm Recharge</div>
+        <div class="modal-sub">Please review your recharge details below.</div>
+        <div class="modal-row"><span>Amount</span><span class="modal-highlight" id="rConfirmAmt">–</span></div>
+        <div class="modal-row"><span>Payment Method</span><span id="rConfirmMethod">–</span></div>
+        <div class="modal-row"><span>Processing Time</span><span>Instant ~ 10 mins</span></div>
+        <div class="modal-row"><span>Fee</span><span>$0.00</span></div>
+        <button class="btn-primary" style="margin-top:20px;" onclick="confirmRecharge()">
+            <i class="fas fa-check"></i> Confirm & Pay
+        </button>
+        <span class="modal-cancel" onclick="closeRechargeModal()">Cancel</span>
+    </div>
+</div>
+
+<!-- ── BANK ACCOUNT MODAL ── -->
+<div class="modal-centered" id="bankModal">
+    <div class="modal-box">
+        <div class="modal-box-head">
+            <div class="modal-box-title">Link Bank Account</div>
+            <button class="modal-close-btn" onclick="closeBankModal()">×</button>
+        </div>
+        <form id="bankForm" onsubmit="saveBankAccount(event)">
+            <div class="form-grp">
+                <label class="form-lbl">Bank Name</label>
+                <select class="form-sel" id="bankNameSelect" required>
+                    <option value="">Select your bank</option>
+                    <option>Chase Bank</option>
+                    <option>Bank of America</option>
+                    <option>Wells Fargo</option>
+                    <option>Citibank</option>
+                    <option>HDFC Bank</option>
+                    <option>AXIS Bank</option>
+                    <option>SBI</option>
+                    <option>ICICI Bank</option>
+                    <option>Kotak Bank</option>
+                    <option>HSBC Bank</option>
+                    <option>Standard Chartered</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div class="form-grp">
+                <label class="form-lbl">Account Number</label>
+                <input type="text" class="form-inp" id="bankAccNum" placeholder="Enter account number" required>
+            </div>
+            <div class="form-grp">
+                <label class="form-lbl">Account Holder Name</label>
+                <input type="text" class="form-inp" id="bankHolderName" placeholder="Enter full name" required>
+            </div>
+            <div class="form-grp">
+                <label class="form-lbl">Routing / IFSC Code</label>
+                <input type="text" class="form-inp" id="bankRoutingCode" placeholder="Enter routing/IFSC code" required>
+            </div>
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Save Bank Account
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- ── SUCCESS MODAL ── -->
+<div class="modal-centered" id="successModal">
+    <div class="modal-box">
+        <div class="success-modal-body">
+            <i class="fas fa-check-circle success-icon"></i>
+            <div class="success-title">Success!</div>
+            <p class="success-msg" id="successMsg">Your request has been processed.</p>
+            <button class="btn-primary" onclick="closeSuccessModal()">OK, Got It!</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════
+   CLEANUP & INITIALIZATION
+══════════════════════════════════════════ */
+// Clean up any existing timers to prevent memory leaks and duplicate intervals
+(function cleanupTimers() {
+    if (window._tickerInterval) {
+        clearInterval(window._tickerInterval);
+        window._tickerInterval = null;
+    }
+    if (window._liveFeedTimer) {
+        clearTimeout(window._liveFeedTimer);
+        window._liveFeedTimer = null;
+    }
+    window._liveFeedRunning = false;
+})();
+
+/* ══════════════════════════════════════════
+   CORE DATA & STATE
+══════════════════════════════════════════ */
+let appBalance = parseFloat(sessionStorage.getItem('userBalance') || '0');
+let totalWithdrawn = parseFloat(localStorage.getItem('ms_totalWithdrawn') || '0');
+let withdrawalRecords = JSON.parse(localStorage.getItem('ms_withdrawalRecords') || '[]');
+let bankAccount = JSON.parse(localStorage.getItem('ms_bankAccount') || 'null');
+let selectedPayMethod = 'USDT';
+let popCurrentPage = 1;
+const popItemsPerPage = 20;
+let popDisplayed = [];
+
+function saveAllData() {
+    localStorage.setItem('ms_withdrawalRecords', JSON.stringify(withdrawalRecords));
+    localStorage.setItem('ms_bankAccount', JSON.stringify(bankAccount));
+    localStorage.setItem('ms_totalWithdrawn', totalWithdrawn.toString());
+}
+
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+function goTo(pageId, navId) {
+    document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    // Guard: only add active class if the nav element actually exists in the DOM
+    if (navId) {
+        const navEl = document.getElementById(navId);
+        if (navEl) navEl.classList.add('active');
+    }
+    window.scrollTo(0, 0);
+
+    // Page-specific init
+    if (pageId === 'homePage') updateHomeUI();
+    if (pageId === 'withdrawPage') updateWdUI();
+    if (pageId === 'popularPage' && popDisplayed.length === 0) initPopular();
+}
+
+/* ══════════════════════════════════════════
+   LIVE TICKER
+══════════════════════════════════════════ */
+const tickerNames = [
+    'Sarah M.','James T.','Priya S.','Ahmed K.','Emma W.','Liam B.',
+    'Sophia C.','Raj P.','Isabella L.','Noah D.','Ava R.','Oliver H.',
+    'Mia F.','Ethan N.','Charlotte Y.','Lucas G.','Amelia V.','Mason J.',
+    'Harper Q.','Elijah Z.','Abigail X.','Logan O.','Emily U.','Alexander I.'
+];
+const tickerActions = [
+    {text:'withdrew', color:'#f59e0b'},
+    {text:'deposited', color:'#10b981'},
+    {text:'recharged', color:'#6366f1'},
+    {text:'received', color:'#8b5cf6'}
+];
+const tickerAmts = [50,100,150,200,250,300,500,750,1000,1500,2000];
+let usedTickerNames = new Set();
+
+function updateTicker() {
+    // Don't update ticker if not authenticated
+    if (!window._authVerified) {
+        return;
+    }
+    
+    const ticker = document.getElementById('transactionTicker');
+    if (!ticker) return; // Element not found, bail out
+    
+    const avail = tickerNames.filter(n => !usedTickerNames.has(n));
+    const name = avail.length ? avail[Math.floor(Math.random()*avail.length)] : tickerNames[Math.floor(Math.random()*tickerNames.length)];
+    if (avail.length) usedTickerNames.add(name); else usedTickerNames.clear();
+    const action = tickerActions[Math.floor(Math.random()*tickerActions.length)];
+    const amt = tickerAmts[Math.floor(Math.random()*tickerAmts.length)];
+    ticker.style.background = `linear-gradient(90deg, ${action.color}, ${action.color}cc)`;
+    document.getElementById('tickerName').textContent = name;
+    document.getElementById('tickerAction').textContent = action.text;
+    document.getElementById('tickerAmount').textContent = '$'+amt;
+    const c = ticker.querySelector('.ticker-content');
+    c.style.animation = 'none';
+    setTimeout(() => { c.style.animation = 'tickerSlide 0.4s ease-out'; }, 10);
+}
+// Clear any existing ticker interval before creating a new one
+if (window._tickerInterval) {
+    clearInterval(window._tickerInterval);
+}
+updateTicker();
+window._tickerInterval = setInterval(updateTicker, 4500);
+
+// Pause/resume ticker based on page visibility to save resources
+if (!window._tickerVisibilitySetup) {
+    window._tickerVisibilitySetup = true;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            // Page is hidden, pause the ticker
+            if (window._tickerInterval) {
+                clearInterval(window._tickerInterval);
+                window._tickerInterval = null;
+            }
+        } else {
+            // Page is visible again, resume the ticker
+            if (!window._tickerInterval) {
+                updateTicker();
+                window._tickerInterval = setInterval(updateTicker, 4500);
+            }
+        }
+    });
+}
+
+/* ══════════════════════════════════════════
+   HOME PAGE
+══════════════════════════════════════════ */
+
+function updateHomeUI() {
+    document.getElementById('homeBalAmt').textContent = '$' + appBalance.toFixed(2);
+}
+
+function formatTxDate(ts) {
+    if (!ts) return '';
+    let d;
+    if (ts && ts.toDate) d = ts.toDate();
+    else if (typeof ts === 'string') d = new Date(ts);
+    else d = new Date(ts);
+    const now = new Date();
+    const diff = now - d;
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    if (mins < 2) return 'Just now';
+    if (mins < 60) return `${mins} min ago`;
+    if (hours < 24) return `Today, ${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
+    if (days === 1) return `Yesterday, ${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
+    if (days < 7) return `${days} days ago`;
+    return d.toLocaleDateString([], {month:'short', day:'numeric'});
+}
+
+function getTxIcon(type) {
+    const map = {
+        recharge:  { cls:'in',   icon:'fa-arrow-down',    label:'Recharge',       color:'#d1fae5', fg:'#059669' },
+        withdrawal:{ cls:'out',  icon:'fa-arrow-up',      label:'Withdrawal',     color:'#fee2e2', fg:'#ef4444' },
+        reward:    { cls:'in',   icon:'fa-gift',          label:'Shopping Reward',color:'#ede9fe', fg:'#7c3aed' },
+        bonus:     { cls:'in',   icon:'fa-star',          label:'Bonus',          color:'#fef3c7', fg:'#d97706' },
+        referral:  { cls:'in',   icon:'fa-users',         label:'Referral Bonus', color:'#dbeafe', fg:'#2563eb' },
+    };
+    return map[type] || map['recharge'];
+}
+
+async function loadTransactions() {
+    // Don't load data until auth is verified
+    if (!window._authVerified) {
+        console.log('Waiting for auth verification before loading transactions');
+        return;
+    }
+    
+    const list = document.getElementById('homeTxList');
+    if (!list) return; // Element not found, bail out
+    
+    list.innerHTML = `<div class="tx-loading">
+        <div class="tx-skeleton"></div>
+        <div class="tx-skeleton"></div>
+        <div class="tx-skeleton"></div>
+    </div>`;
+
+    const userId = sessionStorage.getItem('userId');
+    if (!userId) {
+        console.warn('No userId found, cannot load transactions');
+        list.innerHTML = `<div class="tx-empty">
+            <div class="tx-empty-icon">💳</div>
+            <div class="tx-empty-title">Please log in</div>
+            <div class="tx-empty-sub">You need to be logged in to view transactions</div>
+        </div>`;
+        return;
+    }
+    
+    let allTx = [];
+
+    // — Real withdrawals from local state —
+    try {
+        withdrawalRecords.forEach(r => {
+            allTx.push({
+                type: 'withdrawal',
+                title: 'Withdrawal',
+                subtitle: r.bank || 'Bank Transfer',
+                amt: -r.amount,
+                ts: new Date(r.timestamp),
+                status: r.status
+            });
+        });
+    } catch(e) {
+        console.error('Error loading withdrawal records:', e);
+    }
+
+    // — Real recharges from Firestore —
+    if (userId) {
+        try {
+            const snap = await firebase.firestore()
+                .collection('rechargeRequests')
+                .where('userId', '==', userId)
+                .orderBy('createdAt', 'desc')
+                .limit(20)
+                .get();
+            snap.forEach(doc => {
+                const d = doc.data();
+                allTx.push({
+                    type: 'recharge',
+                    title: 'Recharge',
+                    subtitle: d.method || 'USDT',
+                    amt: parseFloat(d.amount) || 0,
+                    ts: d.createdAt,
+                    status: d.status || 'pending'
+                });
+            });
+        } catch(e) {
+            console.warn('Could not load recharge requests:', e);
+            // rechargeRequests may not exist yet for new users
+        }
+
+        // — Referral bonuses from Firestore —
+        try {
+            const rSnap = await firebase.firestore()
+                .collection('referrals')
+                .where('referrerUid', '==', userId)
+                .orderBy('createdAt', 'desc')
+                .limit(10)
+                .get();
+            rSnap.forEach(doc => {
+                const d = doc.data();
+                if (d.bonusAmount) {
+                    allTx.push({
+                        type: 'referral',
+                        title: 'Referral Bonus',
+                        subtitle: 'New member joined',
+                        amt: parseFloat(d.bonusAmount),
+                        ts: d.createdAt,
+                        status: 'completed'
+                    });
+                }
+            });
+        } catch(e) {
+            console.warn('Could not load referral bonuses:', e);
+        }
+    }
+
+    // Sort newest first
+    allTx.sort((a, b) => {
+        const ta = a.ts && a.ts.toDate ? a.ts.toDate() : new Date(a.ts || 0);
+        const tb = b.ts && b.ts.toDate ? b.ts.toDate() : new Date(b.ts || 0);
+        return tb - ta;
+    });
+
+    if (!allTx.length) {
+        list.innerHTML = `
+            <div class="tx-empty">
+                <div class="tx-empty-icon">💳</div>
+                <div class="tx-empty-title">No transactions yet</div>
+                <div class="tx-empty-sub">Your recharges and withdrawals will appear here</div>
+            </div>`;
+        return;
+    }
+
+    let html = '';
+    allTx.slice(0, 8).forEach(tx => {
+        const meta = getTxIcon(tx.type);
+        const sign = tx.amt >= 0 ? '+' : '';
+        const amtStr = sign + '$' + Math.abs(tx.amt).toFixed(2);
+        const posNeg = tx.amt >= 0 ? 'pos' : 'neg';
+        const dateStr = formatTxDate(tx.ts);
+
+        const statusBadge = (tx.status && tx.status !== 'completed')
+            ? `<span class="tx-status-badge s-${tx.status}">${tx.status}</span>` : '';
+
+        html += `
+        <div class="tx-item tx-item-pro">
+            <div class="tx-left">
+                <div class="tx-icon-pro" style="background:${meta.color}; color:${meta.fg}">
+                    <i class="fas ${meta.icon}"></i>
+                </div>
+                <div>
+                    <div class="tx-name">${tx.title} ${statusBadge}</div>
+                    <div class="tx-date">${tx.subtitle} · ${dateStr}</div>
+                </div>
+            </div>
+            <div class="tx-amt ${posNeg}">${amtStr}</div>
+        </div>`;
+    });
+    list.innerHTML = html;
+}
+
+updateHomeUI();
+// Transactions will be loaded after Firebase is ready (see userDataLoaded event below)
+
+/* ══════════════════════════════════════════
+   LIVE WITHDRAWAL FEED
+══════════════════════════════════════════ */
+(function() {
+    // ANIMATION DISABLED to prevent memory leaks - showing static cards only
+    if (window._liveFeedInitialized) return;
+    window._liveFeedInitialized = true;
+
+    function maskedPhone() {
+        const prefix = ['030','031','032','033','034','035','041','042','051','061','071','091','092'];
+        const p = prefix[Math.floor(Math.random() * prefix.length)];
+        const mid = String(Math.floor(Math.random()*900)+100);
+        const end = String(Math.floor(Math.random()*9000)+1000);
+        return p + mid + '***' + end.slice(-4);
+    }
+
+    const amounts = [
+        3200, 5800, 7500, 9200, 11400, 13800, 15600, 18900,
+        21000, 23600, 28500, 32100, 38700, 41200, 47300,
+        54200, 61400, 72100, 80586, 6820, 8200, 12450, 19800
+    ];
+
+    const today = new Date();
+    const dateStr = [
+        String(today.getDate()).padStart(2,'0'),
+        String(today.getMonth()+1).padStart(2,'0'),
+        today.getFullYear()
+    ].join('-');
+
+    const currencies = ['USDT'];
+
+    function makeCard() {
+        const phone = maskedPhone();
+        const amt = amounts[Math.floor(Math.random() * amounts.length)];
+        const currency = currencies[Math.floor(Math.random() * currencies.length)];
+        const card = document.createElement('div');
+        card.className = 'feed-card';
+        card.innerHTML = `
+            <div class="feed-left">
+                <div class="feed-avatar">${phone.charAt(0)}</div>
+                <div class="feed-phone">${phone}</div>
+            </div>
+            <div class="feed-center">
+                <div class="feed-amount">+${amt.toLocaleString()}</div>
+                <div class="feed-currency">${currency}</div>
+            </div>
+            <div class="feed-date">${dateStr}</div>`;
+        return card;
+    }
+
+    const container = document.getElementById('liveFeedInner');
+    if (!container) return;
+
+    // Display 4 static cards - NO ANIMATION to prevent memory leak
+    for (let i = 0; i < 4; i++) container.appendChild(makeCard());
+
+    // ROTATION DISABLED - this was causing browser freeze and out of memory errors
+    // The feed now shows static withdrawal records instead of animating
+})();
+
+/* ══════════════════════════════════════════
+   RECHARGE PAGE
+══════════════════════════════════════════ */
+function selectRecharge(val) {
+    document.getElementById('rechargeAmtInput').value = val.toFixed(2);
+    document.getElementById('rechargeAmtInput').classList.remove('inp-error');
+    document.getElementById('rechargeAmtErr').style.display = 'none';
+    document.querySelectorAll('.quick-btn').forEach(b => {
+        b.classList.toggle('active', parseFloat(b.textContent.replace(/[^0-9.]/g,'')) === val);
+    });
+}
+function onRechargeAmtType() {
+    document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('rechargeAmtInput').classList.remove('inp-error');
+    document.getElementById('rechargeAmtErr').style.display = 'none';
+}
+function stepRecharge(delta) {
+    const inp = document.getElementById('rechargeAmtInput');
+    let v = parseFloat(inp.value) || 0;
+    v = Math.max(0, v + delta);
+    inp.value = v.toFixed(2);
+    onRechargeAmtType();
+}
+function selectPayMethod(card) {
+    document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    selectedPayMethod = card.dataset.method;
+    const cards = document.querySelectorAll('.payment-card');
+    cards.forEach((c, i) => document.getElementById('rdot'+i)?.classList.toggle('active', c===card));
+}
+document.querySelectorAll('.swiper-dot').forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+        const cards = document.querySelectorAll('.payment-card');
+        if (cards[i]) { cards[i].scrollIntoView({behavior:'smooth',inline:'center'}); selectPayMethod(cards[i]); }
+    });
+});
+function handleRechargeSubmit() {
+    const inp = document.getElementById('rechargeAmtInput');
+    const val = parseFloat(inp.value);
+    if (!val || val < 50) {
+        inp.classList.add('inp-error','shake');
+        document.getElementById('rechargeAmtErr').style.display = 'block';
+        setTimeout(() => inp.classList.remove('shake'), 400);
+        return;
+    }
+    document.getElementById('rConfirmAmt').textContent = '$'+val.toFixed(2);
+    document.getElementById('rConfirmMethod').textContent = selectedPayMethod;
+    document.getElementById('rechargeModal').classList.add('open');
+}
+function closeRechargeModal() { document.getElementById('rechargeModal').classList.remove('open'); }
+async function confirmRecharge() {
+    const val = parseFloat(document.getElementById('rechargeAmtInput').value);
+    const userId = sessionStorage.getItem('userId');
+    
+    if (!userId) {
+        showToast('⚠️ Please log in to recharge');
+        return;
+    }
+    
+    closeRechargeModal();
+    
+    try {
+        // Write to Firestore for admin approval (consistent with recharge.html)
+        await firebase.firestore().collection('rechargeRequests').add({
+            userId: userId,
+            amount: val,
+            method: selectedPayMethod || 'USDT',
+            status: 'pending',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        showSuccess(`Recharge of $${val.toFixed(2)} via ${selectedPayMethod} submitted! Awaiting admin approval.`);
+        
+        // Clear the form
+        document.getElementById('rechargeAmtInput').value = '';
+        document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
+        
+        // Reload transactions to show the new pending recharge
+        setTimeout(() => {
+            loadTransactions();
+        }, 1000);
+        
+    } catch(e) {
+        console.error('Error submitting recharge:', e);
+        showToast('⚠️ Failed to submit recharge. Please try again.');
+    }
+}
+document.getElementById('rechargeModal').addEventListener('click', e => { if(e.target===document.getElementById('rechargeModal')) closeRechargeModal(); });
+
+/* ══════════════════════════════════════════
+   WITHDRAWAL PAGE
+══════════════════════════════════════════ */
+function switchWdTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+    if (tabId === 'wdTabHistory') renderWdHistory().catch(e => console.warn('renderWdHistory error:', e));
+    if (tabId === 'wdTabBank') renderBankManage();
+}
+function updateWdUI() {
+    // Prefer fresh Firestore balance (stored in appBalance after loadReferralDashboard)
+    const displayBal = appBalance || parseFloat(sessionStorage.getItem('userBalance') || '0');
+    document.getElementById('wdBalAmt').textContent = displayBal.toFixed(2);
+    const completed = withdrawalRecords.filter(r => r.status==='approved'||r.status==='completed').reduce((s,r) => s + (r.netAmount||0), 0);
+    document.getElementById('wdTotalWithdrawn').textContent = completed.toFixed(2);
+
+    // Load bank from Firestore if not in memory
+    if (!bankAccount) {
+        const userId = sessionStorage.getItem('userId');
+        if (userId) {
+            firebase.firestore().collection('users').doc(userId).get().then(doc => {
+                if (doc.exists && doc.data().bankAccount) {
+                    bankAccount = {
+                        bankName:      doc.data().bankAccount.bankName,
+                        accountNumber: doc.data().bankAccount.accountNumber,
+                        holderName:    doc.data().bankAccount.beneficiaryName,
+                        routingCode:   doc.data().bankAccount.ifscCode
+                    };
+                    localStorage.setItem('ms_bankAccount', JSON.stringify(bankAccount));
+                    renderWdBankDisplay();
+                }
+            }).catch(() => {});
+        }
+    }
+    renderWdBankDisplay();
+}
+function renderWdBankDisplay() {
+    const div = document.getElementById('wdBankDisplay');
+    if (bankAccount) {
+        div.innerHTML = `<div class="bank-display-card">
+            <div class="bdc-info">
+                <div class="bdc-name">${bankAccount.bankName}</div>
+                <div class="bdc-number">**** **** ${bankAccount.accountNumber.slice(-4)}</div>
+                <div class="bdc-holder">Holder: ${bankAccount.holderName}</div>
+                <div class="bdc-holder">Routing: ${bankAccount.routingCode}</div>
+            </div>
+        </div>
+        <button class="btn-secondary" style="margin-bottom:16px;" onclick="openBankModal()">
+            <i class="fas fa-edit"></i> Update Bank Account
+        </button>`;
+    } else {
+        div.innerHTML = `<div class="alert-warn">
+            <strong>No bank account linked.</strong><br>Add a bank account before making a withdrawal.
+        </div>
+        <button class="btn-primary" style="margin-bottom:16px;" onclick="openBankModal()">
+            <i class="fas fa-plus"></i> Add Bank Account
+        </button>`;
+    }
+}
+function renderBankManage() {
+    const div = document.getElementById('wdBankManage');
+    if (bankAccount) {
+        div.innerHTML = `<div class="bank-display-card">
+            <div class="bdc-info">
+                <div class="bdc-name">${bankAccount.bankName}</div>
+                <div class="bdc-number">**** **** ${bankAccount.accountNumber.slice(-4)}</div>
+                <div class="bdc-holder">Holder: ${bankAccount.holderName}</div>
+                <div class="bdc-holder">Routing: ${bankAccount.routingCode}</div>
+            </div>
+        </div>
+        <button class="btn-primary" style="margin-bottom:12px;" onclick="openBankModal()">
+            <i class="fas fa-edit"></i> Update Bank Account
+        </button>
+        <div class="alert-info"><strong>Tip:</strong> Ensure your bank details are accurate. All withdrawals go to this account.</div>`;
+    } else {
+        div.innerHTML = `<div class="alert-warn">No bank account linked.</div>
+        <button class="btn-primary" onclick="openBankModal()"><i class="fas fa-plus"></i> Add Bank Account</button>`;
+    }
+}
+function selectWdAmt(v, el) {
+    document.getElementById('wdAmtInput').value = v;
+    document.querySelectorAll('.qa-btn').forEach(b => b.classList.remove('active'));
+    if (el) el.classList.add('active');
+    calcWdFee();
+}
+function selectWdAmtAll(el) {
+    document.getElementById('wdAmtInput').value = appBalance.toFixed(2);
+    document.querySelectorAll('.qa-btn').forEach(b => b.classList.remove('active'));
+    if (el) el.classList.add('active');
+    calcWdFee();
+}
+function calcWdFee() {
+    const amt = parseFloat(document.getElementById('wdAmtInput').value) || 0;
+    const fee = Math.max(amt * 0.02, 2);
+    const net = amt - fee;
+    document.getElementById('wdFeeInfo').textContent = amt > 0 ? `Fee: $${fee.toFixed(2)} | You receive: $${net.toFixed(2)}` : '';
+    document.getElementById('wdSumAmt').textContent = '$'+amt.toFixed(2);
+    document.getElementById('wdSumFee').textContent = '$'+fee.toFixed(2);
+    document.getElementById('wdSumNet').textContent = '$'+net.toFixed(2);
+    document.getElementById('wdSummary').style.display = amt > 0 ? 'block' : 'none';
+}
+async function submitWithdrawal() {
+    if (!bankAccount) {
+        showToast('⚠️ Please add a bank account first');
+        openBankModal();
+        return;
+    }
+    const amt = parseFloat(document.getElementById('wdAmtInput').value);
+    const errEl = document.getElementById('wdAmtErr');
+    errEl.style.display = 'none';
+    if (!amt || amt < 50) { errEl.textContent = 'Minimum withdrawal is $50'; errEl.style.display = 'block'; return; }
+    if (amt > 10000) { errEl.textContent = 'Maximum withdrawal is $10,000'; errEl.style.display = 'block'; return; }
+
+    const user = firebase.auth().currentUser;
+    if (!user) { showToast('⚠️ Please log in'); return; }
+
+    const submitBtn = document.querySelector('#wdTabWithdraw .btn-primary');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Processing…'; }
+
+    try {
+        // ── Get fresh balance from Firestore ──
+        const userRef = firebase.firestore().collection('users').doc(user.uid);
+        const userDoc = await userRef.get();
+        const firestoreBal = parseFloat((userDoc.exists ? userDoc.data().balance : 0) || 0);
+
+        if (firestoreBal < amt) {
+            errEl.textContent = 'Insufficient balance ($' + firestoreBal.toFixed(2) + ' available)';
+            errEl.style.display = 'block';
+            return;
+        }
+
+        const fee = Math.max(amt * 0.02, 2);
+        const net = parseFloat((amt - fee).toFixed(2));
+        const newBal = parseFloat((firestoreBal - amt).toFixed(2));
+
+        // ── Deduct from Firestore balance immediately ──
+        await userRef.update({ balance: newBal });
+
+        // ── Write withdrawal request to Firestore ──
+        const docRef = await firebase.firestore().collection('withdrawalRequests').add({
+            userId:          user.uid,
+            userPhone:       sessionStorage.getItem('userPhone') || user.email || '–',
+            userEmail:       user.email || '',
+            amount:          amt,
+            fee:             fee,
+            netAmount:       net,
+            status:          'pending',
+            createdAt:       firebase.firestore.FieldValue.serverTimestamp(),
+            note:            document.getElementById('wdNote').value || '',
+            bankName:        bankAccount.bankName,
+            accountNumber:   bankAccount.accountNumber,
+            beneficiaryName: bankAccount.holderName,
+            ifscCode:        bankAccount.routingCode,
+            balanceBefore:   firestoreBal,
+            balanceAfter:    newBal
+        });
+
+        // ── Update local state ──
+        appBalance = newBal;
+        sessionStorage.setItem('userBalance', newBal.toString());
+
+        const record = {
+            id: docRef.id,
+            amount: amt, fee, netAmount: net,
+            status: 'pending',
+            timestamp: new Date().toISOString(),
+            note: document.getElementById('wdNote').value || '',
+            bank: bankAccount.bankName + ' ***' + bankAccount.accountNumber.slice(-4)
+        };
+        withdrawalRecords.push(record);
+        saveAllData();
+
+        // ── Reset form ──
+        document.getElementById('wdAmtInput').value = '';
+        document.getElementById('wdPassword').value = '';
+        document.getElementById('wdNote').value = '';
+        document.getElementById('wdSummary').style.display = 'none';
+        document.querySelectorAll('.qa-btn').forEach(b => b.classList.remove('active'));
+
+        updateWdUI();
+        updateHomeUI();
+        showSuccess(`Withdrawal of $${amt.toFixed(2)} submitted! You'll receive $${net.toFixed(2)} after admin approval.`);
+        setTimeout(() => switchWdTab('wdTabHistory', document.getElementById('wdBtnHistory')), 1800);
+
+    } catch(e) {
+        console.error('Withdrawal error:', e);
+        showToast('⚠️ ' + (e.message || 'Failed to submit withdrawal'));
+    } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Withdrawal Request'; }
+    }
+}
+async function renderWdHistory() {
+    const div = document.getElementById('wdHistoryList');
+    div.innerHTML = `<div style="padding:16px; color:var(--text-muted); font-size:13px; text-align:center;">Loading history…</div>`;
+
+    const userId = sessionStorage.getItem('userId');
+    let records = [];
+
+    // Prefer Firestore as source of truth
+    if (userId) {
+        try {
+            const snap = await firebase.firestore()
+                .collection('withdrawalRequests')
+                .where('userId', '==', userId)
+                .orderBy('createdAt', 'desc')
+                .limit(30)
+                .get();
+            snap.forEach(doc => {
+                const d = doc.data();
+                records.push({
+                    id: doc.id,
+                    amount: d.amount,
+                    fee: d.fee,
+                    netAmount: d.netAmount,
+                    status: d.status || 'pending',
+                    timestamp: d.createdAt ? d.createdAt.toDate().toISOString() : new Date().toISOString(),
+                    note: d.note || '',
+                    bank: (d.bankName || '–') + (d.accountNumber ? ' ***' + String(d.accountNumber).slice(-4) : '')
+                });
+            });
+        } catch(e) {
+            console.warn('Could not load withdrawal history from Firestore, using local:', e);
+            records = [...withdrawalRecords];
+        }
+    } else {
+        records = [...withdrawalRecords];
+    }
+
+    if (!records.length) {
+        div.innerHTML = `<div class="no-data"><i class="fas fa-receipt"></i>No withdrawal records yet</div>`;
+        return;
+    }
+
+    div.innerHTML = records.map(r => {
+        const sc = r.status==='approved'||r.status==='completed' ? 's-completed' : r.status==='pending' ? 's-pending' : 's-failed';
+        const st = (r.status||'pending').charAt(0).toUpperCase()+(r.status||'pending').slice(1);
+        return `<div class="wd-record">
+            <div class="wd-record-row">
+                <div class="wd-record-amt">-$${parseFloat(r.amount).toFixed(2)}</div>
+                <div class="wd-record-status ${sc}">${st}</div>
+            </div>
+            <div class="wd-record-detail">${new Date(r.timestamp).toLocaleString()}</div>
+            <div class="wd-record-detail">Fee: $${parseFloat(r.fee||0).toFixed(2)} · Receive: $${parseFloat(r.netAmount||0).toFixed(2)}</div>
+            <div class="wd-record-detail">${r.bank||''}</div>
+            ${r.note ? `<div class="wd-record-detail">Note: ${r.note}</div>` : ''}
+        </div>`;
+    }).join('');
+}
+
+/* ── Bank Modal ── */
+function openBankModal() {
+    const m = document.getElementById('bankModal');
+    m.classList.add('open');
+    if (bankAccount) {
+        document.getElementById('bankNameSelect').value = bankAccount.bankName;
+        document.getElementById('bankAccNum').value = bankAccount.accountNumber;
+        document.getElementById('bankHolderName').value = bankAccount.holderName;
+        document.getElementById('bankRoutingCode').value = bankAccount.routingCode;
+    }
+}
+function closeBankModal() { document.getElementById('bankModal').classList.remove('open'); }
+function saveBankAccount(e) {
+    e.preventDefault();
+    bankAccount = {
+        bankName: document.getElementById('bankNameSelect').value,
+        accountNumber: document.getElementById('bankAccNum').value,
+        holderName: document.getElementById('bankHolderName').value,
+        routingCode: document.getElementById('bankRoutingCode').value
+    };
+    saveAllData();
+    closeBankModal();
+    updateWdUI();
+
+    // Also sync to Firestore so admin can see bank details
+    const userId = sessionStorage.getItem('userId');
+    if (userId) {
+        firebase.firestore().collection('users').doc(userId).update({
+            bankAccount: {
+                bankName:        bankAccount.bankName,
+                accountNumber:   bankAccount.accountNumber,
+                beneficiaryName: bankAccount.holderName,
+                ifscCode:        bankAccount.routingCode
+            }
+        }).catch(err => console.warn('Bank sync to Firestore failed:', err));
+    }
+
+    showSuccess('Bank account saved successfully!');
+}
+document.getElementById('bankModal').addEventListener('click', e => { if(e.target===document.getElementById('bankModal')) closeBankModal(); });
+
+/* ══════════════════════════════════════════
+   POPULAR ITEMS
+══════════════════════════════════════════ */
+const allProducts = [
+    {id:1,title:"Kat The Label Maverick Underwired Bra in Sky Blue",price:101.31,rating:4,image:"https://images.asos-media.com/products/kat-the-label-maverick-underwired-bra-in-sky-blue/207589465-1-skyblue"},
+    {id:2,title:"Never Fully Dressed Long Sleeve Mesh Midaxi Dress in Blue Balearic Print",price:165.15,rating:5,image:"https://images.asos-media.com/products/never-fully-dressed-long-sleeve-mesh-midaxi-dress-in-blue-balearic-print/207641852-1-blueprint"},
+    {id:3,title:"Be Mine Bridal Wink 2 Heeled Sandals in Blush Satin",price:44.12,rating:4,image:"https://images.asos-media.com/products/be-mine-bridal-wink-2-heeled-sandals-in-blush-satin/207611234-1-blush"},
+    {id:4,title:"Elemis Soothing Apricot Toner 200ml",price:22.06,rating:4,image:"https://images.asos-media.com/products/elemis-soothing-apricot-toner-200ml/11337191-1-nocolour"},
+    {id:5,title:"CAT Progressor Web Bold Chunky Sandals in Black",price:130.72,rating:4,image:"https://images.asos-media.com/products/cat-progressor-web-bold-chunky-sandals-in-black-womens/207576543-1-black"},
+    {id:6,title:"Calvin Klein Cotton Stretch 3-Pack Low Rise Trunk",price:68.68,rating:4,image:"https://images.asos-media.com/products/calvin-klein-cotton-stretch-3-pack-low-rise-trunk-in-brown-blue-grey/207603421-1-multi"},
+    {id:7,title:"4505 Petite Icon Slim Kick Soft Touch Yoga Legging in Chocolate",price:39.26,rating:4,image:"https://images.asos-media.com/products/asos-4505-petite-icon-slim-kick-soft-touch-yoga-legging-in-chocolate/207598732-1-brown"},
+    {id:8,title:"Cantu Detangling Brush – Medium to Long Hair",price:15.52,rating:5,image:"https://images.asos-media.com/products/cantu-detangling-brush-medium-to-long-hair/11615267-1-nocolour"},
+    {id:9,title:"ASOS DESIGN Denim Bermuda Short in Midwash Blue",price:49.12,rating:4,image:"https://images.asos-media.com/products/asos-design-denim-bermuda-short-on-midwash-blue/207632145-1-blue"},
+    {id:10,title:"ASOS DESIGN Oversized Knitted Polo Jumper in Brushed Grey",price:55.56,rating:4,image:"https://images.asos-media.com/products/asos-design-oversized-boxy-fit-knitted-polo-jumper-in-brushed-grey/207621432-1-grey"},
+    {id:11,title:"Good For Nothing Traipse Carpenter Jeans in Indigo",price:130.72,rating:5,image:"https://images.asos-media.com/products/good-for-nothing-traipse-carpenter-jeans-in-indigo-rust-wash/207618765-1-blue"},
+    {id:12,title:"JJ Rebel Stripe Poplin Shirt in Blue",price:40.88,rating:4,image:"https://images.asos-media.com/products/jack-jones-rebel-stripe-poplin-shirt-in-blue/207625341-1-blue"},
+    {id:13,title:"Garnier Ambre Solaire SPF 50+ Hydra 24H Protect Cream 200ml",price:17.20,rating:5,image:"https://images.asos-media.com/products/garnier-ambre-solaire-spf-50-hydra-24-hour-protect-hydrating-sun-cream-200ml/11616543-1-nocolour"},
+    {id:14,title:"ASOS DESIGN Poplin Pleat Back Trapeze Maxi Dress in White",price:62.20,rating:4,image:"https://images.asos-media.com/products/asos-design-poplin-pleat-back-trapeze-maxi-dress-in-white/207629876-1-white"},
+    {id:15,title:"ASOS LUXE Jacquard Maxi Dress in Champagne Floral",price:205.88,rating:5,image:"https://images.asos-media.com/products/asos-luxe-jacquard-maxi-dress-with-drop-waist-in-champagne-floral/207638921-1-champagne"},
+    {id:16,title:"ASOS DESIGN Maya Sleek Bandeau Bikini Top in Burgundy",price:21.32,rating:5,image:"https://images.asos-media.com/products/asos-design-maya-mix-and-match-sleek-bandeau-bikini-top-in-burgundy/207642187-1-burgundy"},
+    {id:17,title:"ASOS DESIGN One Shoulder Maxi Dress with Ruched Bodice in Black",price:73.53,rating:5,image:"https://images.asos-media.com/products/asos-design-one-shoulder-maxi-dress-with-ruched-bodice-and-sheer-overlay-in-black/207635498-1-black"},
+    {id:18,title:"Carhartt WIP Underground Graphic Sweatshirt in Navy",price:171.57,rating:5,image:"https://images.asos-media.com/products/carhartt-wip-underground-graphic-sweatshirt-in-navy/207628754-1-navy"},
+    {id:19,title:"adidas Originals Retro Track Jacket in Orange and Pink",price:122.65,rating:5,image:"https://images.asos-media.com/products/adidas-originals-retro-track-jacket-in-orange-and-pink/207639812-1-orange"},
+    {id:20,title:"ASOS DESIGN Ribbed Longline Button Through Waistcoat in Black",price:42.50,rating:5,image:"https://images.asos-media.com/products/asos-design-co-ord-ribbed-longline-button-through-v-neck-waistcoat-in-black/207641256-1-black"}
+];
+const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect fill='%23f0f0f0' width='300' height='300'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23aaa' font-family='sans-serif' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E";
+
+function initPopular() {
+    popDisplayed = allProducts.slice();
+    popCurrentPage = 1;
+    renderProducts(popDisplayed);
+}
+function renderProducts(products) {
+    const grid = document.getElementById('productsGrid');
+    const noR = document.getElementById('noResults');
+    const lmBtn = document.getElementById('loadMoreBtn');
+    if (!products.length) { grid.innerHTML=''; noR.style.display='block'; lmBtn.style.display='none'; return; }
+    noR.style.display='none';
+    const items = products.slice(0, popCurrentPage * popItemsPerPage);
+    grid.innerHTML = items.map(p => `
+        <div class="product-card" onclick="showToast('Added to cart: ${p.title.substring(0,30)}...')">
+            <img src="${p.image}" class="product-img" alt="${p.title}"
+                 onerror="this.src='${PLACEHOLDER}'">
+            <div class="product-info">
+                <div class="product-title">${p.title}</div>
+                <div class="product-price">Price: <span class="price-val">$${p.price.toFixed(2)}</span></div>
+                <div class="stars">${generateStars(p.rating)}</div>
+            </div>
+        </div>`).join('');
+    lmBtn.style.display = items.length < products.length ? 'inline-flex' : 'none';
+}
+function generateStars(r) {
+    return Array.from({length:5},(_,i) => `<span class="star${i>=r?' empty':''}">${i<r?'★':'★'}</span>`).join('');
+}
+function searchProducts() {
+    const q = document.getElementById('productSearch').value.toLowerCase().trim();
+    popDisplayed = q ? allProducts.filter(p => p.title.toLowerCase().includes(q)) : allProducts.slice();
+    popCurrentPage = 1;
+    renderProducts(popDisplayed);
+}
+function loadMoreProducts() { popCurrentPage++; renderProducts(popDisplayed); }
+
+/* ══════════════════════════════════════════
+   MODALS & TOAST
+══════════════════════════════════════════ */
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+async function handleLogout() {
+    if (!confirm('Are you sure you want to logout?')) return;
+    try { await firebase.auth().signOut(); } catch(e) {}
+    sessionStorage.clear();
+    window.location.href = 'login.html';
+}
+function showSuccess(msg) {
+    document.getElementById('successMsg').textContent = msg;
+    document.getElementById('successModal').classList.add('open');
+}
+function closeSuccessModal() { document.getElementById('successModal').classList.remove('open'); }
+document.getElementById('successModal').addEventListener('click', e => { if(e.target===document.getElementById('successModal')) closeSuccessModal(); });
+</script>
+
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="auth-guard.js"></script>
+<script>
+/* ══════════════════════════════════════════
+   CRITICAL AUTH CHECK - MUST RUN FIRST
+══════════════════════════════════════════ */
+(function immediateAuthCheck() {
+    // Prevent page from loading data before auth is verified
+    window._authVerified = false;
+    
+    // Check if Firebase is loaded
+    if (typeof firebase === 'undefined') {
+        console.error('Firebase not loaded, redirecting to login');
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    // Set a timeout to redirect if auth check takes too long
+    // 15s instead of 5s — Firebase auth on slow connections (mobile/3G) can take >5s.
+    // A 5s timeout fires too early, redirects to login.html, which then redirects
+    // back here, creating an infinite redirect loop that freezes the browser.
+    const authTimeout = setTimeout(function() {
+        if (!window._authVerified) {
+            console.warn('Auth check timeout after 15s, redirecting to login');
+            window.location.href = 'login.html';
+        }
+    }, 15000);
+    
+    // Wait for Firebase auth to initialize
+    firebase.auth().onAuthStateChanged(function(user) {
+        clearTimeout(authTimeout);
+        
+        // Hide loading overlay
+        const overlay = document.getElementById('authLoadingOverlay');
+        const mainWrapper = document.getElementById('mainWrapper');
+        
+        if (!user) {
+            // No user logged in, redirect immediately
+            console.log('No authenticated user, redirecting to login');
+            window.location.href = 'login.html';
+        } else {
+            // User is authenticated, mark as verified
+            window._authVerified = true;
+            sessionStorage.setItem('userId', user.uid);
+            console.log('User authenticated:', user.uid);
+            
+            // Show the main content
+            if (overlay) overlay.style.display = 'none';
+            if (mainWrapper) mainWrapper.style.display = 'block';
+            
+            // Now safe to load data
+            if (window._loadDataAfterAuth) {
+                window._loadDataAfterAuth();
+            }
+        }
+    });
+})();
+
+// Centralized data loading - only ever runs once, no matter how many times it is called
+window._loadDataAfterAuth = function() {
+    // Hard idempotency guard — prevent any possibility of double execution
+    if (window._dataLoadStarted) {
+        console.log('_loadDataAfterAuth: already running/done, skipping.');
+        return;
+    }
+    window._dataLoadStarted = true;
+    console.log('Auth verified, loading user data...');
+    
+    try {
+        // Load initial UI
+        updateHomeUI();
+        
+        // Load transactions and referral dashboard exactly once
+        if (!window._referralDashLoaded) {
+            window._referralDashLoaded = true;
+            loadReferralDashboard().catch(e => console.error('Error loading referral dashboard:', e));
+            loadTransactions().catch(e => console.error('Error loading transactions:', e));
+        }
+    } catch(e) {
+        console.error('Error in _loadDataAfterAuth:', e);
+        // Reset flag on error so a retry is possible
+        window._dataLoadStarted = false;
+    }
+};
+
+/* ══════════════════════════════════════════
+   REFERRAL DASHBOARD
+══════════════════════════════════════════ */
+async function loadReferralDashboard() {
+    // Don't load data until auth is verified
+    if (!window._authVerified) {
+        console.log('Waiting for auth verification before loading referral dashboard');
+        return;
+    }
+    
+    const userId = sessionStorage.getItem('userId');
+    let inviteCode = sessionStorage.getItem('userInviteCode');
+    let balance = parseFloat(sessionStorage.getItem('userBalance') || '0');
+
+    // ── Step 1: Fetch user doc from Firestore to guarantee fresh data ──
+    if (userId) {
+        try {
+            const userDoc = await firebase.firestore().collection('users').doc(userId).get({ source: 'server' })
+                .catch(() => firebase.firestore().collection('users').doc(userId).get());
+            if (userDoc.exists) {
+                const data = userDoc.data();
+                // Always prefer Firestore as source of truth
+                if (data.inviteCode) {
+                    inviteCode = data.inviteCode;
+                    sessionStorage.setItem('userInviteCode', inviteCode);
+                }
+                if (typeof data.balance === 'number') {
+                    balance = data.balance;
+                    sessionStorage.setItem('userBalance', balance.toString());
+                }
+            }
+        } catch(e) {
+            console.warn('Could not fetch user doc:', e);
+        }
+    }
+
+    // ── Step 2: Show invite code ──
+    const codeEl = document.getElementById('myInviteCode');
+    if (inviteCode) {
+        codeEl.textContent = inviteCode;
+    } else {
+        codeEl.textContent = 'N/A';
+    }
+
+    // ── Step 3: Update balance displays ──
+    document.getElementById('refBalDisplay').textContent = '$' + balance.toFixed(2);
+    appBalance = balance;
+    updateHomeUI();
+
+    // ── Step 4: Load referral count & referred users with their balances ──
+    if (userId) {
+        try {
+            const snap = await firebase.firestore()
+                .collection('referrals')
+                .where('referrerUid', '==', userId)
+                .orderBy('createdAt', 'desc')
+                .limit(50)
+                .get();
+
+            const count = snap.size;
+            document.getElementById('refTotalCount').textContent = count;
+            document.getElementById('refUsersBadge').textContent = count;
+
+            if (count === 0) {
+                document.getElementById('refUsersList').innerHTML =
+                    `<div class="ref-users-empty">No referred users yet.<br>Share your code to start earning!</div>`;
+                return;
+            }
+
+            // Fetch balance for each referred user from users collection
+            const rows = [];
+            const promises = snap.docs.slice(0, 50).map(async (doc) => {  // Limit to 50 max
+                const d = doc.data();
+                const newUid = d.newUserUid;
+                const phone = d.newUserPhone || 'Unknown';
+                const joinedAt = d.createdAt;
+                let userBal = 0;
+                try {
+                    if (newUid) {
+                        // Add timeout to prevent hanging
+                        const timeoutPromise = new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error('Timeout')), 3000)
+                        );
+                        const fetchPromise = firebase.firestore().collection('users').doc(newUid).get();
+                        const uDoc = await Promise.race([fetchPromise, timeoutPromise]);
+                        if (uDoc.exists) userBal = uDoc.data().balance || 0;
+                    }
+                } catch(e) {
+                    console.warn('Could not fetch balance for user:', newUid, e);
+                }
+                rows.push({ phone, joinedAt, balance: userBal });
+            });
+            
+            try {
+                await Promise.all(promises);
+            } catch(e) {
+                console.error('Error loading referral user balances:', e);
+            }
+
+            // Sort by join date descending
+            rows.sort((a, b) => {
+                const ta = a.joinedAt && a.joinedAt.toDate ? a.joinedAt.toDate() : new Date(0);
+                const tb = b.joinedAt && b.joinedAt.toDate ? b.joinedAt.toDate() : new Date(0);
+                return tb - ta;
+            });
+
+            const formatDate = (ts) => {
+                if (!ts) return '';
+                const d = ts.toDate ? ts.toDate() : new Date(ts);
+                return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+            };
+
+            const maskPhone = (p) => {
+                if (!p || p.length < 6) return p;
+                return p.slice(0, 4) + '****' + p.slice(-3);
+            };
+
+            const html = rows.map(r => `
+                <div class="ref-user-row">
+                    <div class="ref-user-avatar">${(r.phone[0] || '?').toUpperCase()}</div>
+                    <div class="ref-user-info">
+                        <div class="ref-user-phone">${maskPhone(r.phone)}</div>
+                        <div class="ref-user-date">Joined ${formatDate(r.joinedAt)}</div>
+                    </div>
+                    <div class="ref-user-balance">$${parseFloat(r.balance).toFixed(2)}</div>
+                </div>`).join('');
+
+            document.getElementById('refUsersList').innerHTML = html;
+
+        } catch(e) {
+            console.error('Error loading referrals:', e);
+            document.getElementById('refTotalCount').textContent = '0';
+            document.getElementById('refUsersBadge').textContent = '0';
+            document.getElementById('refUsersList').innerHTML =
+                `<div class="ref-users-empty">Could not load referral data.</div>`;
+        }
+    } else {
+        document.getElementById('refUsersList').innerHTML =
+            `<div class="ref-users-empty">Please log in to view referrals.</div>`;
+    }
+}
+
+function copyInviteCode() {
+    const code = sessionStorage.getItem('userInviteCode') || '';
+    if (!code) { showToast('No invite code found'); return; }
+    navigator.clipboard.writeText(code).then(() => {
+        showToast('✅ Invite code copied: ' + code);
+    }).catch(() => {
+        const el = document.createElement('textarea');
+        el.value = code;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        showToast('✅ Invite code copied: ' + code);
+    });
+}
+
+function shareInviteLink() {
+    const code = sessionStorage.getItem('userInviteCode') || '';
+    const url = window.location.origin + '/register.html?ref=' + code;
+    if (navigator.share) {
+        navigator.share({
+            title: 'Join ManifestoShop',
+            text: 'Use my referral code ' + code + ' to sign up and get started!',
+            url: url
+        });
+    } else {
+        navigator.clipboard.writeText(url).then(() => {
+            showToast('✅ Invite link copied!');
+        });
+    }
+}
+
+// Triggered by auth-guard.js after Firebase loads user data
+window.addEventListener('userDataLoaded', function() {
+    if (!window._authVerified) {
+        console.log('userDataLoaded event fired but auth not verified yet');
+        return;
+    }
+    // _loadDataAfterAuth is idempotent — safe to call here even if already called
+    if (window._loadDataAfterAuth) {
+        window._loadDataAfterAuth();
+    }
+});
+
+// NOTE: The 3-second fallback timeout was removed.
+// _loadDataAfterAuth is now called reliably via:
+//   1. firebase.auth().onAuthStateChanged() in immediateAuthCheck() above
+//   2. The 'userDataLoaded' event listener below (fired by auth-guard.js)
+// The _dataLoadStarted flag ensures it runs exactly once regardless of which fires first.
+</script>
+
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+Tawk_API.onLoad = function() {
+    Tawk_API.hideWidget();
+};
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/69e9d1b72016bf1c3d6f5e6a/1jmslme1j';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+<script>
+function openTawkChat() {
+    if (typeof Tawk_API !== 'undefined') {
+        try { Tawk_API.maximize(); } catch(e) { console.warn('Tawk maximize failed:', e); }
+    } else {
+        showToast('⏳ Chat is loading, please try again in a moment…');
+    }
+}
+</script>
+
+</body>
+</html>

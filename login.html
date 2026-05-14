@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover, user-scalable=no">
+    <title>Login – ManifestoShop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #764ba2;
+            --accent: #ff6b35;
+            --success: #10b981;
+            --error: #ef4444;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+            --bg-light: #f9fafb;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #f5f3ff 0%, #fef3f9 50%, #fff 100%);
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px; color: var(--text);
+        }
+        .shape { position: fixed; border-radius: 50%; opacity: 0.05; z-index: 0; pointer-events: none; }
+        .shape-1 { width: 400px; height: 400px; background: var(--primary); top: -200px; right: -100px; }
+        .shape-2 { width: 300px; height: 300px; background: var(--accent); bottom: -150px; left: -80px; }
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .login-container {
+            position: relative; z-index: 1;
+            width: 100%; max-width: 440px;
+            background: #fff; border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(102,126,234,0.15), 0 0 1px rgba(0,0,0,0.05);
+            padding: 48px 40px;
+            animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1);
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .brand-section { text-align: center; margin-bottom: 32px; }
+        .logo-circle {
+            width: 72px; height: 72px; margin: 0 auto 14px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 24px rgba(102,126,234,0.35);
+            font-size: 36px;
+        }
+        .brand-name {
+            font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; margin-bottom: 6px;
+        }
+        .brand-tagline { font-size: 14px; color: var(--text-light); font-weight: 500; }
+        .welcome { text-align: center; margin-bottom: 28px; }
+        .welcome h1 { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+        .welcome p { font-size: 14px; color: var(--text-light); }
+        .alert {
+            padding: 13px 16px; border-radius: 12px; font-size: 14px;
+            margin-bottom: 20px; display: none; align-items: center; gap: 10px;
+        }
+        .alert-error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; }
+        .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #16a34a; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7px; }
+        .input-wrapper { position: relative; }
+        .form-input {
+            width: 100%; padding: 14px 16px; padding-right: 48px;
+            border: 2px solid var(--border); border-radius: 12px;
+            font-size: 15px; font-family: 'DM Sans', sans-serif;
+            color: var(--text); transition: all 0.25s; background: var(--bg-light);
+        }
+        .form-input::placeholder { color: #9ca3af; }
+        .form-input:focus {
+            outline: none; border-color: var(--primary); background: #fff;
+            box-shadow: 0 0 0 4px rgba(102,126,234,0.12);
+        }
+        .toggle-password {
+            position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer; font-size: 20px;
+            color: var(--text-light); padding: 4px; transition: color 0.2s;
+        }
+        .toggle-password:hover { color: var(--primary); }
+        .submit-btn {
+            width: 100%; padding: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff; border: none; border-radius: 12px;
+            font-size: 16px; font-weight: 700; font-family: 'Outfit', sans-serif;
+            cursor: pointer; transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(102,126,234,0.4);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(102,126,234,0.5); }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .divider { display: flex; align-items: center; gap: 14px; margin: 28px 0; }
+        .divider-line { flex: 1; height: 1px; background: var(--border); }
+        .divider-text { font-size: 13px; color: var(--text-light); font-weight: 500; }
+        .register-link { text-align: center; font-size: 14px; color: var(--text-light); }
+        .register-link a { color: var(--primary); text-decoration: none; font-weight: 700; }
+        .register-link a:hover { color: var(--primary-dark); text-decoration: underline; }
+        .trust-badge {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            margin-top: 22px; padding: 12px; background: var(--bg-light);
+            border-radius: 10px; font-size: 12.5px; color: var(--text-light);
+        }
+        @media (max-width: 480px) { .login-container { padding: 36px 24px; } }
+    </style>
+</head>
+<body>
+<div class="shape shape-1"></div>
+<div class="shape shape-2"></div>
+
+<div class="login-container">
+    <div class="brand-section">
+        <div class="logo-circle">🛍️</div>
+        <div class="brand-name">ManifestoShop</div>
+        <div class="brand-tagline">Your Premium Shopping Destination</div>
+    </div>
+
+    <div class="welcome">
+        <h1>Welcome Back!</h1>
+        <p>Login to continue shopping</p>
+    </div>
+
+    <div class="alert alert-error" id="alertError"></div>
+    <div class="alert alert-success" id="alertSuccess"></div>
+
+    <form id="loginForm" novalidate>
+        <div class="form-group">
+            <label class="form-label" for="phone">Phone Number</label>
+            <div class="input-wrapper">
+                <input type="tel" id="phone" class="form-input" placeholder="Enter your phone number" autocomplete="tel">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <div class="input-wrapper">
+                <input type="password" id="password" class="form-input" placeholder="Enter your password" autocomplete="current-password">
+                <button type="button" class="toggle-password" id="togglePw" tabindex="-1">👁️</button>
+            </div>
+        </div>
+        <button type="submit" class="submit-btn" id="loginBtn">
+            <i>🔑</i> Login to Account
+        </button>
+    </form>
+
+    <div class="trust-badge">🔒 Secure checkout with end-to-end encryption</div>
+
+    <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">New to ManifestoShop?</div>
+        <div class="divider-line"></div>
+    </div>
+
+    <div class="register-link">Don't have an account? <a href="register.html">Create Account</a></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="auth-guard.js"></script>
+<script>
+(function() {
+    'use strict';
+    var loggingIn = false;
+    function showAlert(type, msg) {
+        var el = document.getElementById(type === 'error' ? 'alertError' : 'alertSuccess');
+        el.textContent = msg; el.style.display = 'flex';
+        setTimeout(function() { el.style.display = 'none'; }, 6000);
+    }
+    function phoneToEmail(phone) { return phone.replace(/\D/g, '') + '@manifestoshop.app'; }
+    document.getElementById('togglePw').addEventListener('click', function() {
+        var input = document.getElementById('password');
+        if (input.type === 'password') { input.type = 'text'; this.textContent = '🙈'; }
+        else { input.type = 'password'; this.textContent = '👁️'; }
+    });
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var phone = document.getElementById('phone').value.trim();
+        var password = document.getElementById('password').value;
+        if (!phone) { showAlert('error', 'Please enter your phone number'); return; }
+        if (password.length < 6) { showAlert('error', 'Password must be at least 6 characters'); return; }
+        var btn = document.getElementById('loginBtn');
+        btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Logging in...'; loggingIn = true;
+        try {
+            // ═══════════════════════════════════════════════════════════
+            // STEP 1: Find user by phone in Firestore BEFORE Firebase Auth
+            // This lets the admin control the password from the admin panel.
+            // ═══════════════════════════════════════════════════════════
+            var cleanPhone = phone.replace(/\D/g, '');
+            var userQuery = await firebase.firestore().collection('users')
+                .where('phone', '==', phone)
+                .limit(1)
+                .get({ source: 'server' });
+
+            // Also try with cleaned phone if first query is empty
+            if (userQuery.empty) {
+                userQuery = await firebase.firestore().collection('users')
+                    .where('phone', '==', cleanPhone)
+                    .limit(1)
+                    .get({ source: 'server' });
+            }
+
+            if (userQuery.empty) {
+                throw new Error('No account found. Please register first.');
+            }
+
+            var userDoc = userQuery.docs[0];
+            var d = userDoc.data();
+
+            // ═══════════════════════════════════════════════════════════
+            // STEP 2: Check if admin has set a custom password in Firestore
+            // If yes, compare against that BEFORE trying Firebase Auth.
+            // This gives admin full control — wrong Firestore password = blocked.
+            // ═══════════════════════════════════════════════════════════
+            if (d.passwordChangedByAdmin === true && d.password) {
+                if (password !== d.password) {
+                    // Admin changed the password — user typed wrong one
+                    throw { code: 'auth/wrong-password' };
+                }
+                // Password matches admin-set password — now update Firebase Auth too
+                // so the two stay in sync. Use REST API (free plan, no Cloud Functions).
+                try {
+                    var apiKey = firebase.app().options.apiKey;
+                    // Sign in with OLD Firebase Auth password (may still work)
+                    // then immediately update to new password
+                    // We do this silently — if it fails we still let them in via Firestore check
+                    var signInResp = await fetch(
+                        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + apiKey,
+                        {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                email: phoneToEmail(phone),
+                                password: password,
+                                returnSecureToken: true
+                            })
+                        }
+                    );
+                    var signInJson = await signInResp.json();
+                    if (signInJson.idToken) {
+                        // Already on new password in Firebase Auth — clear admin flag
+                        await firebase.firestore().collection('users').doc(userDoc.id).update({
+                            passwordChangedByAdmin: false
+                        });
+                    }
+                } catch(syncErr) { /* silent — Firestore check already passed */ }
+            }
+
+            // ═══════════════════════════════════════════════════════════
+            // STEP 3: Normal Firebase Auth sign in
+            // ═══════════════════════════════════════════════════════════
+            var userCredential;
+            try {
+                userCredential = await firebase.auth().signInWithEmailAndPassword(phoneToEmail(phone), password);
+            } catch(authErr) {
+                // If Firebase Auth fails but admin set a matching Firestore password,
+                // update Firebase Auth password via REST and retry
+                if ((authErr.code === 'auth/wrong-password' || authErr.code === 'auth/invalid-credential')
+                    && d.passwordChangedByAdmin === true && d.password === password) {
+                    // Admin changed password — update Firebase Auth using REST API
+                    var apiKey = firebase.app().options.apiKey;
+                    // We need their old Firebase Auth token — try with stored old password
+                    // Since we don't have it, use the password reset flow via update
+                    // Best we can do: show a helpful message
+                    showAlert('error', 'Your password was recently changed by admin. Please contact support to complete the sync, or try again.');
+                    btn.disabled = false; btn.innerHTML = '🔑 Login to Account'; loggingIn = false;
+                    return;
+                }
+                throw authErr;
+            }
+
+            var user = userCredential.user;
+
+            // ═══════════════════════════════════════════════════════════
+            // STEP 4: Check suspension & load session
+            // ═══════════════════════════════════════════════════════════
+            // CHECK IF ACCOUNT IS SUSPENDED
+            if (d.isActive === false) {
+                await firebase.auth().signOut();
+                var suspensionReason = d.suspensionReason || 'Your account has been suspended by the administrator.';
+                sessionStorage.setItem('suspensionReason', suspensionReason);
+                sessionStorage.setItem('userId', user.uid);
+                btn.disabled = false;
+                btn.innerHTML = '🔑 Login to Account';
+                loggingIn = false;
+                window.location.href = 'suspend.html';
+                return;
+            }
+
+            // Account is ACTIVE - set session
+            sessionStorage.setItem('login_flag', '1');
+            sessionStorage.setItem('userId', user.uid);
+            sessionStorage.setItem('userEmail', user.email);
+            sessionStorage.setItem('userPhone', phone);
+            sessionStorage.setItem('userName', d.name || '');
+            sessionStorage.setItem('userBalance', d.balance || 0);
+            sessionStorage.setItem('userFrozenAmount', d.frozenAmount || 0);
+            sessionStorage.setItem('userCreditScore', d.creditScore || 100);
+            sessionStorage.setItem('userInviteCode', d.inviteCode || '');
+            sessionStorage.setItem('userMembershipLevel', d.membershipLevel || 'Free');
+
+            // Update last login (fire and forget)
+            firebase.firestore().collection('users').doc(user.uid).update({
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(function() {});
+
+            // Show success and redirect
+            showAlert('success', 'Login successful! Redirecting...');
+            var redirectTo = sessionStorage.getItem('redirectAfterLogin') || 'homepage.html';
+            sessionStorage.removeItem('redirectAfterLogin');
+            setTimeout(function() { window.location.href = redirectTo; }, 800);
+
+        } catch (error) {
+            loggingIn = false;
+            var msg = 'Login failed. Please check your credentials.';
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-email') msg = 'No account found. Please register first.';
+            else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') msg = 'Incorrect password. Please try again.';
+            else if (error.code === 'auth/user-disabled') msg = 'This account has been disabled.';
+            else if (error.code === 'auth/too-many-requests') msg = 'Too many attempts. Please wait and try again.';
+            else if (error.code === 'auth/network-request-failed') msg = 'Network error. Check your connection.';
+            else if (error.message) msg = error.message;
+            showAlert('error', msg);
+            btn.disabled = false; btn.innerHTML = '🔑 Login to Account';
+        }
+    });
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (loggingIn) return;
+        if (user && sessionStorage.getItem('login_flag') === '1') window.location.href = 'homepage.html';
+    });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover, user-scalable=no">
+    <title>Task Orders – ManifestoShop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="auth-guard.js"></script>
+
+    <style>
+        :root {
+            --teal: #0bb1b3; --teal-dark: #089a9c;
+            --teal-grad: linear-gradient(138deg, rgba(0,0,0,.15) 0%, transparent 70%), #0bb1b3;
+            --teal-light: #e0f7f7;
+            --gold: #f59e0b; --gold-light: #fef3c7;
+            --success: #10b981; --danger: #ef4444;
+            --text: #1f2937; --text-muted: #6b7280;
+            --border: #e5e7eb; --bg: #f5f6fa;
+            --nav-h: 65px; --white: #fff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        .wrapper { max-width: 500px; margin: 0 auto; background: var(--white); min-height: 100vh; padding-bottom: calc(var(--nav-h) + 16px); }
+
+        /* Auth Overlay */
+        #authOverlay { position: fixed; inset: 0; background: #f5f6fa; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+        .auth-spinner { width: 52px; height: 52px; border: 4px solid #e5e7eb; border-top-color: var(--teal); border-radius: 50%; animation: spin .9s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 14px 16px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .page-logo {
+            font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 800;
+            letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px;
+        }
+        .page-logo-icon {
+            width: 34px; height: 34px; background: rgba(255,255,255,0.25);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 17px;
+        }
+        .page-header-actions { display: flex; gap: 10px; }
+        .page-header-btn {
+            background: rgba(255,255,255,0.18); border: none; color: white;
+            width: 34px; height: 34px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 16px; text-decoration: none; transition: background 0.2s;
+        }
+        .page-header-btn:hover { background: rgba(255,255,255,0.32); }
+
+        /* Balance Section */
+        .balance-section { background: var(--teal-grad); padding: 20px 20px 24px; color: white; text-align: center; }
+        .balance-lbl { font-size: 13px; opacity: .88; margin-bottom: 5px; }
+        .balance-amt { font-family: 'Outfit', sans-serif; font-size: 40px; font-weight: 800; letter-spacing: -1px; }
+        .balance-meta { display: flex; justify-content: center; gap: 24px; margin-top: 14px; }
+        .bm-item { text-align: center; }
+        .bm-lbl { font-size: 10px; opacity: .75; margin-bottom: 2px; }
+        .bm-val { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; }
+
+        /* Phase Banner */
+        .phase-banner { margin: 14px 14px 0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,.12); }
+        .phase-header { padding: 14px 18px 10px; display: flex; align-items: center; justify-content: space-between; }
+        .phase-1-bg { background: linear-gradient(135deg, #0bb1b3, #067b7c); }
+        .phase-2-bg { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .phase-3-bg { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .phase-badge { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 800; background: rgba(255,255,255,.25); color: white; padding: 3px 10px; border-radius: 20px; letter-spacing: .5px; }
+        .phase-name { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 800; color: white; }
+        .phase-progress-wrap { padding: 0 18px 14px; background: inherit; }
+        .phase-progress-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+        .phase-progress-text { font-size: 12px; color: rgba(255,255,255,.85); }
+        .phase-order-count { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 800; color: white; }
+        .progress-bar-bg { height: 7px; background: rgba(255,255,255,.25); border-radius: 10px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: white; border-radius: 10px; transition: width .5s ease; }
+
+        /* Order Dots Strip */
+        .order-dots-wrap { padding: 12px 14px 8px; overflow-x: auto; scrollbar-width: none; }
+        .order-dots-wrap::-webkit-scrollbar { display: none; }
+        .order-dots { display: flex; gap: 5px; min-width: max-content; }
+        .order-dot {
+            width: 30px; height: 30px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 800; font-family: 'Outfit', sans-serif;
+            flex-shrink: 0; position: relative; border: 2px solid transparent; transition: all .2s;
+        }
+        .dot-done { background: #d1fae5; color: #059669; border-color: #a7f3d0; }
+        .dot-current { background: var(--teal); color: white; border-color: var(--teal-dark); box-shadow: 0 0 0 3px rgba(11,177,179,.3); }
+        .dot-future { background: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
+        .dot-bonus-done { background: #fef3c7; color: #d97706; border-color: #fcd34d; }
+        .dot-bonus-current { background: #f59e0b; color: white; border-color: #d97706; box-shadow: 0 0 0 3px rgba(245,158,11,.35); animation: bonusPulse 1.8s ease infinite; }
+        .dot-bonus-future { background: #fffbeb; color: #d97706; border-color: #fde68a; }
+        @keyframes bonusPulse { 0%,100%{box-shadow:0 0 0 3px rgba(245,158,11,.35)} 50%{box-shadow:0 0 0 6px rgba(245,158,11,.0)} }
+        .dot-label {
+            position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+            font-size: 8px; font-weight: 800; color: var(--gold); white-space: nowrap;
+            background: #fffbeb; padding: 1px 4px; border-radius: 4px;
+            border: 1px solid #fde68a; display: none;
+        }
+        .dot-bonus-future .dot-label, .dot-bonus-current .dot-label, .dot-bonus-done .dot-label { display: block; }
+
+        /* Rules Card */
+        .rules-card { margin: 10px 14px; border-radius: 14px; border: 1.5px solid var(--border); overflow: hidden; }
+        .rules-header { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; cursor: pointer; background: #fafafa; }
+        .rules-title { font-size: 13px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 6px; }
+        .rules-toggle { font-size: 13px; color: var(--text-muted); transition: transform .2s; }
+        .rules-body { padding: 0 14px; max-height: 0; overflow: hidden; transition: max-height .35s ease, padding .3s; }
+        .rules-body.open { max-height: 900px; padding: 12px 14px; }
+        .rule-row { display: flex; align-items: flex-start; gap: 9px; font-size: 12.5px; color: var(--text-muted); margin-bottom: 7px; line-height: 1.5; }
+        .rule-row:last-child { margin-bottom: 0; }
+        .rule-icon { color: var(--teal); font-size: 13px; margin-top: 1px; flex-shrink: 0; }
+        .rule-highlight { color: var(--teal); font-weight: 700; }
+        .rule-gold { color: var(--gold); font-weight: 700; }
+
+        /* Reference Chart */
+        .chart-card { margin: 10px 14px; border-radius: 14px; border: 1.5px solid var(--border); overflow: hidden; }
+        .chart-header { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; cursor: pointer; background: #fafafa; }
+        .chart-title { font-size: 13px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 6px; }
+        .chart-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+        .chart-body.open { max-height: 2000px; }
+        .chart-scroll { overflow-x: auto; padding: 8px 0; }
+        .chart-table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 520px; }
+        .chart-table th { padding: 6px 8px; background: #f3f4f6; font-weight: 700; color: var(--text-muted); text-align: right; border-bottom: 1.5px solid var(--border); white-space: nowrap; }
+        .chart-table th:first-child, .chart-table th:nth-child(2) { text-align: left; }
+        .chart-table td { padding: 5px 8px; border-bottom: 1px solid var(--border); text-align: right; font-family: 'Outfit', sans-serif; color: var(--text); }
+        .chart-table td:first-child, .chart-table td:nth-child(2) { text-align: left; font-family: 'DM Sans', sans-serif; }
+        .chart-lucky-row { background: linear-gradient(135deg, #fffbeb, #fef3c7); }
+        .chart-lucky-row td { color: var(--gold); font-weight: 700; }
+        .chart-lucky-row td:first-child, .chart-lucky-row td:nth-child(2) { color: var(--gold); }
+        .chart-high-row { background: #f0fdf4; }
+        .chart-high-row td { color: var(--success); font-weight: 700; }
+        .chart-gap-badge { font-size: 10px; font-weight: 700; background: #fef3c7; color: #92400e; padding: 1px 5px; border-radius: 8px; }
+        .chart-phase-label { padding: 6px 14px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; }
+
+        .stats-strip { display: flex; background: white; border-bottom: 1px solid var(--border); }
+        .stat-item { flex: 1; text-align: center; padding: 11px 4px; border-right: 1px solid var(--border); }
+        .stat-item:last-child { border-right: none; }
+        .stat-val { font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 800; color: var(--teal); }
+        .stat-lbl { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+
+        /* Tabs */
+        .tabs-bar { display: flex; border-bottom: 1px solid var(--border); background: white; position: sticky; top: 0; z-index: 50; }
+        .tab-btn { flex: 1; padding: 13px 4px; font-size: 12px; font-weight: 600; color: var(--text-muted); background: none; border: none; border-bottom: 2.5px solid transparent; cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif; }
+        .tab-btn.active { color: var(--teal); border-bottom-color: var(--teal); }
+
+        /* Order Cards */
+        .orders-list { padding: 14px; }
+        .empty-state { text-align: center; padding: 50px 20px 30px; }
+        .empty-icon { width: 80px; height: 80px; background: var(--teal-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 34px; }
+        .empty-title { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .empty-sub { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+        .order-card { background: white; border: 1.5px solid var(--border); border-radius: 14px; margin-bottom: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+        .order-card.lucky-card { border-color: var(--gold); box-shadow: 0 4px 20px rgba(245,158,11,.2); }
+        .order-card-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); background: #fafafa; }
+        .lucky-card .order-card-head { background: linear-gradient(135deg, #fffbeb, #fef3c7); }
+        .order-id-row { display: flex; align-items: center; gap: 7px; }
+        .order-id { font-size: 12px; color: var(--text-muted); }
+        .lucky-badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706); color: white;
+            font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px;
+            display: flex; align-items: center; gap: 3px; animation: luckyPulse 2s infinite;
+        }
+        @keyframes luckyPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,.4); } 50% { box-shadow: 0 0 0 6px rgba(245,158,11,.0); } }
+        .order-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+        .badge-pending { background: #fff8e7; color: #b45309; }
+        .badge-completed { background: #ecfdf5; color: #059669; }
+
+        .order-card-body { display: flex; gap: 11px; padding: 11px 14px; }
+        .order-img { width: 65px; height: 65px; border-radius: 10px; object-fit: cover; flex-shrink: 0; background: var(--bg); }
+        .order-info { flex: 1; min-width: 0; }
+        .order-title { font-size: 12.5px; font-weight: 600; color: var(--text); line-height: 1.45; margin-bottom: 5px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .order-price-row { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+        .order-price { font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); }
+        .order-comm { font-size: 11px; color: var(--success); font-weight: 700; background: #ecfdf5; padding: 2px 7px; border-radius: 20px; }
+
+        /* Bulk quantity badge */
+        .bulk-badge { font-size: 11px; color: var(--gold); font-weight: 700; background: var(--gold-light); padding: 2px 7px; border-radius: 20px; margin-top: 4px; display: inline-block; }
+
+        .order-breakdown { padding: 9px 14px; background: #fafafa; border-top: 1px solid var(--border); }
+        .breakdown-row { display: flex; justify-content: space-between; font-size: 11.5px; margin-bottom: 4px; }
+        .breakdown-row:last-child { margin-bottom: 0; font-weight: 700; color: var(--text); padding-top: 4px; border-top: 1px dashed var(--border); }
+        .breakdown-lbl { color: var(--text-muted); }
+        .breakdown-val { font-family: 'Outfit', sans-serif; font-weight: 700; }
+
+        .order-actions { padding: 10px 14px; display: flex; gap: 8px; }
+        .order-btn { flex: 1; padding: 9px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
+        .btn-submit { background: var(--teal); color: white; }
+        .btn-submit:hover:not(:disabled) { background: var(--teal-dark); }
+        .btn-submit:disabled { opacity: .6; cursor: not-allowed; }
+        .btn-cancel { background: var(--bg); color: var(--text-muted); }
+        .btn-cancel:hover { background: var(--border); }
+
+        /* Phase Complete Banner */
+        .phase-done-banner {
+            margin: 0 14px 10px; background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border: 1.5px solid #a7f3d0; border-radius: 14px; padding: 14px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .phase-done-banner .pdb-icon { font-size: 28px; }
+        .phase-done-banner .pdb-title { font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 800; color: #065f46; }
+        .phase-done-banner .pdb-sub { font-size: 12px; color: #059669; margin-top: 2px; }
+
+        /* ── LUCKY CONGRATS MODAL ── */
+        .lucky-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 998; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .lucky-overlay.open { display: flex; }
+        .lucky-box { background: white; border-radius: 24px; width: 100%; max-width: 400px; overflow: hidden; }
+        .lucky-stars-header {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            padding: 28px 24px 20px; text-align: center; color: white; position: relative;
+        }
+        .lucky-stars-row { font-size: 30px; letter-spacing: 6px; margin-bottom: 10px; animation: starSpin 2s ease-in-out infinite alternate; }
+        @keyframes starSpin { 0%{transform:scale(1)} 100%{transform:scale(1.1)} }
+        .lucky-hl { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 5px; }
+        .lucky-sub { font-size: 13px; opacity: .9; }
+        .lucky-body { padding: 20px; }
+        .lucky-info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 10px; background: #fafafa; margin-bottom: 8px; }
+        .lucky-info-lbl { font-size: 12px; color: var(--text-muted); }
+        .lucky-info-val { font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 800; color: var(--text); }
+        .lucky-gap-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 10px; background: #fff8e7; border: 1.5px solid #fde68a; margin-bottom: 12px; }
+        .lucky-gap-lbl { font-size: 12px; color: #92400e; font-weight: 700; }
+        .lucky-gap-val { font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 800; color: var(--gold); }
+        .lucky-err { background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; display: none; }
+        .lucky-err-title { font-size: 13px; font-weight: 700; color: #dc2626; margin-bottom: 3px; }
+        .lucky-err-msg { font-size: 12px; color: #991b1b; }
+        .lucky-btns { display: flex; gap: 10px; }
+        .lucky-btn { flex: 1; padding: 12px; border-radius: 12px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all .2s; }
+        .lucky-btn-cancel { background: var(--bg); color: var(--text-muted); }
+        .lucky-btn-proceed { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+        .lucky-btn-proceed:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245,158,11,.4); }
+        .lucky-btn-wallet { background: var(--teal); color: white; flex: 1; display: block; text-align: center; text-decoration: none; padding: 12px; border-radius: 12px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; transition: all .2s; }
+
+        /* Grab Modal */
+        .grab-modal { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 999; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .grab-modal.open { display: flex; }
+        .grab-content { background: white; border-radius: 20px; width: 100%; max-width: 400px; overflow: hidden; }
+        .grab-header { background: var(--teal-grad); color: white; padding: 18px 20px; text-align: center; }
+        .grab-header.bonus-header { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .grab-title { font-family: 'Outfit', sans-serif; font-size: 19px; font-weight: 800; }
+        .grab-sub { font-size: 12px; opacity: .85; margin-top: 2px; }
+        .grab-body { padding: 20px; }
+        .grab-product { display: flex; gap: 14px; margin-bottom: 16px; }
+        .grab-img { width: 80px; height: 80px; border-radius: 12px; object-fit: cover; background: var(--bg); }
+        .grab-details { flex: 1; }
+        .grab-prod-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; line-height: 1.4; }
+        .grab-price { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 800; color: var(--text); }
+        .grab-bulk { font-size: 12px; color: var(--gold); font-weight: 700; margin-top: 4px; background: var(--gold-light); display: inline-block; padding: 2px 8px; border-radius: 20px; }
+
+        .grab-calc { background: var(--bg); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
+        .calc-row { display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 5px; }
+        .calc-row:last-child { margin-bottom: 0; font-weight: 700; padding-top: 5px; border-top: 1px dashed var(--border); }
+        .calc-lbl { color: var(--text-muted); }
+        .calc-val { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--text); }
+        .calc-note { font-size: 11px; color: var(--gold); margin-top: 6px; background: var(--gold-light); padding: 6px 10px; border-radius: 8px; }
+
+        .grab-buttons { display: flex; gap: 10px; }
+        .grab-btn { flex: 1; padding: 12px; border-radius: 12px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all .2s; }
+        .btn-confirm { background: var(--teal); color: white; }
+        .btn-confirm:hover:not(:disabled) { background: var(--teal-dark); }
+        .btn-confirm.bonus-confirm { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .btn-close { background: var(--bg); color: var(--text-muted); }
+
+        /* Phase Complete Modal */
+        .phase-complete-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .phase-complete-overlay.open { display: flex; }
+        .pc-box { background: white; border-radius: 24px; width: 100%; max-width: 360px; overflow: hidden; text-align: center; }
+        .pc-header { padding: 32px 24px 24px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .pc-icon { font-size: 64px; margin-bottom: 12px; }
+        .pc-title { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+        .pc-msg { font-size: 13px; opacity: .9; line-height: 1.6; }
+        .pc-stats { padding: 20px 24px; }
+        .pc-stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+        .pc-stat-row:last-child { border-bottom: none; font-weight: 700; }
+        .pc-footer { padding: 16px 24px; }
+        .pc-btn { width: 100%; padding: 14px; background: var(--teal); color: white; border: none; border-radius: 12px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--text); color: white; padding: 12px 20px; border-radius: 30px;
+            font-size: 13px; font-weight: 600; z-index: 9998; opacity: 0; transition: all .3s;
+            white-space: nowrap; max-width: 90vw; text-overflow: ellipsis; overflow: hidden;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.golden { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .toast.error { background: #dc2626; }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 500px; height: var(--nav-h);
+            background: white; border-top: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-around;
+            z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        }
+        .nav-item {
+            flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+            cursor: pointer; text-decoration: none; color: #aaa;
+            font-size: 10.5px; font-weight: 600; padding: 6px 0; transition: color .15s;
+        }
+        .nav-item i { font-size: 21px; }
+        .nav-item.active, .nav-item:hover { color: var(--teal); }
+        .nav-start-wrap {
+            flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+        }
+        .nav-start-btn {
+            width: 58px; height: 58px; border-radius: 50%;
+            background: linear-gradient(138deg, rgba(0,0,0,.15) 0%, transparent 70%), var(--teal);
+            border: 4px solid white; outline: 3px solid var(--teal);
+            box-shadow: 0 4px 16px rgba(11,177,179,0.45);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; margin-top: -28px; transition: all .2s;
+            color: white; font-size: 24px; text-decoration: none;
+        }
+        .nav-start-btn:hover { transform: scale(1.08); box-shadow: 0 8px 24px rgba(11,177,179,0.55); }
+        .nav-start-label { font-size: 10.5px; font-weight: 700; color: var(--teal); }
+
+        /* Star Ratings */
+        .order-stars { padding: 10px 14px; background: #fafafa; border-top: 1px solid var(--border); }
+        .star-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6; }
+        .star-row:last-child { border-bottom: none; }
+        .star-row-label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text); font-weight: 500; }
+        .star-row-label i { font-size: 14px; color: var(--text-muted); width: 16px; text-align: center; }
+        .stars-wrap { display: flex; align-items: center; gap: 2px; }
+        .s { font-size: 14px; color: #e5e7eb; }
+        .s.on { color: #f59e0b; }
+        .star-score-lbl { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-left: 5px; }
+
+        /* Grab Modal Star Rating */
+        .grab-stars-section { background: #f9fafb; border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; }
+        .grab-stars-title { font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 10px; font-weight: 600; letter-spacing: 0.3px; }
+        .grab-star-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .grab-star-row:last-child { margin-bottom: 0; }
+        .grab-star-row-left { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text); font-weight: 500; }
+        .grab-star-row-left i { width: 18px; font-size: 14px; color: var(--text-muted); }
+        .grab-stars { display: flex; gap: 3px; }
+        .grab-star { font-size: 16px; color: #e5e7eb; cursor: pointer; transition: color .15s; }
+        .grab-star.lit { color: #f59e0b; }
+        .grab-star-val { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-left: 4px; }
+    </style>
+</head>
+<body>
+    <div id="authOverlay">
+        <div class="auth-spinner"></div>
+        <div style="font-size:13px;color:var(--text-muted);">Loading your task orders...</div>
+    </div>
+
+    <div class="wrapper">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="page-logo">
+                <div class="page-logo-icon">🛍️</div>
+                ManifestoShop
+            </div>
+            <div class="page-header-actions">
+                <button onclick="openCrispChat()" class="page-header-btn" title="Live Support" style="border:none;"><i class="fas fa-headset"></i></button>
+                <button onclick="logoutUser()" class="page-header-btn" title="Logout" style="border:none;"><i class="fas fa-sign-out-alt"></i></button>
+                <a href="homepage.html" class="page-header-btn" title="Home"><i class="fas fa-home"></i></a>
+            </div>
+        </div>
+
+        <!-- Balance Section -->
+        <div class="balance-section">
+            <div class="balance-lbl">Available Balance</div>
+            <div class="balance-amt" id="balanceDisplay">$0.00</div>
+            <div class="balance-meta">
+                <div class="bm-item">
+                    <div class="bm-lbl">Today Earned</div>
+                    <div class="bm-val" id="todayCommDisplay">$0.00</div>
+                </div>
+                <div class="bm-item">
+                    <div class="bm-lbl">Total Earned</div>
+                    <div class="bm-val" id="totalEarnedDisplay">$0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Progress Header — hidden from user dashboard (surprise experience) -->
+        <div class="phase-banner" id="phaseBanner" style="display:none;">
+            <div class="phase-header phase-1-bg" id="phaseHeader">
+                <div>
+                    <div class="phase-name" id="phaseName">Task Center</div>
+                </div>
+                <div id="phaseBadge" style="display:none;"></div>
+            </div>
+            <div class="phase-progress-wrap phase-1-bg" id="phaseProgressWrap">
+                <div class="phase-progress-row">
+                    <span class="phase-progress-text">Task Progress</span>
+                    <span class="phase-order-count" id="phaseOrderCount">0/0</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressBarFill" style="width:0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Dots — hidden from user dashboard (surprise experience) -->
+        <div class="order-dots-wrap" style="display:none;">
+            <div class="order-dots" id="orderDots"></div>
+        </div>
+
+        <!-- Stats Strip -->
+        <div class="stats-strip">
+            <div class="stat-item">
+                <div class="stat-val" id="statTotal">0</div>
+                <div class="stat-lbl">Total</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-val" id="statPending">0</div>
+                <div class="stat-lbl">Pending</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-val" id="statCompleted">0</div>
+                <div class="stat-lbl">Completed</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-bar">
+            <button class="tab-btn active" id="tabAvailable" onclick="switchTab('available', this)">Available</button>
+            <button class="tab-btn" id="tabPending" onclick="switchTab('pending', this)">Pending</button>
+            <button class="tab-btn" id="tabCompleted" onclick="switchTab('completed', this)">Completed</button>
+        </div>
+
+        <!-- Orders List -->
+        <div class="orders-list" id="ordersList"></div>
+    </div>
+
+    <!-- ══════ LUCKY ORDER — 2-STEP MODAL (spec-exact) ══════ -->
+    <div class="lucky-overlay" id="luckyCongratsModal">
+        <div class="lucky-box">
+
+            <!-- ── STEP 1: Congratulations popup (Continue button only) ── -->
+            <div id="luckyStep1">
+                <div class="lucky-stars-header">
+                    <div class="lucky-stars-row">⭐ ⭐ ⭐</div>
+                    <div class="lucky-hl">Congratulations!</div>
+                    <div class="lucky-sub">You have received a Lucky Order</div>
+                </div>
+                <div class="lucky-body">
+                    <div style="text-align:center;padding:10px 0 18px;">
+                        <div style="font-size:48px;margin-bottom:10px;">🎰</div>
+                        <p style="font-size:14px;color:var(--text-muted);line-height:1.6;">
+                            This is a <strong style="color:var(--gold);">high-value order</strong> with
+                            increased rewards. Complete it to earn a big commission!
+                        </p>
+                    </div>
+                    <!-- Single button: Continue only -->
+                    <button class="lucky-btn lucky-btn-proceed" style="width:100%;" onclick="showLuckyStep2()">
+                        Continue ➜
+                    </button>
+                </div>
+            </div>
+
+            <!-- ── STEP 2: Order details + Add Funds / Cancel ── -->
+            <div id="luckyStep2" style="display:none;">
+                <div class="lucky-stars-header" style="padding:16px 24px 14px;">
+                    <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,.8);margin-bottom:4px;">⭐ Lucky Order Details</div>
+                    <div class="lucky-hl" style="font-size:18px;" id="luckyOrderTitle">Task #–</div>
+                </div>
+                <div class="lucky-body">
+                    <!-- Order Amount -->
+                    <div class="lucky-info-row">
+                        <span class="lucky-info-lbl">Order Amount</span>
+                        <span class="lucky-info-val" id="luckyOrderAmt">$0.00</span>
+                    </div>
+                    <!-- Your Balance -->
+                    <div class="lucky-info-row">
+                        <span class="lucky-info-lbl">Your Balance</span>
+                        <span class="lucky-info-val" id="luckyBalAmt">$0.00</span>
+                    </div>
+                    <!-- Required Amount (gap) -->
+                    <div class="lucky-info-row">
+                        <span class="lucky-info-lbl">Required Amount</span>
+                        <span class="lucky-info-val" id="luckyReqAmt" style="color:var(--gold);">$0.00</span>
+                    </div>
+                    <!-- Profit -->
+                    <div class="lucky-info-row">
+                        <span class="lucky-info-lbl">Profit You'll Earn</span>
+                        <span class="lucky-info-val" style="color:var(--success);" id="luckyProfitAmt">$0.00</span>
+                    </div>
+
+                    <!-- Needs-more message (shown when balance < order amount) -->
+                    <div id="luckyNeedsMoreMsg" style="display:none;background:#fff8e7;border:1.5px solid #fde68a;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12.5px;color:#92400e;line-height:1.5;">
+                        <strong>⚡ You need <span id="luckyNeedAmt">$0</span> more to complete this order.</strong>
+                        Please add funds to your wallet to proceed.
+                    </div>
+
+                    <!-- Insufficient funds error (shown when Proceed clicked without enough balance) -->
+                    <div class="lucky-err" id="luckyErrBox" style="display:none;">
+                        <div class="lucky-err-title">⚠️ Insufficient Funds</div>
+                        <div class="lucky-err-msg" id="luckyErrMsg">Unable to proceed due to insufficient funds. Order gap is $0.</div>
+                    </div>
+
+                    <!-- Buttons: changes based on balance check -->
+                    <!-- Case A: balance is sufficient → Proceed + Cancel -->
+                    <div class="lucky-btns" id="luckyBtns" style="display:none;">
+                        <button class="lucky-btn lucky-btn-cancel" onclick="closeLuckyModal()">Cancel</button>
+                        <button class="lucky-btn lucky-btn-proceed" onclick="proceedFromLucky()">Proceed ➜</button>
+                    </div>
+                    <!-- Case B: balance insufficient → Add Funds + Cancel -->
+                    <div id="luckyInsufficientBtns" style="display:none;gap:10px;">
+                        <button class="lucky-btn lucky-btn-cancel" onclick="closeLuckyModal()" style="flex:1;">Cancel</button>
+                        <a href="recharge.html" class="lucky-btn-wallet">Add Funds</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Grab Modal -->
+    <div class="grab-modal" id="grabModal">
+        <div class="grab-content">
+            <div class="grab-header" id="grabHeader">
+                <div class="grab-title" id="grabTitle">Grab Task</div>
+                <div class="grab-sub" id="grabSub">Review and confirm this task</div>
+            </div>
+            <div class="grab-body">
+                <div class="grab-product" id="grabProduct"></div>
+                <div class="grab-calc" id="grabCalc"></div>
+                <!-- Star Rating -->
+                <div class="grab-stars-section">
+                    <div class="grab-stars-title">RATE YOUR EXPERIENCE BEFORE CONTINUING</div>
+                    <div class="grab-star-row">
+                        <div class="grab-star-row-left"><i class="fas fa-award"></i> Product Quality</div>
+                        <div style="display:flex;align-items:center;">
+                            <div class="grab-stars" id="grabStars1">
+                                <span class="grab-star lit" onclick="setGrabStars(1,1)">★</span>
+                                <span class="grab-star lit" onclick="setGrabStars(1,2)">★</span>
+                                <span class="grab-star lit" onclick="setGrabStars(1,3)">★</span>
+                                <span class="grab-star lit" onclick="setGrabStars(1,4)">★</span>
+                                <span class="grab-star" onclick="setGrabStars(1,5)">★</span>
+                            </div>
+                            <span class="grab-star-val" id="grabStarVal1">4/5</span>
+                        </div>
+                    </div>
+                    <div class="grab-star-row">
+                        <div class="grab-star-row-left"><i class="fas fa-tshirt"></i> Design & Style</div>
+                        <div style="display:flex;align-items:center;">
+                            <div class="grab-stars" id="grabStars2">
+                                <span class="grab-star lit" onclick="setGrabStars(2,1)">★</span>
+                                <span class="grab-star lit" onclick="setGrabStars(2,2)">★</span>
+                                <span class="grab-star lit" onclick="setGrabStars(2,3)">★</span>
+                                <span class="grab-star lit" onclick="setGrabStars(2,4)">★</span>
+                                <span class="grab-star lit" onclick="setGrabStars(2,5)">★</span>
+                            </div>
+                            <span class="grab-star-val" id="grabStarVal2">5/5</span>
+                        </div>
+                    </div>
+                    <div class="grab-star-row">
+                        <div class="grab-star-row-left"><i class="fas fa-tag"></i> Value for Money</div>
+                        <div style="display:flex;align-items:center;">
+                            <div class="grab-stars" id="grabStars3">
+                                <span class="grab-star lit" onclick="setGrabStars(3,1)">★</span>
+                                <span class="grab-star lit" onclick="setGrabStars(3,2)">★</span>
+                                <span class="grab-star lit" onclick="setGrabStars(3,3)">★</span>
+                                <span class="grab-star" onclick="setGrabStars(3,4)">★</span>
+                                <span class="grab-star" onclick="setGrabStars(3,5)">★</span>
+                            </div>
+                            <span class="grab-star-val" id="grabStarVal3">3/5</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="grab-buttons">
+                    <button class="grab-btn btn-close" onclick="closeGrabModal()">Cancel</button>
+                    <button class="grab-btn btn-confirm" id="confirmGrabBtn" onclick="confirmGrab()">Confirm Grab</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phase Complete Modal -->
+    <div class="phase-complete-overlay" id="phaseCompleteOverlay">
+        <div class="pc-box">
+            <div class="pc-header">
+                <div class="pc-icon" id="pcIcon">🎓</div>
+                <div class="pc-title" id="pcTitle">Phase Complete!</div>
+                <div class="pc-msg" id="pcMsg">Congratulations on completing this phase!</div>
+            </div>
+            <div class="pc-stats" id="pcStats"></div>
+            <div class="pc-footer">
+                <button class="pc-btn" onclick="closePhaseComplete()">Got It!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <a class="nav-item" href="homepage.html">
+            <i class="fas fa-home"></i><span>Home</span>
+        </a>
+        <a class="nav-item" href="recharge.html">
+            <i class="fas fa-plus-circle"></i><span>Recharge</span>
+        </a>
+        <div class="nav-start-wrap">
+            <a class="nav-start-btn" href="grab_an_order.html" title="Start Grabbing Orders">
+                <i class="fas fa-rocket"></i>
+            </a>
+            <span class="nav-start-label">Start</span>
+        </div>
+        <a class="nav-item active" href="grab_an_order.html">
+            <i class="fas fa-clipboard-list"></i><span>Order</span>
+        </a>
+        <a class="nav-item" href="my.html">
+            <i class="fas fa-user-circle"></i><span>My</span>
+        </a>
+    </nav>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// PHASE CONFIGURATIONS — Single source of truth (Fully Transparent)
+// ══════════════════════════════════════════════════════════════
+const DEFAULT_PHASE_CONFIGS = {
+    1: {
+        name: 'Training Phase',
+        totalOrders: 11,
+        bonusPositions: [5, 9],
+        // Gap-based lucky orders for Phase 1 — Profit = Gap (same logic as Phase 3)
+        fixedGaps: { 5: 222, 9: 330 },
+        baseRate: 0.10,   // fixed per-order profits for normal orders
+        rules: [
+            'Complete 11 tasks in total to finish Phase 1',
+            'Lucky Order on task #5 ⭐ — high commission reward!',
+            'Lucky Order on task #9 ⭐ — high commission reward!',
+            'Normal task amount = your current balance at the time of the order',
+            'Normal task commission: fixed per-order profit (increases each task)',
+            'Lucky Order #5: Profit = $150 | Required Gap Deposit = $222',
+            'Lucky Order #9: Profit = $246 | Required Gap Deposit = $330',
+            'Lucky Order profit is fixed — the gap is always deposited on top of your balance',
+            'All 11 orders are standard — no sponsored orders',
+            'All calculations are logged and visible to you'
+        ]
+    },
+    2: {
+        name: 'First Deposit Phase',
+        totalOrders: 20,
+        bonusPositions: [11],
+        fixedGaps: { 11: 189 },
+        baseRate: null,
+        rules: [
+            'Complete 20 tasks in total to finish Phase 2',
+            'Lucky Order on task #11 ⭐ — high commission reward!',
+            'Normal task amount is fixed per order schedule',
+            'Normal task commission: fixed per-order profit',
+            'Lucky Order #11: Fixed Amount = $306 | Profit = $47 | Gap = $189',
+            'Lucky Order profit equals the gap — no rate calculation',
+            'All calculations are logged and visible to you',
+            'Requires first deposit to access this phase'
+        ]
+    },
+    3: {
+        name: 'Second Deposit Phase',
+        totalOrders: 21,
+        bonusPositions: [9, 14, 17, 19, 21],
+        // Fixed gaps for each lucky order in Phase 3
+        fixedGaps: { 9: 358, 14: 1028, 17: 2238, 19: 4449, 21: 8896 },
+        baseRate: 0.025,
+        rules: [
+            'Complete 21 tasks in total to finish Phase 3',
+            'Lucky Orders on tasks: #9, #14, #17, #19, #21 ⭐',
+            'All task amounts are fixed — your balance never changes the price',
+            'Normal task commission: fixed per-order profit',
+            'After Balance = task amount + commission for all orders',
+            'Lucky Order profits: #9→$155 | #14→$289 | #17→$1,099 | #19→$2,437 | #21→$4,350',
+            'Lucky Order gaps: #9→$358 | #14→$1,028 | #17→$2,238 | #19→$4,449 | #21→$8,896',
+            'Gap = fixed amount minus your balance (if balance ≥ amount, gap = $0)',
+            'Lucky Order profit is fixed regardless of your balance',
+            'All calculations are logged and visible to you',
+            'Requires second deposit to access this phase'
+        ]
+    }
+};
+
+// ══════════════════════════════════════════════════════════════
+// PRODUCTS — Unique pools per phase (no overlap)
+// ══════════════════════════════════════════════════════════════
+const PRODUCT_MAP = {};
+
+// Phase 1 — Fashion & Accessories (11 products)
+const PHASE1_PRODUCTS = [
+    { id: 'PH1-001', title: 'Classic White Sneakers Unisex', price: 64.99, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&h=300&fit=crop' },
+    { id: 'PH1-002', title: 'Slim Fit Chino Trousers', price: 44.99, image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=300&h=300&fit=crop' },
+    { id: 'PH1-003', title: 'Floral Wrap Midi Dress', price: 52.99, image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=300&h=300&fit=crop' },
+    { id: 'PH1-004', title: 'Oversized Knit Pullover Sweater', price: 48.99, image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=300&h=300&fit=crop' },
+    { id: 'PH1-005', title: 'Genuine Leather Tote Bag', price: 79.99, image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300&h=300&fit=crop' },
+    { id: 'PH1-006', title: 'Slim Leather Watch Brown Strap', price: 59.99, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop' },
+    { id: 'PH1-007', title: 'Gold Layered Necklace Set', price: 34.99, image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=300&h=300&fit=crop' },
+    { id: 'PH1-008', title: 'Aviator Sunglasses Polarized', price: 29.99, image: 'https://images.unsplash.com/photo-1508296695146-257a814070b4?w=300&h=300&fit=crop' },
+    { id: 'PH1-009', title: 'Striped Linen Button-Down Shirt', price: 38.99, image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=300&h=300&fit=crop' },
+    { id: 'PH1-010', title: 'High-Waist Denim Jeans Straight', price: 54.99, image: 'https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?w=300&h=300&fit=crop' },
+    { id: 'PH1-011', title: 'Cashmere Wool Beanie Hat', price: 27.99, image: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=300&h=300&fit=crop' },
+];
+
+// Phase 2 — Fashion & Accessories (20 products — strictly unique images, no overlap with Phase 1 or Phase 3)
+const PHASE2_PRODUCTS = [
+    { id: 'PH2-001', title: 'Genuine Leather Bifold Wallet', price: 35.99, image: 'https://images.unsplash.com/photo-1574634534894-89d7576c8259?w=300&h=300&fit=crop' },
+    { id: 'PH2-002', title: 'Canvas Tote Shopper Bag', price: 29.99, image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=300&fit=crop' },
+    { id: 'PH2-003', title: 'Retro Cat-Eye Sunglasses', price: 24.99, image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=300&h=300&fit=crop' },
+    { id: 'PH2-004', title: 'Luxury Silk Square Scarf', price: 42.99, image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=300&h=300&fit=crop' },
+    { id: 'PH2-005', title: 'Designer Ankle Boots Suede', price: 74.99, image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=300&h=300&fit=crop' },
+    { id: 'PH2-006', title: 'Mini Croc-Embossed Shoulder Bag', price: 49.99, image: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=300&h=300&fit=crop' },
+    { id: 'PH2-007', title: 'Vintage Corduroy Baseball Cap', price: 22.99, image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&h=300&fit=crop' },
+    { id: 'PH2-008', title: 'Leather Belt Reversible 2-in-1', price: 28.99, image: 'https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?w=300&h=300&fit=crop' },
+    { id: 'PH2-009', title: 'Wide-Leg Linen Trousers', price: 38.99, image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=300&h=300&fit=crop' },
+    { id: 'PH2-010', title: 'Designer Eau de Parfum 100ml', price: 55.99, image: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=300&h=300&fit=crop' },
+    { id: 'PH2-011', title: 'Wide Brim Straw Summer Hat', price: 26.99, image: 'https://images.unsplash.com/photo-1521369909029-2afed882baee?w=300&h=300&fit=crop' },
+    { id: 'PH2-012', title: 'Slim Fit Polo Shirt Cotton', price: 32.99, image: 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=300&h=300&fit=crop' },
+    { id: 'PH2-013', title: 'Printed Maxi Boho Dress', price: 47.99, image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=300&h=300&fit=crop' },
+    { id: 'PH2-014', title: 'Knitted Beanie Wool Blend', price: 19.99, image: 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=300&h=300&fit=crop' },
+    { id: 'PH2-015', title: 'Crossbody Bag Vegan Leather', price: 39.99, image: 'https://images.unsplash.com/photo-1560707303-4e980ce876ad?w=300&h=300&fit=crop' },
+    { id: 'PH2-016', title: 'Graphic Print Oversized Tee', price: 21.99, image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop' },
+    { id: 'PH2-017', title: 'Running Sneakers Lightweight', price: 69.99, image: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=300&h=300&fit=crop' },
+    { id: 'PH2-018', title: 'Floral Print Kimono Cardigan', price: 33.99, image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=300&h=300&fit=crop' },
+    { id: 'PH2-019', title: 'Silver Hoop Earrings Set', price: 18.99, image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=300&h=300&fit=crop' },
+    { id: 'PH2-020', title: 'Denim Jacket Classic Wash', price: 58.99, image: 'https://images.unsplash.com/photo-1523205771623-e0faa4d2813d?w=300&h=300&fit=crop' },
+];
+
+// Phase 3 — Fashion & Luxury (21 products)
+const PHASE3_PRODUCTS = [
+    { id: 'PH3-001', title: 'Tailored Blazer Double Breasted', price: 119.99, image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=300&h=300&fit=crop' },
+    { id: 'PH3-002', title: 'Leather Crossbody Bag Mini', price: 89.99, image: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=300&h=300&fit=crop' },
+    { id: 'PH3-003', title: 'Silk Evening Blouse V-Neck', price: 74.99, image: 'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=300&h=300&fit=crop' },
+    { id: 'PH3-004', title: 'Chelsea Ankle Boots Leather', price: 139.99, image: 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=300&h=300&fit=crop' },
+    { id: 'PH3-005', title: 'Wool Blend Trench Coat Belted', price: 189.99, image: 'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=300&h=300&fit=crop' },
+    { id: 'PH3-006', title: 'Diamond-Cut Hoop Earrings Gold', price: 49.99, image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=300&fit=crop' },
+    { id: 'PH3-007', title: 'Merino Wool Turtleneck Slim', price: 68.99, image: 'https://images.unsplash.com/photo-1547624643-3bf761b09502?w=300&h=300&fit=crop' },
+    { id: 'PH3-008', title: 'Pleated Wide-Leg Trousers', price: 62.99, image: 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=300&h=300&fit=crop' },
+    { id: 'PH3-009', title: 'Structured Top-Handle Handbag', price: 159.99, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300&h=300&fit=crop' },
+    { id: 'PH3-010', title: 'Satin Slip Midi Skirt', price: 54.99, image: 'https://images.unsplash.com/photo-1572804013427-4d7ca7268217?w=300&h=300&fit=crop' },
+    { id: 'PH3-011', title: 'Puffer Jacket Quilted Lightweight', price: 99.99, image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=300&h=300&fit=crop' },
+    { id: 'PH3-012', title: 'Suede Loafers Classic Slip-On', price: 109.99, image: 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=300&h=300&fit=crop' },
+    { id: 'PH3-013', title: 'Cashmere Cardigan Open-Front', price: 134.99, image: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=300&h=300&fit=crop' },
+    { id: 'PH3-014', title: 'Pearl Choker Necklace Layered', price: 39.99, image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=300&h=300&fit=crop' },
+    { id: 'PH3-015', title: 'Faux Leather Biker Jacket', price: 94.99, image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=300&h=300&fit=crop' },
+    { id: 'PH3-016', title: 'Embroidered Linen Summer Dress', price: 69.99, image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=300&h=300&fit=crop' },
+    { id: 'PH3-017', title: 'Stainless Steel Bracelet Cuff', price: 44.99, image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=300&h=300&fit=crop' },
+    { id: 'PH3-018', title: 'Bucket Hat Reversible Cotton', price: 24.99, image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&h=300&fit=crop' },
+    { id: 'PH3-019', title: 'Velvet Mini Party Dress', price: 84.99, image: 'https://images.unsplash.com/photo-1578681994506-b8f463449011?w=300&h=300&fit=crop' },
+    { id: 'PH3-020', title: 'Oxford Lace-Up Derby Shoes', price: 114.99, image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=300&h=300&fit=crop' },
+    { id: 'PH3-021', title: 'Luxury Silk Kimono Robe', price: 149.99, image: 'https://images.unsplash.com/photo-1601924994987-69e26d50dc26?w=300&h=300&fit=crop' },
+];
+
+// Build product map (all phases)
+[...PHASE1_PRODUCTS, ...PHASE2_PRODUCTS, ...PHASE3_PRODUCTS].forEach(p => { PRODUCT_MAP[p.id] = p; });
+
+// Helper: get products for current phase
+function getPhaseProducts() {
+    if (phaseNum === 1) return PHASE1_PRODUCTS;
+    if (phaseNum === 2) return PHASE2_PRODUCTS;
+    return PHASE3_PRODUCTS;
+}
+
+// ══════════════════════════════════════════════════════════════
+// FIXED REFERENCE ORDER TABLES (match exact chart values)
+// ══════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════
+// ALL TASK AMOUNTS ARE 100% FIXED — balance never affects any price
+// Lucky order "amount" = the user's expected balance going in (not the total required).
+// Lucky order total required = amount + fixedGap  (locked, never changes)
+// ══════════════════════════════════════════════════════════════
+const PHASE1_HIGH_VALUE = {}; // unused
+
+// Phase 1 — REFERENCE amounts starting from $100 (for display reference only)
+// Actual order amounts are computed dynamically from user balance:
+//   Normal: orderAmount = balance   Lucky: orderAmount = balance + fixedGap
+// Reference table (Start Balance = $100):
+// #1:Normal  $100.00  +$6.00    → After $106.00
+// #2:Normal  $106.00  +$8.00    → After $114.00
+// #3:Normal  $114.00  +$11.00   → After $125.00
+// #4:Normal  $125.00  +$15.00   → After $140.00
+// #5:Lucky   $362.00  +$150(gap $222) → After $512.00  (amount = balance $140 + gap $222)
+// #6:Normal  $512.00  +$48.00   → After $560.00
+// #7:Normal  $560.00  +$44.00   → After $604.00
+// #8:Normal  $604.00  +$66.00   → After $670.00
+// #9:Lucky   $1000.00 +$246(gap $330) → After $1,246.00 (amount = balance $670 + gap $330)
+// #10:Normal $1,246.00 +$70.00  → After $1,316.00
+// #11:Normal $1,316.00 +$78.00  → After $1,394.00
+const PHASE1_FIXED_AMOUNTS = {
+    1:  100.00,
+    2:  106.00,
+    3:  114.00,
+    4:  125.00,
+    5:  362.00,   // Lucky reference: balance $140 + gap $222
+    6:  512.00,
+    7:  560.00,
+    8:  604.00,
+    9:  1000.00,  // Lucky reference: balance $670 + gap $330
+    10: 1246.00,
+    11: 1316.00
+};
+
+// Phase 1 — Fixed profits for normal (non-lucky) orders
+const PHASE1_FIXED_NORMAL_PROFITS = {
+    1: 6.00,   2: 8.00,   3: 11.00,  4: 15.00,
+    6: 48.00,  7: 44.00,  8: 66.00,
+    10: 70.00, 11: 78.00
+};
+
+// Phase 2 — Fixed amounts (Start Balance = $100)
+// Reference table (Orders 1-20):
+// #1:Normal   $100.00  +$1.00    → After $101.00
+// #2:Normal   $101.00  +$1.25    → After $102.25
+// #3:Normal   $102.25  +$1.25    → After $103.50
+// #4:Normal   $103.50  +$1.50    → After $105.00
+// #5:Normal   $105.00  +$2.00    → After $107.00
+// #6:Normal   $107.00  +$1.75    → After $108.75
+// #7:Normal   $108.75  +$2.00    → After $110.75
+// #8:Normal   $110.75  +$2.25    → After $113.00
+// #9:Normal   $113.00  +$2.50    → After $115.50
+// #10:Normal  $115.50  +$2.25    → After $117.75
+// #11:Lucky   $306.00  +$47.00 (gap $189) → After $353.00
+// #12:Normal  $353.00  +$2.50    → After $355.50
+// #13:Normal  $355.50  +$2.75    → After $358.25
+// #14:Normal  $358.25  +$2.50    → After $360.75
+// #15:Normal  $360.75  +$2.75    → After $363.50
+// #16:Normal  $363.50  +$2.25    → After $365.75
+// #17:Normal  $365.75  +$3.00    → After $368.75
+// #18:Normal  $368.75  +$2.00    → After $370.75
+// #19:Normal  $370.75  +$3.25    → After $374.00
+// #20:Normal  $374.00  +$2.25    → After $376.25
+const PHASE2_FIXED_AMOUNTS = {
+    1:  100.00,
+    2:  101.00,
+    3:  102.25,
+    4:  103.50,
+    5:  105.00,
+    6:  107.00,
+    7:  108.75,
+    8:  110.75,
+    9:  113.00,
+    10: 115.50,
+    11: 306.00,  // Lucky — gap = 189, After = 353
+    12: 353.00,
+    13: 355.50,
+    14: 358.25,
+    15: 360.75,
+    16: 363.50,
+    17: 365.75,
+    18: 368.75,
+    19: 370.75,
+    20: 374.00
+};
+
+// Phase 2 — Fixed profits for each normal order (matches reference table)
+const PHASE2_FIXED_NORMAL_PROFITS = {
+    1:  1.00,  2:  1.25,  3:  1.25,  4:  1.50,
+    5:  2.00,  6:  1.75,  7:  2.00,  8:  2.25,
+    9:  2.50,  10: 2.25,
+    12: 2.50,  13: 2.75,  14: 2.50,  15: 2.75,
+    16: 2.25,  17: 3.00,  18: 2.00,  19: 3.25,  20: 2.25
+};
+
+// Phase 3 — Fixed profits for each normal order (matches reference table)
+const PHASE3_FIXED_NORMAL_PROFITS = {
+    1: 3.00,  2: 3.30,  3: 3.61,  4: 3.96,  5: 4.33,
+    6: 4.73,  7: 5.16,  8: 5.64,
+    10: 16.17, 11: 17.23, 12: 18.36, 13: 19.56,
+    15: 50.88, 16: 54.23,
+    18: 142.40,
+    20: 312.64
+};
+
+// Phase 3 — All 21 tasks fully fixed amounts (balance NEVER changes the price)
+// Reference table (Start Balance = $100):
+// #1:Normal   $100.00  +$3.00     → After $103.00
+// #2:Normal   $103.00  +$3.30     → After $106.30
+// #3:Normal   $106.30  +$3.61     → After $109.91
+// #4:Normal   $109.91  +$3.96     → After $113.87
+// #5:Normal   $113.87  +$4.33     → After $118.20
+// #6:Normal   $118.20  +$4.73     → After $122.93
+// #7:Normal   $122.93  +$5.16     → After $128.09
+// #8:Normal   $128.09  +$5.64     → After $133.73
+// #9:Lucky    $491.73  +$155(gap $358)  → After $646.73
+// #10:Normal  $646.73  +$16.17    → After $662.90
+// #11:Normal  $662.90  +$17.23    → After $680.13
+// #12:Normal  $680.13  +$18.36    → After $698.49
+// #13:Normal  $698.49  +$19.56    → After $718.05
+// #14:Lucky   $1,746.05 +$289(gap $1,028) → After $2,035.05
+// #15:Normal  $2,035.05 +$50.88   → After $2,085.93
+// #16:Normal  $2,085.93 +$54.23   → After $2,140.16
+// #17:Lucky   $4,378.16 +$1,099(gap $2,238) → After $5,477.16
+// #18:Normal  $5,477.00 +$142.40  → After $5,619.40
+// #19:Lucky   $10,068.40 +$2,437(gap $4,449) → After $12,505.40
+// #20:Normal  $12,505.40 +$312.64 → After $12,818.04
+// #21:Lucky   $21,714.00 +$4,350(gap $8,896) → After $26,064.00
+const PHASE3_FIXED_AMOUNTS = {
+    1:  100.00,    2:  103.00,    3:  106.30,    4:  109.91,    5:  113.87,
+    6:  118.20,    7:  122.93,    8:  128.09,
+    9:  491.73,    // Lucky — profit=$155, gap=$358
+    10: 646.73,    11: 662.90,    12: 680.13,    13: 698.49,
+    14: 1746.05,   // Lucky — profit=$289, gap=$1,028
+    15: 2035.05,   16: 2085.93,
+    17: 4378.16,   // Lucky — profit=$1,099, gap=$2,238 (after #16: 2085.93+54.23=2140.16, +gap 2238 = 4378.16)
+    18: 5477.00,
+    19: 10068.40,  // Lucky — profit=$2,437, gap=$4,449
+    20: 12505.40,
+    21: 21714.04   // Lucky — profit=$4,350, gap=$8,896 (after #20: 12505.40+312.64=12818.04, +gap 8896 = 21714.04)
+};
+
+// Fixed profits for lucky orders (keyed by phase → orderNumber)
+const LUCKY_FIXED_PROFITS = {
+    1: { 5: 150,      9: 246    },
+    2: { 11: 47 },
+    3: { 9: 155,  14: 289,  17: 1099,  19: 2437,  21: 4350 }
+};
+
+// ══════════════════════════════════════════════════════════════
+// GLOBAL STATE
+// ══════════════════════════════════════════════════════════════
+let userId = null;
+let userPhone = '';
+let balance = 0;
+let phaseNum = 1;
+let phaseConfig = DEFAULT_PHASE_CONFIGS[1];
+let phaseOrdersDone = 0;
+let totalEarned = 0;
+let todayComm = 0;
+let firstDepositAmount = 0;
+let phaseResetAtTimestamp = null;
+let orders = [];
+let currentProduct = null;
+let currentCalc = null;  // store computed calc for lucky popup flow
+let currentTab = 'available';
+let processing = false;
+let phaseCompleteShown = false;
+// Locked lucky order amounts — prevents amount inflation when user adds funds
+let lockedLuckyAmounts = {};  // key: "p{phase}_o{orderNum}" → locked orderAmount
+
+// ══════════════════════════════════════════════════════════════
+// INITIALIZATION
+// ══════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+    firebase.auth().onAuthStateChanged(async (user) => {
+        if (!user) { window.location.href = 'login.html'; return; }
+        userId = user.uid;
+        await loadPhaseConfig();
+        await loadUserData();
+        await loadOrders();
+        document.getElementById('authOverlay').style.display = 'none';
+        renderAll();
+    });
+});
+
+// ══════════════════════════════════════════════════════════════
+// LOAD ADMIN PHASE CONFIG FROM FIRESTORE
+// ══════════════════════════════════════════════════════════════
+async function loadPhaseConfig() {
+    try {
+        for (let p = 1; p <= 3; p++) {
+            const doc = await firebase.firestore().collection('phaseConfigs').doc('phase' + p).get();
+            if (doc.exists) {
+                const data = doc.data();
+                // Bridge admin field names
+                if (data.bonusRateFor100 !== undefined || data.bonusRateFor200 !== undefined) {
+                    data.bonusRates = {
+                        100: data.bonusRateFor100 ?? DEFAULT_PHASE_CONFIGS[p].bonusRates?.[100] ?? 0.15,
+                        200: data.bonusRateFor200 ?? DEFAULT_PHASE_CONFIGS[p].bonusRates?.[200] ?? 0.30
+                    };
+                }
+                DEFAULT_PHASE_CONFIGS[p] = { ...DEFAULT_PHASE_CONFIGS[p], ...data };
+            }
+        }
+    } catch(e) { console.warn('Could not load phase configs, using defaults:', e); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// DATA LOADING
+// ══════════════════════════════════════════════════════════════
+async function loadUserData() {
+    try {
+        const userDoc = await firebase.firestore().collection('users').doc(userId).get({ source: 'server' })
+            .catch(() => firebase.firestore().collection('users').doc(userId).get());
+        if (!userDoc.exists) return;
+        const data = userDoc.data();
+        balance = parseFloat(data.balance || 0);
+        phaseNum = parseInt(data.currentPhase || data.phase || 1);
+        phaseConfig = DEFAULT_PHASE_CONFIGS[phaseNum] || DEFAULT_PHASE_CONFIGS[1];
+        phaseCompleteShown = false;
+        phaseOrdersDone = parseInt(data.phaseOrdersCompleted || 0);
+
+        if (data.phaseResetAt) {
+            phaseResetAtTimestamp = data.phaseResetAt.toDate ? data.phaseResetAt.toDate() : new Date(data.phaseResetAt);
+        } else { phaseResetAtTimestamp = null; }
+
+        totalEarned = parseFloat(data.totalEarned || 0);
+        firstDepositAmount = parseFloat(data.firstDepositAmount || 0);
+        userPhone = data.phone || '';
+        // Load locked lucky order amounts (prevents amount inflation on re-visit)
+        lockedLuckyAmounts = data.lockedLuckyAmounts || {};
+
+        const todayStr = new Date().toISOString().split('T')[0];
+        const lastCommDate = data.lastCommissionDate || '';
+        if (lastCommDate !== todayStr) {
+            todayComm = 0;
+            firebase.firestore().collection('users').doc(userId).update({
+                todayCommission: 0, lastCommissionDate: todayStr
+            }).catch(e => console.warn('Could not reset daily commission:', e));
+        } else {
+            todayComm = parseFloat(data.todayCommission || 0);
+        }
+
+        document.getElementById('balanceDisplay').textContent = '$' + balance.toFixed(2);
+        document.getElementById('todayCommDisplay').textContent = '$' + todayComm.toFixed(2);
+        document.getElementById('totalEarnedDisplay').textContent = '$' + totalEarned.toFixed(2);
+    } catch(error) {
+        console.error('❌ Error loading user data:', error);
+        showToast('Error loading profile', false);
+    }
+}
+
+async function loadOrders() {
+    try {
+        let query = firebase.firestore()
+            .collection('orderLogs')
+            .where('userId', '==', userId)
+            .where('phase', '==', phaseNum)
+            .orderBy('timestamp', 'desc');
+        const snapshot = await query.get();
+        orders = snapshot.docs.map(doc => ({
+            firestoreId: doc.id,
+            ...doc.data(),
+            timestamp: doc.data().timestamp?.toDate() || new Date()
+        }));
+
+        const phaseResetAt = phaseResetAtTimestamp;
+        const ordersAfterReset = phaseResetAt
+            ? orders.filter(o => o.timestamp >= phaseResetAt)
+            : orders;
+        const actualCompleted = ordersAfterReset.filter(o => o.status === 'completed').length;
+
+        if (actualCompleted > phaseOrdersDone) {
+            phaseOrdersDone = actualCompleted;
+            firebase.firestore().collection('users').doc(userId).update({
+                phaseOrdersCompleted: phaseOrdersDone
+            }).catch(e => console.warn('Could not sync phase orders:', e));
+        }
+        if (phaseResetAt) { orders = ordersAfterReset; }
+
+        // Deduplicate: keep only ONE entry per orderNumber
+        // Prefer 'completed' over 'pending'; among same status keep most recent
+        const seen = new Map();
+        orders.forEach(o => {
+            const key = `${o.orderNumber}`;
+            const existing = seen.get(key);
+            if (!existing) {
+                seen.set(key, o);
+            } else {
+                // Prefer completed over pending (completed is the final state)
+                const existingIsDone = existing.status === 'completed';
+                const newIsDone = o.status === 'completed';
+                if (newIsDone && !existingIsDone) {
+                    seen.set(key, o); // replace pending with completed
+                } else if (newIsDone === existingIsDone && o.timestamp > existing.timestamp) {
+                    seen.set(key, o); // same status — keep most recent
+                }
+            }
+        });
+        orders = Array.from(seen.values()).sort((a, b) => b.timestamp - a.timestamp);
+    } catch(error) { console.error('❌ Error loading orders:', error); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// COMMISSION CALCULATION (Transparent & Logged)
+// ══════════════════════════════════════════════════════════════
+function getBaseRate(orderNumber) {
+    // Phase 1 normal orders use FIXED profits (PHASE1_FIXED_NORMAL_PROFITS), not rate-based.
+    // This function is only called for Phase 2/3 normal orders, or Phase 1 as a fallback.
+    // Phase 1 pattern (fallback only): orders 1-4: 10%, orders 6-8: 15%, orders 10-11: 20%
+    if (phaseNum === 1) {
+        const p1Pattern = { 1:0.10, 2:0.10, 3:0.10, 4:0.10, 6:0.15, 7:0.15, 8:0.15, 10:0.20, 11:0.20 };
+        return p1Pattern[orderNumber] ?? 0.10;
+    }
+    // Phase 2: uses fixed profits (PHASE2_FIXED_NORMAL_PROFITS) — rate is a fallback only
+    if (phaseNum === 2) {
+        return orderNumber <= 10 ? 0.03 : 0.025;
+    }
+    // Phase 3: uses fixed profits (PHASE3_FIXED_NORMAL_PROFITS) — rate is a fallback only
+    if (phaseNum === 3) {
+        return orderNumber <= 8 ? 0.03 : 0.025;
+    }
+    return 0.025;
+}
+
+function calculateCommission(orderNumber) {
+    // ══════════════════════════════════════════════════════════════
+    // CALCULATION RULES — 100% accurate for all 3 phases
+    //
+    // PHASE 1 — BALANCE-BASED AMOUNTS:
+    //   Normal: orderAmount = current balance, commission = fixed per-order, gap = 0
+    //           after = balance + commission  (balance grows by commission each order)
+    //   Lucky:  orderAmount = balance + fixedGap (user deposits fixedGap on top of balance)
+    //           gap = fixedGap (always required additional deposit)
+    //           commission = fixed profit ($150 for #5, $246 for #9)
+    //           after = orderAmount + commission
+    //
+    // PHASE 2 — FIXED AMOUNTS (balance never changes the price):
+    //   Normal: orderAmount = fixed table, commission = fixed per-order, gap = 0
+    //           after = orderAmount + commission
+    //   Lucky(#11): orderAmount = $306 (fixed), gap = max(0, $306 - balance)
+    //           commission = $47 (fixed), after = $306 + $47 = $353
+    //
+    // PHASE 3 — FIXED AMOUNTS, balance NEVER changes price:
+    //   Normal: orderAmount = fixed table, commission = fixed per-order, gap = 0
+    //           after = orderAmount + commission
+    //   Lucky(#9,14,17,19,21): orderAmount = fixed, commission = fixed
+    //           gap = max(0, orderAmount - balance)  → 0 if balance ≥ orderAmount
+    //           after = orderAmount + commission
+    // ══════════════════════════════════════════════════════════════
+
+    const isBonus = phaseConfig.bonusPositions.includes(orderNumber);
+
+    // ── Step 1: Order amount ──
+    // RULE: The order price shown to the user MUST NEVER change because of their balance.
+    //
+    // Phase 1 Lucky: amount is locked on first display as (balance_at_first_view + fixedGap).
+    //   Once locked, adding more funds reduces the gap to $0 but NEVER inflates the price.
+    //   e.g. bal=$140, fixedGap=$222 → locked amt=$362. User adds $222 → bal=$362, amt still $362, gap=$0.
+    //   Without the lock: bal=$362 → amt=$362+$222=$584 ✗ (the reported bug)
+    //
+    // Phase 1 Normal: orderAmount = current balance (auto-completes instantly — no mid-order deposit possible)
+    // Phase 2 / 3 ALL orders: amount is 100% FIXED from lookup table; balance is irrelevant to price.
+    let orderAmount;
+    if (phaseNum === 1) {
+        if (isBonus) {
+            // LOCK: freeze the amount on first view and persist so page refreshes also use frozen value
+            const lockKey = 'p1_o' + orderNumber;
+            if (lockedLuckyAmounts[lockKey] !== undefined) {
+                orderAmount = parseFloat(Number(lockedLuckyAmounts[lockKey]).toFixed(2));
+            } else {
+                const fixedGap = phaseConfig.fixedGaps[orderNumber] ?? 0;
+                orderAmount = parseFloat((balance + fixedGap).toFixed(2));
+                lockedLuckyAmounts[lockKey] = orderAmount;
+                if (userId) {
+                    firebase.firestore().collection('users').doc(userId).update({
+                        ['lockedLuckyAmounts.' + lockKey]: orderAmount
+                    }).catch(function(e) { console.warn('Could not persist Phase 1 lucky lock:', e); });
+                }
+            }
+        } else {
+            orderAmount = parseFloat(balance.toFixed(2));
+        }
+    } else {
+        const fixedAmtMap = phaseNum === 2 ? PHASE2_FIXED_AMOUNTS : PHASE3_FIXED_AMOUNTS;
+        orderAmount = parseFloat((fixedAmtMap[orderNumber] ?? 0).toFixed(2));
+    }
+
+    // totalRequired = orderAmount (the full order price user must have/pay)
+    const totalRequired = orderAmount;
+
+    // ── Step 2: Gap = how much MORE the user needs to deposit ──
+    // All phases lucky: gap = max(0, lockedOrderAmount - currentBalance)
+    //   balance >= orderAmount → gap = $0.00  (sufficient — "Ready to Submit")
+    //   balance <  orderAmount → gap = orderAmount - balance  (show "Add $X more")
+    // Normal orders: gap = 0 always
+    let gap = 0;
+    if (isBonus) {
+        gap = parseFloat(Math.max(0, orderAmount - balance).toFixed(2));
+    }
+
+    // ── Step 3: Commission ──
+    let rate, commission, calcNote;
+    if (isBonus) {
+        const luckyProfits = LUCKY_FIXED_PROFITS[phaseNum] || {};
+        commission = parseFloat((luckyProfits[orderNumber] ?? 0).toFixed(2));
+        rate = orderAmount > 0 ? parseFloat((commission / orderAmount).toFixed(4)) : 0;
+        // ALL phases lucky: After = orderAmount + commission
+        // Phase 2 lucky #11: After = $306 + $47 = $353 (fixed)
+        // Phase 3 lucky:     After = orderAmount + commission  (orderAmount is fixed)
+        // Phase 1 lucky:     After = orderAmount + commission
+        const afterBal = parseFloat((orderAmount + commission).toFixed(2));
+        calcNote = `Lucky #${orderNumber}: OrderAmt=$${orderAmount.toFixed(2)} | Bal=$${balance.toFixed(2)} | NeedMore=$${gap.toFixed(2)} | Profit=$${commission.toFixed(2)} | After=$${afterBal.toFixed(2)}`;
+    } else if (phaseNum === 1 && PHASE1_FIXED_NORMAL_PROFITS[orderNumber] !== undefined) {
+        commission = parseFloat(PHASE1_FIXED_NORMAL_PROFITS[orderNumber].toFixed(2));
+        rate = orderAmount > 0 ? parseFloat((commission / orderAmount).toFixed(4)) : 0;
+        const afterBal = parseFloat((orderAmount + commission).toFixed(2));
+        calcNote = `Normal #${orderNumber}: $${orderAmount.toFixed(2)} + $${commission.toFixed(2)} = After $${afterBal.toFixed(2)}`;
+    } else if (phaseNum === 2 && !isBonus && PHASE2_FIXED_NORMAL_PROFITS[orderNumber] !== undefined) {
+        commission = parseFloat(PHASE2_FIXED_NORMAL_PROFITS[orderNumber].toFixed(2));
+        rate = orderAmount > 0 ? parseFloat((commission / orderAmount).toFixed(4)) : 0;
+        const afterBal = parseFloat((orderAmount + commission).toFixed(2));
+        calcNote = `Normal #${orderNumber}: $${orderAmount.toFixed(2)} + $${commission.toFixed(2)} = After $${afterBal.toFixed(2)}`;
+    } else if (phaseNum === 3 && !isBonus && PHASE3_FIXED_NORMAL_PROFITS[orderNumber] !== undefined) {
+        commission = parseFloat(PHASE3_FIXED_NORMAL_PROFITS[orderNumber].toFixed(2));
+        rate = orderAmount > 0 ? parseFloat((commission / orderAmount).toFixed(4)) : 0;
+        const afterBal3 = parseFloat((orderAmount + commission).toFixed(2));
+        calcNote = `Normal #${orderNumber}: $${orderAmount.toFixed(2)} + $${commission.toFixed(2)} = After $${afterBal3.toFixed(2)}`;
+    } else {
+        rate = getBaseRate(orderNumber);
+        commission = parseFloat((orderAmount * rate).toFixed(2));
+        calcNote = `Normal #${orderNumber}: $${orderAmount.toFixed(2)} × ${(rate*100).toFixed(1)}% = $${commission.toFixed(2)}`;
+    }
+
+    console.log(`💰 P${phaseNum} #${orderNumber} ${isBonus?'LUCKY':'Normal'} | Bal=$${balance.toFixed(2)} | Amt=$${orderAmount.toFixed(2)} | Gap=$${gap.toFixed(2)} | Profit=$${commission.toFixed(2)}`);
+    return { isBonus, orderAmount, totalRequired, rate, commission, gap, calcNote };
+}
+
+
+function getBulkDisplay(totalAmount) {
+    const unitPrices = [15, 20, 25, 30, 31, 35, 40, 45, 50];
+    for (const price of unitPrices) {
+        const qty = Math.round(totalAmount / price);
+        if (qty >= 8 && qty <= 500) {
+            return `${qty} × $${price}`;
+        }
+    }
+    const qty = Math.round(totalAmount / 30);
+    return `${qty} × $30`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// RENDERING
+// ══════════════════════════════════════════════════════════════
+function renderAll() {
+    renderPhaseBanner();
+    renderOrderDots();
+    renderStats();
+    renderOrders();
+}
+
+function renderPhaseBanner() {
+    document.getElementById('phaseBanner').style.display = 'block';
+    const bgClass = `phase-${phaseNum}-bg`;
+    document.getElementById('phaseHeader').className = `phase-header ${bgClass}`;
+    document.getElementById('phaseProgressWrap').className = `phase-progress-wrap ${bgClass}`;
+    document.getElementById('phaseName').textContent = 'Task Center';
+    const progress = phaseConfig.totalOrders > 0
+        ? Math.min((phaseOrdersDone / phaseConfig.totalOrders) * 100, 100) : 0;
+    document.getElementById('phaseOrderCount').textContent = `${phaseOrdersDone}/${phaseConfig.totalOrders}`;
+    document.getElementById('progressBarFill').style.width = progress + '%';
+}
+
+function renderOrderDots() {
+    const dotsHTML = Array.from({ length: phaseConfig.totalOrders }, (_, i) => {
+        const position = i + 1;
+        const isBonus = phaseConfig.bonusPositions.includes(position);
+        const isDone = position <= phaseOrdersDone;
+        const isCurrent = position === phaseOrdersDone + 1;
+        let dotClass = 'order-dot ';
+        if (isBonus) {
+            dotClass += isDone ? 'dot-bonus-done' : isCurrent ? 'dot-bonus-current' : 'dot-bonus-future';
+        } else {
+            dotClass += isDone ? 'dot-done' : isCurrent ? 'dot-current' : 'dot-future';
+        }
+        return `<div class="${dotClass}">
+            ${isBonus ? '<span class="dot-label">⭐</span>' : ''}
+            ${position}
+        </div>`;
+    }).join('');
+    document.getElementById('orderDots').innerHTML = dotsHTML;
+}
+
+function renderRules() {
+    const phaseNames  = { 1: '🎓 Phase 1 — Training', 2: '💳 Phase 2 — First Deposit', 3: '👑 Phase 3 — Second Deposit' };
+    const phaseColors = { 1: '#0bb1b3', 2: '#667eea', 3: '#f59e0b' };
+    let html = '';
+    for (let p = 1; p <= 3; p++) {
+        const cfg = DEFAULT_PHASE_CONFIGS[p];
+        if (!cfg) continue;
+        const isActive = p === phaseNum;
+        const rules = cfg.rules || [];
+        html += `<div style="margin-bottom:${p < 3 ? '14px' : '0'};border-radius:10px;overflow:hidden;border:1.5px solid ${isActive ? phaseColors[p] : '#e5e7eb'};opacity:${isActive ? '1' : '0.65'};">
+            <div style="background:${isActive ? phaseColors[p] : '#f3f4f6'};padding:7px 12px;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:12px;font-weight:800;color:${isActive ? 'white' : '#6b7280'};">${phaseNames[p]}</span>
+                ${isActive ? '<span style="font-size:10px;font-weight:700;background:rgba(255,255,255,.25);color:white;padding:2px 8px;border-radius:20px;">YOUR PHASE</span>' : ''}
+            </div>
+            <div style="padding:8px 12px;">` +
+            rules.map(rule => `<div class="rule-row">
+                <i class="fas fa-check-circle rule-icon" style="color:${phaseColors[p]};"></i>
+                <span>${rule.replace(/Lucky Order/gi,'<span class="rule-gold">Lucky Order ⭐</span>').replace(/(\d+\.?\d*%)/g,'<span class="rule-highlight">$1</span>').replace(/(\$[\d,]+)/g,'<span class="rule-highlight">$1</span>')}</span>
+            </div>`).join('') +
+            `</div></div>`;
+    }
+    document.getElementById('rulesContent').innerHTML = html;
+}
+
+function renderStats() {
+    document.getElementById('statTotal').textContent = orders.length;
+    document.getElementById('statPending').textContent = orders.filter(o => o.status === 'pending').length;
+    document.getElementById('statCompleted').textContent = orders.filter(o => o.status === 'completed').length;
+}
+
+function renderOrders() {
+    const container = document.getElementById('ordersList');
+    const phaseComplete = phaseOrdersDone >= phaseConfig.totalOrders;
+    const hasPending = orders.filter(o => o.status === 'pending').length > 0;
+
+    if (currentTab === 'available') {
+        if (phaseComplete) {
+            container.innerHTML = `<div class="phase-done-banner">
+                <div class="pdb-icon">🏆</div>
+                <div><div class="pdb-title">All Tasks Complete!</div>
+                <div class="pdb-sub">Great work! Please contact support for your next steps.</div></div>
+            </div>`;
+            return;
+        }
+        if (hasPending) {
+            container.innerHTML = `<div class="empty-state">
+                <div class="empty-icon">⏳</div>
+                <div class="empty-title">Finish Your Pending Task</div>
+                <div class="empty-sub">Complete or cancel your current task before grabbing a new one.</div>
+            </div>`;
+            return;
+        }
+
+        // ── Minimum balance check: user must have at least $100 to grab orders ──
+        if (balance < 100) {
+            container.innerHTML = `
+                <div style="margin:20px 14px;border-radius:16px;overflow:hidden;border:2px solid #fecaca;box-shadow:0 4px 20px rgba(239,68,68,.12);">
+                    <div style="background:linear-gradient(135deg,#ef4444,#dc2626);padding:18px 20px;text-align:center;">
+                        <div style="font-size:36px;margin-bottom:8px;">🔒</div>
+                        <div style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:white;margin-bottom:4px;">Insufficient Balance</div>
+                        <div style="font-size:12px;color:rgba(255,255,255,.85);">A minimum deposit of $100 is required to start working</div>
+                    </div>
+                    <div style="background:#fff5f5;padding:18px 20px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;background:white;border:1.5px solid #fecaca;border-radius:12px;padding:12px 16px;margin-bottom:14px;">
+                            <span style="font-size:13px;color:#6b7280;">Your Current Balance</span>
+                            <span style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;color:#ef4444;">$${balance.toFixed(2)}</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;background:white;border:1.5px solid #fecaca;border-radius:12px;padding:12px 16px;margin-bottom:18px;">
+                            <span style="font-size:13px;color:#6b7280;">Minimum Required</span>
+                            <span style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;color:#1f2937;">$100.00</span>
+                        </div>
+                        <div style="background:#fff8e7;border:1.5px solid #fde68a;border-radius:12px;padding:12px 16px;margin-bottom:18px;font-size:12.5px;color:#92400e;line-height:1.6;text-align:center;">
+                            ⚠️ Your balance is insufficient to start work or grab an order.<br>
+                            Please <strong>recharge at least $100</strong> to begin your first task.
+                        </div>
+                        <a href="recharge.html" style="display:block;text-align:center;background:linear-gradient(135deg,#0bb1b3,#089a9c);color:white;padding:14px;border-radius:12px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;text-decoration:none;letter-spacing:.3px;box-shadow:0 4px 14px rgba(11,177,179,.35);">
+                            <i class="fas fa-plus-circle" style="margin-right:8px;"></i>Recharge Now
+                        </a>
+                    </div>
+                </div>`;
+            return;
+        }
+
+        const nextPosition = phaseOrdersDone + 1;
+        const products = getPhaseProducts();
+        const product = products[(nextPosition - 1) % products.length];
+        const isBonus = phaseConfig.bonusPositions.includes(nextPosition);
+
+        const calc = calculateCommission(nextPosition);
+        const bulkDisplay = isBonus ? getBulkDisplay(calc.orderAmount) : null;
+
+        // ── LOCK: if balance < order amount, block order (for normal orders in Phase 2/3 only) ──
+        // Phase 1 normal orders are always unblocked since orderAmount = current balance
+        if (phaseNum !== 1 && !isBonus && balance < calc.orderAmount) {
+            container.innerHTML = `
+                <div style="margin:20px 14px;border-radius:16px;overflow:hidden;border:2px solid #fecaca;box-shadow:0 4px 20px rgba(239,68,68,.12);">
+                    <div style="background:linear-gradient(135deg,#ef4444,#dc2626);padding:18px 20px;text-align:center;">
+                        <div style="font-size:36px;margin-bottom:8px;">🔒</div>
+                        <div style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:white;margin-bottom:4px;">Insufficient Balance</div>
+                        <div style="font-size:12px;color:rgba(255,255,255,.85);">You need more funds to grab Task #${nextPosition}</div>
+                    </div>
+                    <div style="background:#fff5f5;padding:18px 20px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;background:white;border:1.5px solid #fecaca;border-radius:12px;padding:12px 16px;margin-bottom:14px;">
+                            <span style="font-size:13px;color:#6b7280;">Your Current Balance</span>
+                            <span style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;color:#ef4444;">$${balance.toFixed(2)}</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;background:white;border:1.5px solid #fecaca;border-radius:12px;padding:12px 16px;margin-bottom:18px;">
+                            <span style="font-size:13px;color:#6b7280;">Task #${nextPosition} Amount Required</span>
+                            <span style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;color:#1f2937;">$${calc.orderAmount.toFixed(2)}</span>
+                        </div>
+                        <div style="background:#fff8e7;border:1.5px solid #fde68a;border-radius:12px;padding:12px 16px;margin-bottom:18px;font-size:12.5px;color:#92400e;line-height:1.6;text-align:center;">
+                            ⚠️ Your balance must be at least <strong>$${calc.orderAmount.toFixed(2)}</strong> to grab this task.<br>
+                            Adding more than the required amount will <strong>not</strong> change the task price.
+                        </div>
+                        <a href="recharge.html" style="display:block;text-align:center;background:linear-gradient(135deg,#0bb1b3,#089a9c);color:white;padding:14px;border-radius:12px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;text-decoration:none;letter-spacing:.3px;box-shadow:0 4px 14px rgba(11,177,179,.35);">
+                            <i class="fas fa-plus-circle" style="margin-right:8px;"></i>Add Funds
+                        </a>
+                    </div>
+                </div>`;
+            return;
+        }
+
+        // For lucky orders: show how much more user needs to add (gap), or $0.00 if sufficient
+        const luckyGapDisplay = isBonus ? `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:${calc.gap > 0 ? '#fff8e7' : '#ecfdf5'};border-top:1px solid ${calc.gap > 0 ? '#fde68a' : '#a7f3d0'};">
+                <span style="font-size:11.5px;font-weight:600;color:${calc.gap > 0 ? '#92400e' : '#059669'};">
+                    ${calc.gap > 0 ? '⚡ Amount Needed' : '✅ Ready to Submit'}
+                </span>
+                <span style="font-family:'Outfit',sans-serif;font-size:13px;font-weight:800;color:${calc.gap > 0 ? '#d97706' : '#059669'};">
+                    ${calc.gap > 0 ? `Add $${calc.gap.toFixed(2)} more` : '$0.00 — Sufficient'}
+                </span>
+            </div>` : '';
+
+        container.innerHTML = `
+            <div class="order-card ${isBonus ? 'lucky-card' : ''}"
+                 onclick="openOrderFlow('${escapeHtml(product.id)}')"
+                 style="cursor:pointer;">
+                <div class="order-card-head">
+                    <div class="order-id-row">
+                        <span class="order-id">Task #${nextPosition}</span>
+                        ${isBonus ? '<div class="lucky-badge"><i class="fas fa-star"></i> Lucky Order</div>' : ''}
+                    </div>
+                    <span class="order-badge badge-pending">Tap to Grab</span>
+                </div>
+                <div class="order-card-body">
+                    <img src="${escapeHtml(product.image)}" alt="" class="order-img"
+                         onerror="this.src='https://placehold.co/65x65?text=?'">
+                    <div class="order-info">
+                        <div class="order-title">${escapeHtml(product.title)}</div>
+                        ${isBonus ? `<div class="bulk-badge">📦 ${getBulkDisplay(calc.orderAmount)}</div>` : ''}
+                        <div class="order-price-row">
+                            <div class="order-price">$${calc.orderAmount.toFixed(2)}</div>
+                            <div class="order-comm">+$${calc.commission.toFixed(2)}</div>
+                        </div>
+                    </div>
+                </div>
+                ${luckyGapDisplay}
+            </div>`;
+        return;
+    }
+
+    let filteredOrders = currentTab === 'pending'
+        ? orders.filter(o => o.status === 'pending')
+        : orders.filter(o => o.status === 'completed');
+
+    if (filteredOrders.length === 0) {
+        container.innerHTML = `<div class="empty-state">
+            <div class="empty-icon">${currentTab === 'pending' ? '⏳' : '✅'}</div>
+            <div class="empty-title">No ${currentTab} tasks</div>
+            <div class="empty-sub">${currentTab === 'pending' ? 'Grab a task to get started' : 'Completed tasks will appear here'}</div>
+        </div>`;
+        return;
+    }
+
+    container.innerHTML = filteredOrders.map(order => {
+        const isBonus = order.isBonus;
+        const showBulk = isBonus;
+        const bulkDisplay = showBulk ? getBulkDisplay(parseFloat(order.orderAmount || 0)) : null;
+        return `
+        <div class="order-card ${isBonus ? 'lucky-card' : ''}">
+            <div class="order-card-head">
+                <div class="order-id-row">
+                    <span class="order-id">Task #${order.orderNumber}</span>
+                    ${isBonus ? '<div class="lucky-badge"><i class="fas fa-star"></i> Lucky Order</div>' : ''}
+                </div>
+                <span class="order-badge ${order.status === 'pending' ? 'badge-pending' : 'badge-completed'}">
+                    ${order.status === 'pending' ? 'Pending' : 'Completed'}
+                </span>
+            </div>
+            <div class="order-card-body">
+                <img src="${order.productImage}" alt="" class="order-img" onerror="this.src='https://placehold.co/65x65?text=?'">
+                <div class="order-info">
+                    <div class="order-title">${escapeHtml(order.productTitle)}</div>
+                    ${bulkDisplay ? `<div class="bulk-badge">📦 ${bulkDisplay}</div>` : ''}
+                    <div class="order-price-row">
+                        <div class="order-price">$${parseFloat(order.orderAmount || 0).toFixed(2)}</div>
+                        <div class="order-comm">+$${parseFloat(order.commission || 0).toFixed(2)}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="order-breakdown">
+                <div class="breakdown-row">
+                    <span class="breakdown-lbl">Before Balance</span>
+                    <span class="breakdown-val">$${parseFloat(order.balanceBefore || 0).toFixed(2)}</span>
+                </div>
+                <div class="breakdown-row">
+                    <span class="breakdown-lbl">Task Amount</span>
+                    <span class="breakdown-val">$${parseFloat(order.orderAmount || 0).toFixed(2)}</span>
+                </div>
+                ${isBonus && parseFloat(order.gap||0) > 0 ? `
+                <div class="breakdown-row">
+                    <span class="breakdown-lbl" style="color:var(--gold);">⚡ Gap (Deposit)</span>
+                    <span class="breakdown-val" style="color:var(--gold);">$${parseFloat(order.gap||0).toFixed(2)}</span>
+                </div>` : ''}
+                <div class="breakdown-row">
+                    <span class="breakdown-lbl">Commission Earned</span>
+                    <span class="breakdown-val" style="color:var(--success)">+$${parseFloat(order.commission || 0).toFixed(2)}</span>
+                </div>
+                <div class="breakdown-row">
+                    <span class="breakdown-lbl">After Balance</span>
+                    <span class="breakdown-val">${order.status === 'pending' && order.isBonus ? '<span style="color:var(--text-muted);font-size:11px;">Upon completion</span>' : '$' + parseFloat(order.balanceAfter || 0).toFixed(2)}</span>
+                </div>
+            </div>
+            ${order.status === 'completed' ? `
+            <div class="order-stars">
+                ${renderOrderStars(order.firestoreId || order.orderNumber, order.ratings)}
+            </div>` : ''}
+            ${order.status === 'pending' ? `
+            <div class="order-actions">
+                <button class="order-btn btn-cancel" onclick="cancelOrder('${order.firestoreId}')">Cancel</button>
+                <button class="order-btn btn-submit" onclick="completeOrder('${order.firestoreId}', this)">Submit Task</button>
+            </div>` : ''}
+        </div>`;
+    }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// ORDER FLOW — Lucky popup → funds check → grab modal
+// ══════════════════════════════════════════════════════════════
+function openOrderFlow(productId) {
+    const product = PRODUCT_MAP[productId];
+    if (!product) { showToast('Product not found.', false); return; }
+    if (phaseOrdersDone >= phaseConfig.totalOrders) {
+        showToast('All tasks complete! Please contact support for next steps.', false); return;
+    }
+    // Only lucky (bonus) pending orders should block; normal orders auto-complete
+    if (orders.filter(o => o.status === 'pending').length > 0) {
+        showToast('Please complete your pending task first.', false); return;
+    }
+
+    if (balance < 100) {
+        showToast('Insufficient balance. Please recharge at least $100 to grab orders.', false); return;
+    }
+
+    const nextPosition = phaseOrdersDone + 1;
+    currentProduct = { id: product.id, title: product.title, price: product.price, image: product.image };
+    currentCalc = calculateCommission(nextPosition);
+
+    if (currentCalc.isBonus) {
+        showLuckyCongratsModal(nextPosition, currentCalc);
+    } else {
+        openGrabModal();
+    }
+}
+
+function showLuckyCongratsModal(orderNum, calc) {
+    // STEP 1: just show congratulations — hide step 2
+    document.getElementById('luckyStep1').style.display = 'block';
+    document.getElementById('luckyStep2').style.display = 'none';
+    // Pre-fill step 2 data (populated but hidden until Continue clicked)
+    document.getElementById('luckyOrderTitle').textContent = `Task #${orderNum}`;
+    document.getElementById('luckyOrderAmt').textContent = '$' + calc.orderAmount.toFixed(2);
+    document.getElementById('luckyBalAmt').textContent = '$' + balance.toFixed(2);
+    document.getElementById('luckyReqAmt').textContent = '$' + calc.gap.toFixed(2);
+    document.getElementById('luckyProfitAmt').textContent = '+$' + calc.commission.toFixed(2);
+    // Reset error state
+    document.getElementById('luckyErrBox').style.display = 'none';
+    document.getElementById('luckyBtns').style.display = 'none';
+    document.getElementById('luckyInsufficientBtns').style.display = 'none';
+    document.getElementById('luckyNeedsMoreMsg').style.display = 'none';
+    document.getElementById('luckyCongratsModal').classList.add('open');
+}
+
+function showLuckyStep2() {
+    // Transition: hide step 1, show step 2 with balance check
+    document.getElementById('luckyStep1').style.display = 'none';
+    document.getElementById('luckyStep2').style.display = 'block';
+    if (!currentCalc) return;
+
+    // Recalculate gap live at step 2
+    // Phase 1 lucky: gap is always the fixedGap (user MUST deposit it on top of balance)
+    // Phase 2/3 lucky: gap = max(0, fixedOrderAmount - currentBalance)
+    const totalReq = currentCalc.orderAmount;  // orderAmount = balance+fixedGap (P1) or fixedAmt (P2/3)
+    const needAmount = parseFloat(Math.max(0, totalReq - balance).toFixed(2));
+    const insufficient = needAmount > 0;
+
+    // Update displayed values with live balance
+    document.getElementById('luckyBalAmt').textContent = '$' + balance.toFixed(2);
+    document.getElementById('luckyReqAmt').textContent = '$' + needAmount.toFixed(2);
+
+    if (insufficient) {
+        // Show "you need $X more" message
+        document.getElementById('luckyNeedAmt').textContent = '$' + needAmount.toFixed(2);
+        document.getElementById('luckyNeedsMoreMsg').style.display = 'block';
+        // Show Add Funds / Cancel
+        document.getElementById('luckyBtns').style.display = 'none';
+        document.getElementById('luckyInsufficientBtns').style.display = 'flex';
+    } else {
+        // Balance is sufficient — show Proceed / Cancel
+        document.getElementById('luckyNeedsMoreMsg').style.display = 'none';
+        document.getElementById('luckyBtns').style.display = 'flex';
+        document.getElementById('luckyInsufficientBtns').style.display = 'none';
+    }
+}
+
+function closeLuckyModal() {
+    document.getElementById('luckyCongratsModal').classList.remove('open');
+    currentProduct = null;
+    currentCalc = null;
+}
+
+function proceedFromLucky() {
+    if (!currentCalc) return;
+    // orderAmount IS the total required — user must have at least this much
+    const totalReq = currentCalc.orderAmount;
+    if (balance < totalReq) {
+        const gap = parseFloat(Math.max(0, totalReq - balance).toFixed(2));
+        document.getElementById('luckyErrMsg').textContent =
+            `Unable to proceed due to insufficient funds. You still need $${gap.toFixed(2)} more.`;
+        document.getElementById('luckyErrBox').style.display = 'block';
+        document.getElementById('luckyBtns').style.display = 'none';
+        document.getElementById('luckyInsufficientBtns').style.display = 'flex';
+    } else {
+        document.getElementById('luckyCongratsModal').classList.remove('open');
+        openGrabModal();
+    }
+}
+
+function openGrabModal() {
+    if (!currentProduct || !currentCalc) return;
+    // Reset star ratings to fresh defaults each time modal opens
+    grabStarValues[1] = 4; grabStarValues[2] = 5; grabStarValues[3] = 3;
+    setGrabStars(1, grabStarValues[1]);
+    setGrabStars(2, grabStarValues[2]);
+    setGrabStars(3, grabStarValues[3]);
+
+    const nextPosition = phaseOrdersDone + 1;
+    const calc = currentCalc;
+    const isBonus = calc.isBonus;
+    const bulkDisplay = isBonus ? getBulkDisplay(calc.orderAmount) : null;
+
+    const header = document.getElementById('grabHeader');
+    header.className = 'grab-header' + (isBonus ? ' bonus-header' : '');
+    document.getElementById('grabTitle').textContent = isBonus
+        ? '⭐ Lucky Order Confirmed!'
+        : (phaseNum === 1 && PHASE1_HIGH_VALUE[nextPosition])
+        ? '🔥 High-Value Sponsored Order'
+        : 'Grab Task';
+    document.getElementById('grabSub').textContent = isBonus
+        ? 'High-value task — confirm to proceed'
+        : `Task #${nextPosition}`;
+
+    const confirmBtn = document.getElementById('confirmGrabBtn');
+    confirmBtn.className = 'grab-btn btn-confirm' + (isBonus ? ' bonus-confirm' : '');
+    confirmBtn.textContent = 'Confirm Grab';
+    confirmBtn.disabled = false;
+
+    document.getElementById('grabProduct').innerHTML = `
+        <img src="${escapeHtml(currentProduct.image)}" alt="" class="grab-img"
+             onerror="this.src='https://placehold.co/80x80?text=?'">
+        <div class="grab-details">
+            <div class="grab-prod-title">${escapeHtml(currentProduct.title)}</div>
+            <div class="grab-price">$${calc.orderAmount.toFixed(2)}</div>
+            ${bulkDisplay ? `<div class="grab-bulk">📦 ${bulkDisplay}</div>` : ''}
+        </div>`;
+
+    let calcHTML = `
+        <div class="calc-row">
+            <span class="calc-lbl">Task #${nextPosition}</span>
+            <span class="calc-val">${isBonus ? '⭐ Lucky Order' : 'Regular Task'}</span>
+        </div>
+        <div class="calc-row">
+            <span class="calc-lbl">Your Balance (Before)</span>
+            <span class="calc-val">$${balance.toFixed(2)}</span>
+        </div>
+        <div class="calc-row">
+            <span class="calc-lbl">Task Amount</span>
+            <span class="calc-val">$${calc.orderAmount.toFixed(2)}</span>
+        </div>`;
+
+    if (calc.gap > 0) {
+        calcHTML += `<div class="calc-row">
+            <span class="calc-lbl" style="color:var(--gold);">⚡ Gap (Deposited)</span>
+            <span class="calc-val" style="color:var(--gold);">$${calc.gap.toFixed(2)}</span>
+        </div>`;
+    }
+
+    calcHTML += `<div class="calc-row">
+            <span class="calc-lbl">Commission Rate</span>
+            <span class="calc-val">${(calc.rate * 100).toFixed(1)}%</span>
+        </div>
+        <div class="calc-row">
+            <span class="calc-lbl">You Will Earn</span>
+            <span class="calc-val" style="color:var(--success)">+$${calc.commission.toFixed(2)}</span>
+        </div>`;
+
+    document.getElementById('grabCalc').innerHTML = calcHTML;
+    document.getElementById('grabModal').classList.add('open');
+}
+
+function closeGrabModal() {
+    document.getElementById('grabModal').classList.remove('open');
+    currentProduct = null;
+    currentCalc = null;
+}
+
+async function confirmGrab() {
+    if (!currentProduct || !currentCalc || processing) return;
+    if (phaseOrdersDone >= phaseConfig.totalOrders) {
+        showToast('Phase limit reached!', false); closeGrabModal(); return;
+    }
+
+    // ── LOCK: block normal orders if balance < order amount (Phase 2/3 only) ──
+    // Phase 1 normal orders are always allowed since orderAmount = balance
+    if (phaseNum !== 1 && !currentCalc.isBonus && balance < currentCalc.orderAmount) {
+        showToast(`⚠️ Insufficient balance. Need $${currentCalc.orderAmount.toFixed(2)} to grab this task.`, false);
+        closeGrabModal();
+        renderOrders();
+        return;
+    }
+
+    processing = true;
+    const btn = document.getElementById('confirmGrabBtn');
+    btn.disabled = true;
+    btn.textContent = 'Creating...';
+
+    // Capture star ratings BEFORE the transaction so they're accessible after it resolves
+    const snapRatings = {
+        quality: grabStarValues[1] || 4,
+        design:  grabStarValues[2] || 5,
+        value:   grabStarValues[3] || 3
+    };
+
+    const db = firebase.firestore();
+    const userRef = db.collection('users').doc(userId);
+    const newOrderRef = db.collection('orderLogs').doc();
+    const snap = { ...currentProduct };
+    const snapCalc = { ...currentCalc };
+
+    try {
+        // ── TRANSACTION: returns all updated values directly (no stale re-fetch) ──
+        const txResult = await db.runTransaction(async (tx) => {
+            const userSnap = await tx.get(userRef);
+            if (!userSnap.exists) throw new Error('User not found');
+            const userData = userSnap.data();
+            const serverCount = parseInt(userData.phaseOrdersCompleted || 0);
+            const serverPhase = parseInt(userData.currentPhase || userData.phase || 1);
+            if (serverPhase !== phaseNum) throw new Error('Phase mismatch — please reload the page.');
+            if (serverCount >= phaseConfig.totalOrders) throw new Error('PHASE_LIMIT_REACHED');
+            const nextNum = serverCount + 1;
+
+            // Normal orders auto-complete immediately; only lucky (bonus) orders go to pending
+            const orderStatus = snapCalc.isBonus ? 'pending' : 'completed';
+            const todayStrTx = new Date().toISOString().split('T')[0];
+
+            // Read server values (authoritative — not cached local variables)
+            const serverBalance = parseFloat(userData.balance || 0);
+            const prevTotalEarned = parseFloat(userData.totalEarned || 0);
+            const sameDay = (userData.lastCommissionDate || '') === todayStrTx;
+            const prevTodayComm = sameDay ? parseFloat(userData.todayCommission || 0) : 0;
+
+            // For normal orders: after = serverBalance + commission
+            // For lucky (pending) orders: balance unchanged until user submits
+            let balanceAfterTx = serverBalance;
+            let newTotalEarned = prevTotalEarned;
+            let newTodayComm = prevTodayComm;
+
+            if (!snapCalc.isBonus) {
+                // Auto-complete: apply commission immediately
+                // After Balance = currentServerBalance + commission
+                // (Task/product price NEVER reduces the balance)
+                balanceAfterTx = parseFloat((serverBalance + snapCalc.commission).toFixed(2));
+                newTotalEarned = parseFloat((prevTotalEarned + snapCalc.commission).toFixed(2));
+                newTodayComm = parseFloat((prevTodayComm + snapCalc.commission).toFixed(2));
+                tx.update(userRef, {
+                    balance: balanceAfterTx,
+                    phaseOrdersCompleted: nextNum,
+                    totalEarned: newTotalEarned,
+                    todayCommission: newTodayComm,
+                    lastCommissionDate: todayStrTx,
+                    lastOrderAmount: snapCalc.orderAmount
+                });
+            }
+
+            // Capture user's star ratings at time of grab (defined before runTransaction)
+            tx.set(newOrderRef, {
+                userId, userPhone,
+                orderId: 'ORD-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7).toUpperCase(),
+                phase: phaseNum,
+                orderNumber: nextNum,
+                isBonus: snapCalc.isBonus,
+                productId: snap.id,
+                productTitle: snap.title,
+                productPrice: snap.price,
+                productImage: snap.image,
+                orderAmount: snapCalc.orderAmount,
+                commissionRate: snapCalc.rate,
+                commission: snapCalc.commission,
+                gap: snapCalc.gap || 0,
+                balanceBefore: serverBalance,
+                balanceAfter: balanceAfterTx,
+                status: orderStatus,
+                ratings: snapRatings,
+                calculationLog: snapCalc.calcNote || '',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                ...(orderStatus === 'completed' ? { completedAt: firebase.firestore.FieldValue.serverTimestamp() } : {})
+            });
+
+            // ── Return all computed values so we NEVER need to re-fetch ──
+            return {
+                newBalance: balanceAfterTx,
+                newPhaseOrders: nextNum,
+                newTotalEarned,
+                newTodayComm,
+                orderStatus,
+                serverOrderNum: nextNum,
+                serverBalanceBefore: serverBalance
+            };
+        });
+
+        // Use the authoritative transaction result — no stale Firestore re-fetch
+        const nextNum2 = txResult.serverOrderNum;
+        const finalStatus = txResult.orderStatus;
+        const localOrder = {
+            firestoreId: newOrderRef.id,
+            userId, userPhone,
+            phase: phaseNum, orderNumber: nextNum2,
+            isBonus: snapCalc.isBonus,
+            productId: snap.id, productTitle: snap.title,
+            productPrice: snap.price, productImage: snap.image,
+            orderAmount: snapCalc.orderAmount, commissionRate: snapCalc.rate,
+            commission: snapCalc.commission, gap: snapCalc.gap || 0,
+            // Use authoritative server values — NOT cached local variables
+            balanceBefore: txResult.serverBalanceBefore,
+            balanceAfter: txResult.newBalance,
+            ratings: snapRatings,
+            status: finalStatus, timestamp: new Date()
+        };
+
+        orders.unshift(localOrder);
+        currentProduct = null;
+        currentCalc = null;
+        closeGrabModal();
+
+        if (snapCalc.isBonus) {
+            // Lucky order → pending tab, user must submit
+            balance = txResult.newBalance;
+            phaseOrdersDone = txResult.newPhaseOrders;
+            totalEarned = txResult.newTotalEarned;
+            todayComm = txResult.newTodayComm;
+            switchTab('pending', document.getElementById('tabPending'));
+            showToast('⭐ Lucky Order grabbed! Submit to earn your commission.', true);
+        } else {
+            // Normal order → auto-completed, go to completed tab
+            balance = txResult.newBalance;
+            phaseOrdersDone = txResult.newPhaseOrders;
+            totalEarned = txResult.newTotalEarned;
+            todayComm = txResult.newTodayComm;
+            document.getElementById('balanceDisplay').textContent = '$' + balance.toFixed(2);
+            document.getElementById('todayCommDisplay').textContent = '$' + todayComm.toFixed(2);
+            document.getElementById('totalEarnedDisplay').textContent = '$' + totalEarned.toFixed(2);
+            switchTab('completed', document.getElementById('tabCompleted'));
+            showToast(`🎉 Task complete! +$${snapCalc.commission.toFixed(2)} earned!`, false);
+        }
+
+        document.getElementById('balanceDisplay').textContent = '$' + balance.toFixed(2);
+        document.getElementById('todayCommDisplay').textContent = '$' + todayComm.toFixed(2);
+        document.getElementById('totalEarnedDisplay').textContent = '$' + totalEarned.toFixed(2);
+
+        renderAll();
+
+        if (finalStatus === 'completed' && txResult.newPhaseOrders >= phaseConfig.totalOrders && !phaseCompleteShown) {
+            phaseCompleteShown = true;
+            setTimeout(() => showPhaseComplete(txResult.newPhaseOrders, txResult.newTotalEarned), 800);
+        }
+
+    } catch(error) {
+        if (error.message === 'PHASE_LIMIT_REACHED') {
+            showToast('All tasks for this phase are complete!', false);
+            closeGrabModal(); phaseOrdersDone = phaseConfig.totalOrders; renderAll();
+        } else {
+            console.error('❌ Grab error:', error);
+            showToast('Failed to grab task: ' + error.message, false);
+            btn.disabled = false; btn.textContent = 'Confirm Grab';
+        }
+    } finally { processing = false; }
+}
+
+async function completeOrder(firestoreId, btnEl) {
+    const order = orders.find(o => o.firestoreId === firestoreId);
+    if (!order || order.status !== 'pending') return;
+    if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Processing...'; }
+
+    const db = firebase.firestore();
+    const userRef = db.collection('users').doc(userId);
+    const orderRef = db.collection('orderLogs').doc(firestoreId);
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    try {
+        const result = await db.runTransaction(async (tx) => {
+            const userSnap = await tx.get(userRef);
+            const orderSnap = await tx.get(orderRef);
+            if (!userSnap.exists) throw new Error('User not found');
+            if (!orderSnap.exists) throw new Error('Order not found');
+            if (orderSnap.data().status !== 'pending') throw new Error('ORDER_ALREADY_COMPLETED');
+
+            const userData = userSnap.data();
+            const commission = parseFloat(orderSnap.data().commission || 0);
+            const savedOrderAmount = parseFloat(orderSnap.data().orderAmount || 0);
+            const savedPhase = parseInt(orderSnap.data().phase || 1);
+            const savedIsBonus = orderSnap.data().isBonus || false;
+            // ── After Balance Logic for Lucky (Bonus) Orders ──
+            // After = serverBalance + commission
+            // User's actual current balance (may be >= orderAmount after depositing gap) + profit
+            // Using savedOrderAmount would wrongly reset balance if user had more than orderAmount
+            const serverBalance = parseFloat(userData.balance || 0);
+            const newBalance = parseFloat((serverBalance + commission).toFixed(2));
+            const prevCompleted = parseInt(userData.phaseOrdersCompleted || 0);
+            // Lucky orders were NOT counted when grabbed (only set to 'pending'),
+            // so we increment here upon submission
+            const newPhaseOrders = prevCompleted + 1;
+            const prevTotalEarned = parseFloat(userData.totalEarned || 0);
+            const newTotalEarned = parseFloat((prevTotalEarned + commission).toFixed(2));
+            const sameDay = (userData.lastCommissionDate || '') === todayStr;
+            const prevToday = sameDay ? parseFloat(userData.todayCommission || 0) : 0;
+            const newTodayComm = parseFloat((prevToday + commission).toFixed(2));
+
+            tx.update(orderRef, {
+                status: 'completed',
+                balanceAfter: newBalance,
+                completedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            tx.update(userRef, {
+                balance: newBalance,
+                phaseOrdersCompleted: newPhaseOrders,
+                totalEarned: newTotalEarned,
+                todayCommission: newTodayComm,
+                lastCommissionDate: todayStr,
+                lastOrderAmount: parseFloat(orderSnap.data().orderAmount || 0)
+            });
+            return { newBalance, newPhaseOrders, newTotalEarned, newTodayComm };
+        });
+
+        order.status = 'completed';
+        order.balanceAfter = result.newBalance;
+        balance = result.newBalance;
+        phaseOrdersDone = result.newPhaseOrders;
+        totalEarned = result.newTotalEarned;
+        todayComm = result.newTodayComm;
+
+        document.getElementById('balanceDisplay').textContent = '$' + balance.toFixed(2);
+        document.getElementById('todayCommDisplay').textContent = '$' + todayComm.toFixed(2);
+        document.getElementById('totalEarnedDisplay').textContent = '$' + totalEarned.toFixed(2);
+
+        renderAll();
+        showToast(order.isBonus
+            ? `⭐ Lucky Order! +$${order.commission.toFixed(2)} earned!`
+            : `🎉 +$${order.commission.toFixed(2)} earned!`, order.isBonus);
+
+        if (result.newPhaseOrders >= phaseConfig.totalOrders && !phaseCompleteShown) {
+            phaseCompleteShown = true;
+            setTimeout(() => showPhaseComplete(result.newPhaseOrders, result.newTotalEarned), 800);
+        }
+
+    } catch(error) {
+        if (error.message === 'ORDER_ALREADY_COMPLETED') {
+            order.status = 'completed';
+            renderAll();
+            showToast('Task already completed.', false);
+        } else {
+            console.error('❌ Complete order error:', error);
+            showToast('Error: ' + error.message, false);
+            if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Submit Task'; }
+        }
+    }
+}
+
+// Cancel order
+let pendingCancelId = null;
+function cancelOrder(firestoreId) {
+    pendingCancelId = firestoreId;
+    const t = document.getElementById('toast');
+    t.innerHTML = '⚠️ Cancel this task? <button onclick="doCancelOrder()" style="margin-left:8px;padding:3px 10px;border-radius:20px;border:none;background:white;color:#dc2626;font-weight:700;cursor:pointer;font-size:12px;">Yes, cancel</button><button onclick="clearCancelToast()" style="margin-left:6px;padding:3px 10px;border-radius:20px;border:none;background:rgba(255,255,255,.2);color:white;font-weight:700;cursor:pointer;font-size:12px;">No</button>';
+    t.className = 'toast error show';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.classList.remove('show'); pendingCancelId = null; }, 6000);
+}
+function clearCancelToast() {
+    pendingCancelId = null;
+    document.getElementById('toast').classList.remove('show');
+}
+async function doCancelOrder() {
+    clearCancelToast();
+    const firestoreId = pendingCancelId;
+    if (!firestoreId) return;
+    pendingCancelId = null;
+    try {
+        // Find the order being cancelled to clear its lucky lock if applicable
+        const cancelledOrder = orders.find(o => o.firestoreId === firestoreId);
+        await firebase.firestore().collection('orderLogs').doc(firestoreId).delete();
+        orders = orders.filter(o => o.firestoreId !== firestoreId);
+
+        // Clear stale locked lucky order amount so it recalculates fresh on re-grab
+        if (cancelledOrder && cancelledOrder.isBonus) {
+            // Lucky orders increment phaseOrdersDone locally on grab but NOT in Firestore
+            // (Firestore only increments on submit). So decrement local counter on cancel.
+            phaseOrdersDone = Math.max(0, phaseOrdersDone - 1);
+
+            const lockKey = `p${cancelledOrder.phase}_o${cancelledOrder.orderNumber}`;
+            delete lockedLuckyAmounts[lockKey];
+            firebase.firestore().collection('users').doc(userId).update({
+                [`lockedLuckyAmounts.${lockKey}`]: firebase.firestore.FieldValue.delete()
+            }).catch(e => console.warn('Could not clear lucky lock on cancel:', e));
+        }
+
+        renderAll();
+        showToast('Task cancelled.', false);
+    } catch(error) {
+        console.error('❌ Cancel error:', error);
+        showToast('Error cancelling task: ' + error.message, false);
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════════════════════════
+function toggleChart() { /* chart removed for user view */ }
+function renderRefChart() {
+    const table = document.getElementById('refChart');
+    // Reference data per phase — PHASE1 must exactly match the reference image
+    const PHASE1_DATA = [
+        {n:1,  t:'Normal', amt:100.00,   rate:null, profit:6.00,   after:106.00,   gap:0},
+        {n:2,  t:'Normal', amt:106.00,   rate:null, profit:8.00,   after:114.00,   gap:0},
+        {n:3,  t:'Normal', amt:114.00,   rate:null, profit:11.00,  after:125.00,   gap:0},
+        {n:4,  t:'Normal', amt:125.00,   rate:null, profit:15.00,  after:140.00,   gap:0},
+        {n:5,  t:'Lucky',  amt:362.00,   rate:null, profit:150.00, after:512.00,   gap:222},
+        {n:6,  t:'Normal', amt:512.00,   rate:null, profit:48.00,  after:560.00,   gap:0},
+        {n:7,  t:'Normal', amt:560.00,   rate:null, profit:44.00,  after:604.00,   gap:0},
+        {n:8,  t:'Normal', amt:604.00,   rate:null, profit:66.00,  after:670.00,   gap:0},
+        {n:9,  t:'Lucky',  amt:1000.00,  rate:null, profit:246.00, after:1246.00,  gap:330},
+        {n:10, t:'Normal', amt:1246.00,  rate:null, profit:70.00,  after:1316.00,  gap:0},
+        {n:11, t:'Normal', amt:1316.00,  rate:null, profit:78.00,  after:1394.00,  gap:0},
+    ];
+    const PHASE2_DATA = [
+        {n:1,  t:'Normal',amt:100.00,  rate:null, profit:1.00, after:101.00, gap:0},
+        {n:2,  t:'Normal',amt:101.00,  rate:null, profit:1.25, after:102.25, gap:0},
+        {n:3,  t:'Normal',amt:102.25,  rate:null, profit:1.25, after:103.50, gap:0},
+        {n:4,  t:'Normal',amt:103.50,  rate:null, profit:1.50, after:105.00, gap:0},
+        {n:5,  t:'Normal',amt:105.00,  rate:null, profit:2.00, after:107.00, gap:0},
+        {n:6,  t:'Normal',amt:107.00,  rate:null, profit:1.75, after:108.75, gap:0},
+        {n:7,  t:'Normal',amt:108.75,  rate:null, profit:2.00, after:110.75, gap:0},
+        {n:8,  t:'Normal',amt:110.75,  rate:null, profit:2.25, after:113.00, gap:0},
+        {n:9,  t:'Normal',amt:113.00,  rate:null, profit:2.50, after:115.50, gap:0},
+        {n:10, t:'Normal',amt:115.50,  rate:null, profit:2.25, after:117.75, gap:0},
+        {n:11, t:'Lucky', amt:306.00,  rate:null, profit:47.00,after:353.00, gap:189},
+        {n:12, t:'Normal',amt:353.00,  rate:null, profit:2.50, after:355.50, gap:0},
+        {n:13, t:'Normal',amt:355.50,  rate:null, profit:2.75, after:358.25, gap:0},
+        {n:14, t:'Normal',amt:358.25,  rate:null, profit:2.50, after:360.75, gap:0},
+        {n:15, t:'Normal',amt:360.75,  rate:null, profit:2.75, after:363.50, gap:0},
+        {n:16, t:'Normal',amt:363.50,  rate:null, profit:2.25, after:365.75, gap:0},
+        {n:17, t:'Normal',amt:365.75,  rate:null, profit:3.00, after:368.75, gap:0},
+        {n:18, t:'Normal',amt:368.75,  rate:null, profit:2.00, after:370.75, gap:0},
+        {n:19, t:'Normal',amt:370.75,  rate:null, profit:3.25, after:374.00, gap:0},
+        {n:20, t:'Normal',amt:374.00,  rate:null, profit:2.25, after:376.25, gap:0},
+    ];
+    const PHASE3_DATA = [
+        {n:1,  t:'Normal', amt:100.00,    rate:null, profit:3.00,    after:103.00,    gap:0},
+        {n:2,  t:'Normal', amt:103.00,    rate:null, profit:3.30,    after:106.30,    gap:0},
+        {n:3,  t:'Normal', amt:106.30,    rate:null, profit:3.61,    after:109.91,    gap:0},
+        {n:4,  t:'Normal', amt:109.91,    rate:null, profit:3.96,    after:113.87,    gap:0},
+        {n:5,  t:'Normal', amt:113.87,    rate:null, profit:4.33,    after:118.20,    gap:0},
+        {n:6,  t:'Normal', amt:118.20,    rate:null, profit:4.73,    after:122.93,    gap:0},
+        {n:7,  t:'Normal', amt:122.93,    rate:null, profit:5.16,    after:128.09,    gap:0},
+        {n:8,  t:'Normal', amt:128.09,    rate:null, profit:5.64,    after:133.73,    gap:0},
+        {n:9,  t:'Lucky',  amt:491.73,    rate:null, profit:155.00,  after:646.73,    gap:358},
+        {n:10, t:'Normal', amt:646.73,    rate:null, profit:16.17,   after:662.90,    gap:0},
+        {n:11, t:'Normal', amt:662.90,    rate:null, profit:17.23,   after:680.13,    gap:0},
+        {n:12, t:'Normal', amt:680.13,    rate:null, profit:18.36,   after:698.49,    gap:0},
+        {n:13, t:'Normal', amt:698.49,    rate:null, profit:19.56,   after:718.05,    gap:0},
+        {n:14, t:'Lucky',  amt:1746.05,   rate:null, profit:289.00,  after:2035.05,   gap:1028},
+        {n:15, t:'Normal', amt:2035.05,   rate:null, profit:50.88,   after:2085.93,   gap:0},
+        {n:16, t:'Normal', amt:2085.93,   rate:null, profit:54.23,   after:2140.16,   gap:0},
+        {n:17, t:'Lucky',  amt:4378.16,   rate:null, profit:1099.00, after:5477.16,   gap:2238},
+        {n:18, t:'Normal', amt:5477.00,   rate:null, profit:142.40,  after:5619.40,   gap:0},
+        {n:19, t:'Lucky',  amt:10068.40,  rate:null, profit:2437.00, after:12505.40,  gap:4449},
+        {n:20, t:'Normal', amt:12505.40,  rate:null, profit:312.64,  after:12818.04,  gap:0},
+        {n:21, t:'Lucky',  amt:21714.04,  rate:null, profit:4350.00, after:26064.04,  gap:8896},
+    ];
+
+    // chart hidden from user view — data kept for admin reference only
+    const phaseTitles = { 1:'Phase 1 – Training (11 Orders)', 2:'Phase 2 – First Deposit (11 Orders)', 3:'Phase 3 – Second Deposit (21 Orders)' };
+    const phaseColors = { 1:'#0bb1b3', 2:'#667eea', 3:'#f59e0b' };
+    const chartTitleEl = document.getElementById('chartTitle');
+    if (chartTitleEl) chartTitleEl.textContent = phaseTitles[phaseNum] || 'Order Reference Chart';
+
+    const data = phaseNum === 1 ? PHASE1_DATA : phaseNum === 2 ? PHASE2_DATA : PHASE3_DATA;
+    const showPct = phaseNum !== 3; // Phase 3 lucky profit = gap, not %
+
+    let html = `<thead><tr>
+        <th>#</th><th>Type</th><th>Amount ($)</th><th>Profit</th><th>After Bal ($)</th><th>Gap ($)</th>
+    </tr></thead><tbody>`;
+
+    data.forEach(row => {
+        const isLucky = row.t === 'Lucky';
+        const isHigh = row.t === 'Normal★';
+        const cls = isLucky ? 'chart-lucky-row' : isHigh ? 'chart-high-row' : '';
+        const typeLabel = isLucky ? '⭐ Lucky' : isHigh ? '🔥 High-Value' : 'Normal';
+        const profitLabel = isLucky && !showPct
+            ? `+$${row.profit.toFixed(2)} (gap)`
+            : row.rate !== null
+            ? `+$${row.profit.toFixed(2)} (${(row.rate*100)}%)`
+            : `+$${row.profit.toFixed(2)}`;
+        const gapBadge = row.gap > 0 ? `<span class="chart-gap-badge">Gap=$${row.gap}</span>` : '–';
+
+        html += `<tr class="${cls}">
+            <td><strong>${row.n}</strong></td>
+            <td>${typeLabel}</td>
+            <td>${row.amt.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+            <td style="color:var(--success)">${profitLabel}</td>
+            <td>${row.after.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+            <td>${gapBadge}</td>
+        </tr>`;
+    });
+    html += '</tbody>';
+    table.innerHTML = html;
+}
+
+
+function switchTab(tab, btn) {
+    currentTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderOrders();
+}
+
+function showToast(msg, golden = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (golden ? ' golden' : '');
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function showPhaseComplete(ordersCount, earned) {
+    document.getElementById('pcIcon').textContent = '🏆';
+    document.getElementById('pcTitle').textContent = 'Tasks Complete!';
+    document.getElementById('pcMsg').textContent = `Congratulations! You've completed all ${ordersCount} tasks. Please contact support for your next steps.`;
+    document.getElementById('pcStats').innerHTML = `
+        <div class="pc-stat-row"><span>Tasks Completed</span><span>${ordersCount}</span></div>
+        <div class="pc-stat-row"><span>Total Earned</span><span style="color:var(--success)">+$${earned.toFixed(2)}</span></div>`;
+    document.getElementById('phaseCompleteOverlay').classList.add('open');
+}
+
+function closePhaseComplete() {
+    document.getElementById('phaseCompleteOverlay').classList.remove('open');
+}
+
+// ══════════════════════════════════════════════════════════════
+// STAR RATING HELPERS
+// ══════════════════════════════════════════════════════════════
+const grabStarValues = { 1: 4, 2: 5, 3: 3 };
+
+function setGrabStars(rowIdx, val) {
+    grabStarValues[rowIdx] = val;
+    const container = document.getElementById('grabStars' + rowIdx);
+    if (!container) return;
+    container.querySelectorAll('.grab-star').forEach((s, i) => {
+        s.classList.toggle('lit', i < val);
+    });
+    const valEl = document.getElementById('grabStarVal' + rowIdx);
+    if (valEl) valEl.textContent = val + '/5';
+}
+
+function seededRating(seed, min, max) {
+    let h = 0;
+    for (let i = 0; i < seed.length; i++) h = (Math.imul(31, h) + seed.charCodeAt(i)) | 0;
+    return min + Math.abs(h) % (max - min + 1);
+}
+
+function renderOrderStars(orderId, savedRatings) {
+    const id = String(orderId);
+    // Use user-saved ratings if available, otherwise fall back to seeded (for old orders without ratings)
+    const ratings = [
+        { icon: 'fas fa-award', label: 'Product Quality', val: (savedRatings && savedRatings.quality) ? savedRatings.quality : seededRating(id + 'q', 3, 5) },
+        { icon: 'fas fa-tshirt', label: 'Design & Style',  val: (savedRatings && savedRatings.design)  ? savedRatings.design  : seededRating(id + 'd', 4, 5) },
+        { icon: 'fas fa-tag',   label: 'Value for Money', val: (savedRatings && savedRatings.value)   ? savedRatings.value   : seededRating(id + 'v', 3, 5) },
+    ];
+    return ratings.map(r => {
+        const stars = Array.from({length: 5}, (_, i) =>
+            `<span class="s${i < r.val ? ' on' : ''}">★</span>`).join('');
+        return `<div class="star-row">
+            <div class="star-row-label"><i class="${r.icon}"></i>${r.label}</div>
+            <div style="display:flex;align-items:center;">${stars}<span class="star-score-lbl">${r.val}/5</span></div>
+        </div>`;
+    }).join('');
+}
+
+function escapeHtml(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function logoutUser() {
+    if (confirm('Are you sure you want to logout?')) {
+        firebase.auth().signOut().then(() => {
+            window.location.href = 'login.html';
+        }).catch(e => {
+            console.error('Logout error:', e);
+            window.location.href = 'login.html';
+        });
+    }
+}
+
+window.addEventListener('userDataLoaded', (e) => {
+    if (e.detail && e.detail.balance !== undefined) {
+        balance = parseFloat(e.detail.balance || 0);
+        document.getElementById('balanceDisplay').textContent = '$' + balance.toFixed(2);
+    }
+});
+</script>
+
+<script type="text/javascript">
+window.$crisp=[];
+window.CRISP_WEBSITE_ID="e2018a9b-d17d-427b-a6ad-c2d865637f65";
+window.$crisp.push(["config", "hide:on:mobile", false]);
+window.$crisp.push(["do", "chat:hide"]);
+window.$crisp.push(["on", "session:loaded", function() {
+    window.$crisp.push(["do", "chat:hide"]);
+}]);
+window.$crisp.push(["on", "chat:closed", function() {
+    window.$crisp.push(["do", "chat:hide"]);
+}]);
+(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();
+</script>
+<script>
+function openCrispChat() {
+    if (window.$crisp) {
+        $crisp.push(["do", "chat:show"]);
+        $crisp.push(["do", "chat:open"]);
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover, user-scalable=no">
+    <meta name="description" content="Withdrawal Management – ManifestoShop">
+    <title>Withdrawal – ManifestoShop</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --teal: #0bb1b3; --teal-dark: #089a9c;
+            --primary-grad: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --teal-grad: linear-gradient(138deg, rgba(0,0,0,.15) 0%, transparent 70%), #0bb1b3;
+            --teal-light: #e0f7f7;
+            --gold: #f59e0b;
+            --success: #10b981; --danger: #ef4444;
+            --text: #1f2937; --text-muted: #6b7280;
+            --border: #e5e7eb; --bg: #f5f6fa;
+            --nav-h: 65px; --white: #fff;
+            /* legacy compat */
+            --primary-color: #0bb1b3;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        .wrapper { max-width: 500px; margin: 0 auto; background: var(--white); min-height: 100vh; padding-bottom: calc(var(--nav-h) + 16px); }
+
+        .header {
+            background: var(--primary-grad);
+            color: white;
+            padding: 0 16px;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .header-logo-icon {
+            width: 34px; height: 34px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 17px;
+        }
+        .header-actions { display: flex; gap: 10px; }
+        .hdr-btn {
+            background: rgba(255,255,255,0.18);
+            border: none; color: white;
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 16px; transition: background 0.2s;
+        }
+        .hdr-btn:hover { background: rgba(255,255,255,0.32); }
+
+        .main-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 16px 14px;
+        }
+
+        .balance-card {
+            background: var(--teal-grad);
+            color: white;
+            border-radius: 16px;
+            padding: 22px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 5px 20px rgba(11,177,179,0.3);
+        }
+
+        .balance-amount {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 8px 0;
+            letter-spacing: -1px;
+        }
+
+        .balance-label {
+            opacity: 0.88;
+            font-size: 12px;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 14px;
+            border: 1.5px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text);
+            border-bottom: 2px solid var(--teal);
+            padding-bottom: 8px;
+        }
+
+        .bank-card {
+            background: var(--primary-grad);
+            color: white;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bank-card::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            top: -100px;
+            right: -100px;
+        }
+
+        .bank-card-info {
+            position: relative;
+            z-index: 1;
+        }
+
+        .bank-name {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .account-number {
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            margin: 10px 0;
+        }
+
+        .account-holder {
+            opacity: 0.9;
+            font-size: 13px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-control, .form-select {
+            width: 100%;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 11px 14px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(11,177,179,0.15);
+        }
+
+        .btn-primary {
+            background: var(--teal);
+            border: none;
+            padding: 13px 30px;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: var(--teal-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(11,177,179,0.35);
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: var(--text-muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .withdrawal-record {
+            border-bottom: 1px solid var(--border);
+            padding: 13px 0;
+            transition: all 0.2s;
+        }
+
+        .withdrawal-record:hover {
+            background: #fafafa;
+            padding-left: 8px;
+        }
+
+        .withdrawal-record:last-child {
+            border-bottom: none;
+        }
+
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .record-amount {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .record-status {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .record-details {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        .no-data i {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.3;
+            display: block;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 13px 16px;
+            font-size: 13px;
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            border: 1.5px solid #fde68a;
+            color: #92400e;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            border: 1.5px solid #bfdbfe;
+            color: #1e40af;
+        }
+
+        .quick-amounts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .quick-amount-btn {
+            padding: 9px 6px;
+            border: 1.5px solid var(--teal);
+            background: white;
+            color: var(--teal);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .quick-amount-btn:hover, .quick-amount-btn.active {
+            background: var(--teal);
+            color: white;
+        }
+
+        .withdrawal-info {
+            background: var(--teal-light);
+            padding: 13px 14px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--teal);
+        }
+
+        .withdrawal-info ul {
+            margin: 8px 0 0 0;
+            padding-left: 18px;
+        }
+
+        .withdrawal-info li {
+            margin: 4px 0;
+            font-size: 12.5px;
+            color: var(--text-muted);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.55);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 8% auto;
+            padding: 24px;
+            border-radius: 18px;
+            width: 90%;
+            max-width: 480px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+            animation: slideIn 0.25s;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-30px); opacity: 0; }
+            to   { transform: translateY(0);     opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .close {
+            font-size: 1.8rem;
+            font-weight: 300;
+            color: var(--text-muted);
+            cursor: pointer;
+            background: none;
+            border: none;
+            line-height: 1;
+        }
+
+        .close:hover { color: var(--text); }
+
+        .tab-buttons {
+            display: flex;
+            gap: 0;
+            margin-bottom: 16px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 11px 8px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: var(--teal);
+            border-bottom-color: var(--teal);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ── BOTTOM NAV ── */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 500px;
+            height: 65px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            z-index: 200;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #aaa;
+            font-size: 10.5px;
+            font-weight: 600;
+            flex: 1;
+            padding: 6px 0;
+            transition: color 0.15s;
+        }
+        .nav-item.active, .nav-item:hover { color: #0bb1b3; }
+        .nav-item i { font-size: 21px; }
+        .nav-start-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        .nav-start-btn {
+            width: 58px; height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(138deg, rgba(0,0,0,.15) 0%, transparent 70%), #0bb1b3;
+            border: 4px solid white;
+            outline: 3px solid #0bb1b3;
+            box-shadow: 0 4px 16px rgba(11,177,179,0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-top: -28px;
+            transition: all 0.2s;
+            color: white;
+            font-size: 24px;
+            text-decoration: none;
+        }
+        .nav-start-btn:hover { transform: scale(1.08); box-shadow: 0 8px 24px rgba(11,177,179,0.55); }
+        .nav-start-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #0bb1b3;
+        }
+        
+        /* Add padding to body to account for fixed navigation */
+        body {
+            padding-bottom: calc(var(--nav-h) + 16px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-logo">
+            <div class="header-logo-icon">🛍️</div>
+            ManifestoShop
+        </div>
+        <div class="header-actions">
+            <button class="hdr-btn" onclick="openCrispChat()" title="Live Support"><i class="fas fa-headset"></i></button>
+            <button class="hdr-btn" onclick="history.back()" title="Back"><i class="fas fa-arrow-left"></i></button>
+            <button class="hdr-btn" title="Notifications"><i class="fas fa-bell"></i></button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Balance Card -->
+        <div class="balance-card">
+            <div class="balance-label">Available Balance</div>
+            <div class="balance-amount">$<span id="availableBalance">0.00</span></div>
+            <div class="balance-label">Total Withdrawn: $<span id="totalWithdrawn">0.00</span></div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="switchTab('withdraw')">
+                <i class="fas fa-wallet" style="margin-right:5px;"></i>Withdraw
+            </button>
+            <button class="tab-btn" onclick="switchTab('history')">
+                <i class="fas fa-history" style="margin-right:5px;"></i>History
+            </button>
+            <button class="tab-btn" onclick="switchTab('bank')">
+                <i class="fas fa-credit-card" style="margin-right:5px;"></i>Bank Account
+            </button>
+        </div>
+
+        <!-- Withdraw Tab -->
+        <div id="withdrawTab" class="tab-content active">
+            <!-- Bank Account Display -->
+            <div class="section-card" id="bankAccountSection">
+                <div class="section-title">
+                    <i class="fas fa-university" style="color:var(--teal);"></i>
+                    Linked Bank Account
+                </div>
+                <div id="bankAccountDisplay">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Withdrawal Form -->
+            <div class="section-card">
+                <div class="section-title">
+                    <i class="fas fa-money-check-alt" style="color:var(--teal);"></i>
+                    Withdrawal Request
+                </div>
+
+                <div class="withdrawal-info">
+                    <strong><i class="fas fa-info-circle"></i> Important Information:</strong>
+                    <ul>
+                        <li>Minimum withdrawal amount: $50</li>
+                        
+                        <li>Processing time: 1-3 business days</li>
+                    </ul>
+                </div>
+
+                <form id="withdrawalForm">
+                    <div class="form-group">
+                        <label class="form-label">Quick Amount Selection</label>
+                        <div class="quick-amounts">
+                            <button type="button" class="quick-amount-btn" onclick="selectQuickAmount(100,this)">$100</button>
+                            <button type="button" class="quick-amount-btn" onclick="selectQuickAmount(500,this)">$500</button>
+                            <button type="button" class="quick-amount-btn" onclick="selectQuickAmount(1000,this)">$1,000</button>
+                            <button type="button" class="quick-amount-btn" onclick="selectQuickAmount(2000,this)">$2,000</button>
+                            <button type="button" class="quick-amount-btn" onclick="selectQuickAmount(5000,this)">$5,000</button>
+                            <button type="button" class="quick-amount-btn" onclick="selectQuickAmount('all',this)">All</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="withdrawalAmount">
+                            <i class="fas fa-dollar-sign"></i>
+                            Withdrawal Amount (USD)
+                        </label>
+                        <input type="number" class="form-control" id="withdrawalAmount" 
+                               placeholder="Enter amount" min="50" step="0.01" required>
+                        <small id="amountError" class="text-danger" style="display: none;"></small>
+                        <small id="feeInfo" class="text-muted" style="display: block; margin-top: 5px;"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="withdrawalPassword">
+                            <i class="fas fa-lock"></i>
+                            Transaction Password
+                        </label>
+                        <input type="password" class="form-control" id="withdrawalPassword" 
+                               placeholder="Enter your transaction password" required>
+                        <small class="text-muted">Enter your account password to confirm withdrawal</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="withdrawalNote">
+                            <i class="fas fa-sticky-note"></i>
+                            Note (Optional)
+                        </label>
+                        <textarea class="form-control" id="withdrawalNote" rows="3" 
+                                  placeholder="Add a note for this withdrawal"></textarea>
+                    </div>
+
+                    <div id="withdrawalSummary" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none;">
+                        <strong>Withdrawal Summary:</strong>
+                        <div style="margin-top: 10px;">
+                            <div style="display: flex; justify-content: space-between; margin: 5px 0; font-weight: 600;">
+                                <span>You will receive:</span>
+                                <span id="summaryTotal" style="color: var(--success-color);">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-paper-plane"></i>
+                        Submit Withdrawal Request
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="historyTab" class="tab-content">
+            <div class="section-card">
+                <div class="section-title">
+                    <i class="fas fa-receipt"></i>
+                    Withdrawal History
+                </div>
+                <div id="withdrawalHistory">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bank Account Tab -->
+        <div id="bankTab" class="tab-content">
+            <div class="section-card">
+                <div class="section-title">
+                    <i class="fas fa-university" style="color:var(--teal);"></i>
+                    Bank Account Management
+                </div>
+                <div id="bankManagement">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bank Card Binding Modal -->
+    <div id="bankModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Bind Bank Account</h2>
+                <button class="close" onclick="closeBankModal()">&times;</button>
+            </div>
+            <form id="bankForm">
+                <div class="form-group">
+                    <label class="form-label" for="bankName">Bank Name</label>
+                    <select class="form-select" id="bankName" required>
+                        <option value="">Please select a bank</option>
+                        <option value="AXIS BANK">AXIS BANK</option>
+                        <option value="KOTAK BANK">KOTAK BANK</option>
+                        <option value="HDFC">HDFC</option>
+                        <option value="SBI">SBI</option>
+                        <option value="ICIC">ICIC</option>
+                        <option value="INDUSLND BANK">INDUSLND BANK</option>
+                        <option value="BANK OF INDIA/BOI BANK">BANK OF INDIA/BOI BANK</option>
+                        <option value="Canara bank">Canara bank</option>
+                        <option value="DIGI BANK/DBS BANK">DIGI BANK/DBS BANK</option>
+                        <option value="UNION BANK">UNION BANK</option>
+                        <option value="AU SMALL BANK">AU SMALL BANK</option>
+                        <option value="FEDERAL BANK">FEDERAL BANK</option>
+                        <option value="BANK OF BARODA">BANK OF BARODA</option>
+                        <option value="IDBI BANK">IDBI BANK</option>
+                        <option value="SOUTH INDIAN BANK">SOUTH INDIAN BANK</option>
+                        <option value="YES BANK">YES BANK</option>
+                        <option value="PNB PUNJAB BANK">PNB PUNJAB BANK</option>
+                        <option value="HSBC Bank">HSBC Bank</option>
+                        <option value="Punjab and Sindh Bank">Punjab and Sindh Bank</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="accountNumber">Bank Account Number</label>
+                    <input type="text" class="form-control" id="accountNumber" 
+                           placeholder="Enter account number" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="beneficiaryName">Beneficiary Name</label>
+                    <input type="text" class="form-control" id="beneficiaryName" 
+                           placeholder="Enter account holder name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="ifscCode">IFSC Code</label>
+                    <input type="text" class="form-control" id="ifscCode" 
+                           placeholder="Enter IFSC code" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="bankPassword">Login Password</label>
+                    <input type="password" class="form-control" id="bankPassword" 
+                           placeholder="Enter your login password" required>
+                    <small class="text-muted">Do not enter the bank password. Use your account login password.</small>
+                </div>
+
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Security Notice:</strong> Never share your bank password with anyone. This form only requires your account login password for verification.
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i>
+                    Confirm Modification
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── WITHDRAWAL CONFIRMATION MODAL ── -->
+    <div id="wdConfirmModal" class="modal">
+        <div class="modal-content" style="max-width:420px;">
+            <div class="modal-header">
+                <h2 class="modal-title">⚡ Confirm Withdrawal</h2>
+                <button class="close" onclick="cancelWithdrawalConfirm()">&times;</button>
+            </div>
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">
+                Please review your withdrawal details. Once confirmed, our live agent will be notified to process your request.
+            </p>
+
+            <!-- Amount breakdown -->
+            <div style="background:#f9fafb;border-radius:12px;padding:14px;margin-bottom:14px;border:1.5px solid var(--border);">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="font-size:13px;color:var(--text-muted);">Withdrawal Amount</span>
+                    <span style="font-family:'Outfit',sans-serif;font-weight:800;font-size:15px;" id="wdConfirmAmount">$0.00</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px dashed var(--border);">
+                    <span style="font-size:13px;font-weight:700;">You Will Receive</span>
+                    <span style="font-family:'Outfit',sans-serif;font-weight:800;font-size:16px;color:var(--success);" id="wdConfirmNet">$0.00</span>
+                </div>
+            </div>
+
+            <!-- Bank details -->
+            <div style="background:linear-gradient(135deg,#667eea,#764ba2);border-radius:12px;padding:14px;margin-bottom:16px;color:white;">
+                <div style="font-size:11px;opacity:.8;margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">To Bank Account</div>
+                <div style="font-weight:700;font-size:14px;margin-bottom:4px;" id="wdConfirmBank">—</div>
+                <div style="font-size:13px;letter-spacing:2px;margin-bottom:4px;" id="wdConfirmAcc">****</div>
+                <div style="font-size:12px;opacity:.9;" id="wdConfirmName">—</div>
+                <div style="font-size:11px;opacity:.8;margin-top:4px;">IFSC: <span id="wdConfirmIFSC">—</span></div>
+            </div>
+
+            <!-- Info note -->
+            <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;padding:11px 13px;margin-bottom:16px;font-size:12px;color:#92400e;line-height:1.6;">
+                ⚡ After confirming, a live support chat will open automatically with your details pre-filled. Our agent will process your withdrawal shortly.
+            </div>
+
+            <div style="display:flex;gap:10px;">
+                <button class="btn-secondary" style="flex:1;" onclick="cancelWithdrawalConfirm()">Cancel</button>
+                <button class="btn-primary" style="flex:2;" onclick="confirmWithdrawal()">
+                    <i class="fas fa-headset"></i> Confirm & Open Support Chat
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <i class="fas fa-check-circle" style="font-size:3rem;color:var(--success);"></i>
+            <h2 style="margin: 20px 0;">Success!</h2>
+            <div id="successMessage">Your request has been processed successfully.</div>
+            <button class="btn-primary" onclick="closeSuccessModal()" style="margin-top: 20px;">OK</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs (must match firebase-config.js) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="auth-guard.js"></script>
+
+    <!-- Scripts -->
+    
+    
+    <script>
+        // Data Storage
+        let bankAccount = null;
+        let withdrawalRecords = [];
+        let availableBalance = 0;
+        let _currentUserId = null; // tracks logged-in user for scoped localStorage keys
+
+        // ── USER-SCOPED localStorage keys — prevents data leaking between users ──
+        function userKey(key) { return _currentUserId ? `wd_${_currentUserId}_${key}` : null; }
+
+        // Load data from localStorage (bank account & history — USER-SCOPED by uid)
+        function loadData() {
+            // ALWAYS load balance fresh from Firestore — never trust stale sessionStorage
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (!user) { updateUI(); return; }
+                _currentUserId = user.uid;
+
+                // Load user-scoped localStorage data (bank + local history cache)
+                const savedBankAccount = localStorage.getItem(userKey('bankAccount'));
+                const savedRecords = localStorage.getItem(userKey('withdrawalRecords'));
+                if (savedBankAccount) { try { bankAccount = JSON.parse(savedBankAccount); } catch(e) {} }
+                if (savedRecords) { try { withdrawalRecords = JSON.parse(savedRecords); } catch(e) {} }
+
+                // Always fetch balance + bank + withdrawal history live from Firestore
+                firebase.firestore().collection('users').doc(user.uid).get()
+                    .then(function(doc) {
+                        if (doc.exists) {
+                            const data = doc.data();
+                            // ── BALANCE: always from Firestore, never stale cache ──
+                            availableBalance = parseFloat(data.balance || 0);
+                            sessionStorage.setItem('userBalance', availableBalance.toString());
+                            // ── BANK: prefer Firestore (source of truth) ──
+                            if (data.bankAccount) {
+                                bankAccount = data.bankAccount;
+                                saveData();
+                            }
+                        }
+                        // Load withdrawal history from Firestore (real-time listener)
+                        firebase.firestore().collection('withdrawalRequests')
+                            .where('userId', '==', user.uid)
+                            .orderBy('createdAt', 'desc')
+                            .onSnapshot(function(snapshot) {
+                                if (snapshot && !snapshot.empty) {
+                                    withdrawalRecords = snapshot.docs.map(function(d) {
+                                        const r = d.data();
+                                        return {
+                                            id: d.id,
+                                            amount: parseFloat(r.amount || 0),
+                                            fee: parseFloat(r.fee || 0),
+                                            netAmount: parseFloat(r.netAmount || r.amount || 0),
+                                            status: r.status || 'pending',
+                                            timestamp: r.createdAt ? (r.createdAt.toDate ? r.createdAt.toDate().toISOString() : r.createdAt) : new Date().toISOString(),
+                                            note: r.note || '',
+                                            bankAccount: (r.bankName || '') + (r.accountNumber ? ' – ****' + String(r.accountNumber).slice(-4) : '')
+                                        };
+                                    });
+                                    saveData();
+                                }
+                                updateUI();
+                            }, function(err) {
+                                console.warn('Firestore load error:', err);
+                                updateUI();
+                            });
+                    }); // ← closes .then(function(doc) — this was missing, causing the whole page to fail silently
+            }); // ← closes onAuthStateChanged
+        }
+
+        // Also refresh balance when Firebase user data is ready
+        window.addEventListener('userDataLoaded', function() {
+            const freshBalance = parseFloat(sessionStorage.getItem('userBalance') || '0');
+            if (freshBalance !== availableBalance) {
+                availableBalance = freshBalance;
+                updateUI();
+            }
+        });
+
+        // Save data to localStorage (user-scoped; balance is authoritative in Firestore/sessionStorage)
+        function saveData() {
+            if (!_currentUserId) return; // never write without knowing which user
+            localStorage.setItem(userKey('bankAccount'), JSON.stringify(bankAccount));
+            localStorage.setItem(userKey('withdrawalRecords'), JSON.stringify(withdrawalRecords));
+            sessionStorage.setItem('userBalance', availableBalance.toString());
+        }
+
+        // Update UI
+        function updateUI() {
+            document.getElementById('availableBalance').textContent = availableBalance.toFixed(2);
+            
+            const totalWithdrawn = withdrawalRecords
+                .filter(record => record.status === 'completed' || record.status === 'approved')
+                .reduce((sum, record) => sum + record.netAmount, 0);
+            document.getElementById('totalWithdrawn').textContent = totalWithdrawn.toFixed(2);
+            
+            displayBankAccount();
+            displayWithdrawalHistory();
+            displayBankManagement();
+        }
+
+        // Display bank account
+        function displayBankAccount() {
+            const display = document.getElementById('bankAccountDisplay');
+            
+            if (bankAccount) {
+                display.innerHTML = `
+                    <div class="bank-card">
+                        <div class="bank-card-info">
+                            <div class="bank-name">${bankAccount.bankName}</div>
+                            <div class="account-number">**** **** ${bankAccount.accountNumber.slice(-4)}</div>
+                            <div class="account-holder">Account Holder: ${bankAccount.beneficiaryName}</div>
+                            <div class="account-holder">IFSC: ${bankAccount.ifscCode}</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-secondary" onclick="openBankModal()">
+                        <i class="fas fa-edit"></i>
+                        Update Bank Account
+                    </button>
+                `;
+            } else {
+                display.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        No bank account linked. Please add a bank account to process withdrawals.
+                    </div>
+                    <button type="button" class="btn-primary" onclick="openBankModal()">
+                        <i class="fas fa-plus"></i>
+                        Add Bank Account
+                    </button>
+                `;
+            }
+        }
+
+        // Display withdrawal history
+        function displayWithdrawalHistory() {
+            const display = document.getElementById('withdrawalHistory');
+            
+            if (withdrawalRecords.length === 0) {
+                display.innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-receipt"></i>
+                        <p>No withdrawal records found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const sortedRecords = [...withdrawalRecords].sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            );
+            
+            let html = '';
+            sortedRecords.forEach(record => {
+                const statusClass = (record.status === 'completed' || record.status === 'approved') ? 'status-completed' : 
+                                  record.status === 'pending' ? 'status-pending' : 'status-failed';
+                const statusText = record.status === 'approved' ? 'Approved' :
+                                  record.status === 'completed' ? 'Completed' :
+                                  record.status === 'pending' ? 'Pending' : 'Rejected';
+                
+                html += `
+                    <div class="withdrawal-record">
+                        <div class="record-header">
+                            <div>
+                                <div class="record-amount">-$${record.amount.toFixed(2)}</div>
+                                <div class="record-details">
+                                    ${new Date(record.timestamp).toLocaleString()}
+                                </div>
+                            </div>
+                            <div class="record-status ${statusClass}">${statusText}</div>
+                        </div>
+                        <div class="record-details" style="margin-top: 10px;">
+                            Fee: $${record.fee.toFixed(2)} | Net Amount: $${record.netAmount.toFixed(2)}
+                            ${record.note ? `<br>Note: ${record.note}` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            display.innerHTML = html;
+        }
+
+        // Display bank management
+        function displayBankManagement() {
+            const display = document.getElementById('bankManagement');
+            
+            if (bankAccount) {
+                display.innerHTML = `
+                    <div class="bank-card">
+                        <div class="bank-card-info">
+                            <div class="bank-name">${bankAccount.bankName}</div>
+                            <div class="account-number">${bankAccount.accountNumber}</div>
+                            <div class="account-holder">Account Holder: ${bankAccount.beneficiaryName}</div>
+                            <div class="account-holder">IFSC Code: ${bankAccount.ifscCode}</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="btn-primary" onclick="openBankModal()">
+                            <i class="fas fa-edit"></i>
+                            Update Bank Account
+                        </button>
+                    </div>
+                    <div class="alert alert-info" style="margin-top: 20px;">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Important:</strong> Ensure your bank account information is accurate. All withdrawals will be processed to this account.
+                    </div>
+                `;
+            } else {
+                display.innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>No Bank Account Linked</strong>
+                        <p>You need to add a bank account before you can withdraw funds.</p>
+                    </div>
+                    <button type="button" class="btn-primary" onclick="openBankModal()">
+                        <i class="fas fa-plus"></i>
+                        Add Bank Account
+                    </button>
+                `;
+            }
+        }
+
+        // Tab switching
+        function switchTab(tab) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Deactivate all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            if (tab === 'withdraw') {
+                document.getElementById('withdrawTab').classList.add('active');
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            } else if (tab === 'history') {
+                document.getElementById('historyTab').classList.add('active');
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            } else if (tab === 'bank') {
+                document.getElementById('bankTab').classList.add('active');
+                document.querySelectorAll('.tab-btn')[2].classList.add('active');
+            }
+        }
+
+        // Quick amount selection
+        function selectQuickAmount(amount, btn) {
+            const amountInput = document.getElementById('withdrawalAmount');
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.quick-amount-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            if (btn) btn.classList.add('active');
+            
+            if (amount === 'all') {
+                amountInput.value = availableBalance.toFixed(2);
+            } else {
+                amountInput.value = amount;
+            }
+            
+            calculateFee();
+        }
+
+        // Calculate withdrawal fee
+        function calculateFee() {
+            const amount = parseFloat(document.getElementById('withdrawalAmount').value) || 0;
+            
+            document.getElementById('feeInfo').textContent = 
+                amount > 0 ? `You will receive: $${amount.toFixed(2)}` : '';
+            
+            document.getElementById('summaryTotal').textContent = `$${amount.toFixed(2)}`;
+            document.getElementById('withdrawalSummary').style.display = amount > 0 ? 'block' : 'none';
+        }
+
+        // ── WITHDRAWAL FORM SUBMISSION — Smart Flow ──
+        // Flow: Validate → Show Confirm Modal → User confirms →
+        //       Write lightweight Firestore record (NO balance deduction) +
+        //       Auto-open Crisp chat with withdrawal message.
+        //       Admin sees request in panel, verifies via chat, deducts balance manually.
+        document.getElementById('withdrawalForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!bankAccount) {
+                alert('Please add a bank account before making a withdrawal.');
+                openBankModal();
+                return;
+            }
+
+            const amount = parseFloat(document.getElementById('withdrawalAmount').value);
+            const note   = document.getElementById('withdrawalNote').value;
+
+            if (isNaN(amount) || amount < 50) {
+                document.getElementById('amountError').textContent = 'Minimum withdrawal amount is $50';
+                document.getElementById('amountError').style.display = 'block';
+                return;
+            }
+            if (amount > availableBalance) {
+                document.getElementById('amountError').textContent = 'Insufficient balance';
+                document.getElementById('amountError').style.display = 'block';
+                return;
+            }
+            document.getElementById('amountError').style.display = 'none';
+
+            const fee       = 0;
+            const netAmount = parseFloat(amount.toFixed(2));
+
+            // Populate and open confirmation modal
+            document.getElementById('wdConfirmAmount').textContent  = '$' + amount.toFixed(2);
+            document.getElementById('wdConfirmNet').textContent     = '$' + amount.toFixed(2);
+            document.getElementById('wdConfirmBank').textContent    = bankAccount.bankName;
+            document.getElementById('wdConfirmAcc').textContent     = '****' + bankAccount.accountNumber.slice(-4);
+            document.getElementById('wdConfirmName').textContent    = bankAccount.beneficiaryName;
+            document.getElementById('wdConfirmIFSC').textContent    = bankAccount.ifscCode;
+
+            // Store pending data for confirm handler
+            window._pendingWithdrawal = { amount, fee, netAmount, note, bankAccount: {...bankAccount} };
+            document.getElementById('wdConfirmModal').style.display = 'block';
+        });
+
+        function confirmWithdrawal() {
+            const { amount, fee, netAmount, note, bankAccount: ba } = window._pendingWithdrawal || {};
+            if (!amount) return;
+
+            document.getElementById('wdConfirmModal').style.display = 'none';
+            const submitBtn = document.querySelector('#withdrawalForm [type="submit"]');
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Submitting…'; }
+
+            const user = firebase.auth().currentUser;
+            const userPhone = sessionStorage.getItem('userPhone') || sessionStorage.getItem('userEmail') || (user && user.email) || '–';
+
+            // ── Write lightweight record to Firestore — NO balance deduction ──
+            // Admin will deduct balance manually after verifying via live chat.
+            const record = {
+                userId:          user ? user.uid : '',
+                userPhone:       userPhone,
+                userEmail:       user ? (user.email || '') : '',
+                amount:          amount,
+                fee:             fee,
+                netAmount:       netAmount,
+                status:          'pending',
+                createdAt:       firebase.firestore.FieldValue.serverTimestamp(),
+                note:            note,
+                bankName:        ba.bankName,
+                accountNumber:   ba.accountNumber,
+                beneficiaryName: ba.beneficiaryName,
+                ifscCode:        ba.ifscCode,
+                balanceBefore:   availableBalance,
+                source:          'chat_assisted'   // flag: admin must deduct manually
+            };
+
+            firebase.firestore().collection('withdrawalRequests').add(record)
+                .then(function(docRef) {
+                    // Mirror locally for history tab
+                    withdrawalRecords.push({
+                        id:          docRef.id,
+                        amount:      amount,
+                        fee:         0,
+                        netAmount:   amount,
+                        status:      'pending',
+                        timestamp:   new Date().toISOString(),
+                        note:        note,
+                        bankAccount: ba.bankName + ' – ****' + ba.accountNumber.slice(-4)
+                    });
+                    saveData();
+
+                    // Reset form
+                    document.getElementById('withdrawalForm').reset();
+                    document.getElementById('withdrawalSummary').style.display = 'none';
+                    document.querySelectorAll('.quick-amount-btn').forEach(b => b.classList.remove('active'));
+                    updateUI();
+
+                    // ── Directly open Crisp chat ──
+                    openCrispChat();
+                })
+                .catch(function(err) {
+                    console.error('Withdrawal record failed:', err);
+                    // Even if Firestore write fails, open Crisp so user can contact support
+                    openCrispChat();
+                })
+                .finally(function() {
+                    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit Withdrawal Request'; }
+                    window._pendingWithdrawal = null;
+                });
+        }
+
+        function cancelWithdrawalConfirm() {
+            document.getElementById('wdConfirmModal').style.display = 'none';
+            window._pendingWithdrawal = null;
+        }
+
+        // ── BANK FORM SUBMISSION ──
+        document.getElementById('bankForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const pw = document.getElementById('bankPassword').value;
+            if (!pw) { alert('Please enter your login password to confirm.'); return; }
+
+            bankAccount = {
+                bankName:        document.getElementById('bankName').value,
+                accountNumber:   document.getElementById('accountNumber').value,
+                beneficiaryName: document.getElementById('beneficiaryName').value,
+                ifscCode:        document.getElementById('ifscCode').value
+            };
+
+            saveData();
+            closeBankModal();
+            updateUI();
+
+            // Persist to Firestore so admin can see bank details on user profile
+            const user = firebase.auth().currentUser;
+            if (user) {
+                firebase.firestore().collection('users').doc(user.uid).update({
+                    bankAccount: bankAccount
+                }).catch(err => console.warn('Bank save to Firestore failed:', err));
+            }
+
+            // ── Auto-open Crisp after bank account is saved ──
+            $crisp.push(['do', 'chat:open']);
+
+            document.getElementById('successMessage').innerHTML =
+                `<strong>✅ Bank account saved!</strong><br>Your details have been updated.<br><br>` +
+                `<button class="btn-primary" style="font-size:13px;padding:10px 16px;" onclick="closeSuccessModal();openCrispChat();">` +
+                `<i class="fas fa-headset"></i> Notify Support</button>`;
+            document.getElementById('successModal').style.display = 'block';
+        });
+
+        // Modal functions
+        function openBankModal() {
+            document.getElementById('bankModal').style.display = 'block';
+            
+            // Pre-fill if editing
+            if (bankAccount) {
+                document.getElementById('bankName').value = bankAccount.bankName;
+                document.getElementById('accountNumber').value = bankAccount.accountNumber;
+                document.getElementById('beneficiaryName').value = bankAccount.beneficiaryName;
+                document.getElementById('ifscCode').value = bankAccount.ifscCode;
+            }
+        }
+
+        function closeBankModal() {
+            document.getElementById('bankModal').style.display = 'none';
+            document.getElementById('bankForm').reset();
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Amount input listener
+        document.getElementById('withdrawalAmount').addEventListener('input', calculateFee);
+
+        // Initialize
+        loadData();
+    </script>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-home"></i><span>Home</span>
+        </a>
+        <a href="recharge.html" class="nav-item">
+            <i class="fas fa-plus-circle"></i><span>Recharge</span>
+        </a>
+        <div class="nav-start-wrap">
+            <a class="nav-start-btn" href="grab_an_order.html" title="Start Grabbing Orders">
+                <i class="fas fa-rocket"></i>
+            </a>
+            <span class="nav-start-label">Start</span>
+        </div>
+        <a href="grab_an_order.html" class="nav-item">
+            <i class="fas fa-clipboard-list"></i><span>Order</span>
+        </a>
+        <a href="my.html" class="nav-item">
+            <i class="fas fa-user-circle"></i><span>My</span>
+        </a>
+    </nav>
+
+
+<script>
+function openCrispChat() {
+    if (window.$crisp) {
+        $crisp.push(["do", "chat:show"]);
+        $crisp.push(["do", "chat:open"]);
+    }
+}
+</script>
+<script type="text/javascript">
+window.$crisp=[];
+window.CRISP_WEBSITE_ID="e2018a9b-d17d-427b-a6ad-c2d865637f65";
+window.$crisp.push(["config", "hide:on:mobile", false]);
+window.$crisp.push(["do", "chat:hide"]);
+window.$crisp.push(["on", "session:loaded", function() {
+    window.$crisp.push(["do", "chat:hide"]);
+}]);
+window.$crisp.push(["on", "chat:closed", function() {
+    window.$crisp.push(["do", "chat:hide"]);
+}]);
+(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();
+</script>
+<script>
+function openCrispChat() {
+    if (window.$crisp) {
+        $crisp.push(["do", "chat:show"]);
+        $crisp.push(["do", "chat:open"]);
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover, user-scalable=no">
+  <title>Recharge – ManifestoShop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal: #0bb1b3;
+      --teal-dark: #089799;
+      --teal-light: #e0f7f7;
+      --text: #222;
+      --muted: #888;
+      --border: #e0e0e0;
+      --bg: #f5f6fa;
+      --white: #fff;
+      --nav-h: 62px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      max-width: 500px;
+      margin: 0 auto;
+      background: #fff;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 58px;
+      padding: 0 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+    .header-logo-icon {
+      width: 34px; height: 34px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+    }
+    .header-icons { display: flex; align-items: center; gap: 10px; }
+    .header-icons .hdr-btn {
+      background: rgba(255,255,255,0.18);
+      border: none; color: white;
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 16px;
+    }
+    .lang-badge {
+      border: 1.5px solid rgba(255,255,255,0.6);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 5px;
+      color: rgba(255,255,255,0.9);
+      cursor: pointer;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .page-body {
+      padding: 20px 16px 100px;
+    }
+
+    .amount-label {
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    /* Amount Input */
+    .amount-input-wrap {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .amount-input {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 44px 14px 18px;
+      font-size: 20px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s;
+      background: #fff;
+    }
+    .amount-input:focus { border-color: var(--teal); }
+    .amount-input::placeholder { color: #bbb; font-size: 18px; }
+    .amount-spinners {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .amount-spinners button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #aaa;
+      font-size: 11px;
+      line-height: 1;
+      padding: 1px 3px;
+      transition: color .15s;
+    }
+    .amount-spinners button:hover { color: var(--teal); }
+
+    /* Quick Amount Grid */
+    .quick-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .quick-btn {
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      padding: 14px 10px;
+      font-size: 15px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      transition: all .18s;
+      text-align: center;
+    }
+    .quick-btn:hover,
+    .quick-btn.active {
+      border-color: var(--teal);
+      background: var(--teal-light);
+      color: var(--teal-dark);
+    }
+
+    /* Payment Method */
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    .payment-cards {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 6px;
+      scrollbar-width: none;
+    }
+    .payment-cards::-webkit-scrollbar { display: none; }
+
+    .payment-card {
+      min-width: 200px;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      background: var(--teal);
+      color: #fff;
+      padding: 14px 16px 16px;
+      cursor: pointer;
+      transition: all .2s;
+      flex-shrink: 0;
+    }
+    .payment-card.active,
+    .payment-card:hover {
+      border-color: var(--teal-dark);
+      box-shadow: 0 4px 16px rgba(23,190,187,.3);
+    }
+    .payment-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: rgba(255,255,255,.18);
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: .03em;
+      margin-bottom: 12px;
+    }
+    .payment-card-top i { font-size: 17px; }
+    .payment-card h5 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+    .payment-card p {
+      font-size: 12px;
+      opacity: .85;
+    }
+
+    /* Pagination dots */
+    .swiper-dots {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      margin: 10px 0 22px;
+    }
+    .swiper-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ccc;
+      transition: background .2s;
+    }
+    .swiper-dot.active { background: var(--teal); }
+
+    /* Notes */
+    .notes-card {
+      background: #f9f9f9;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+    }
+    .notes-card p {
+      font-size: 12.5px;
+      color: #666;
+      line-height: 1.65;
+      margin-bottom: 6px;
+    }
+    .notes-card p:last-child { margin-bottom: 0; }
+    .notes-card span { color: var(--teal); font-weight: 700; }
+
+    /* Submit Button */
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      letter-spacing: .02em;
+    }
+    .submit-btn:hover { background: var(--teal-dark); transform: translateY(-1px); }
+    .submit-btn:active { transform: translateY(0); }
+
+    /* ── BOTTOM NAV ── */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 500px;
+      height: var(--nav-h);
+      background: #fff;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 200;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      text-decoration: none;
+      color: #aaa;
+      font-size: 11px;
+      font-weight: 500;
+      flex: 1;
+      padding: 6px 0;
+      transition: color .15s;
+    }
+    .nav-item i { font-size: 21px; }
+    .nav-item.active, .nav-item:hover { color: var(--teal); }
+
+    /* Start Button */
+    .nav-start-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .nav-start-btn {
+      width: 58px; height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(138deg, rgba(0,0,0,.15) 0%, transparent 70%), #0bb1b3;
+      border: 4px solid white;
+      outline: 3px solid #0bb1b3;
+      box-shadow: 0 4px 16px rgba(11,177,179,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-top: -28px;
+      transition: all 0.2s;
+      color: white;
+      font-size: 24px;
+      text-decoration: none;
+    }
+    .nav-start-btn:hover { transform: scale(1.08); box-shadow: 0 8px 24px rgba(11,177,179,0.55); }
+    .nav-start-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #0bb1b3;
+    }
+
+    /* ── SUCCESS TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #222;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      transition: all .3s;
+      z-index: 999;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 500;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-sheet {
+      background: #fff;
+      width: 100%;
+      max-width: 500px;
+      border-radius: 20px 20px 0 0;
+      padding: 24px 20px 40px;
+      animation: slideUp .3s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+    .modal-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .modal-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
+    .modal-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+    }
+    .modal-row:last-of-type { border-bottom: none; }
+    .modal-row span:first-child { color: var(--muted); }
+    .modal-row span:last-child { font-weight: 600; }
+    .modal-row .highlight { color: var(--teal); font-size: 18px; font-weight: 700; }
+    .modal-confirm-btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 15px;
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .modal-confirm-btn:hover { background: var(--teal-dark); }
+    .modal-cancel {
+      display: block;
+      text-align: center;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* error shake */
+    .shake { animation: shake .3s; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    .input-error { border-color: #e53935 !important; }
+    .error-msg { color: #e53935; font-size: 12px; margin-top: -14px; margin-bottom: 14px; display: none; }
+
+    /* ── NEXT STEPS PANEL ── */
+    .next-steps-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 600;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .next-steps-overlay.open { display: flex; }
+    .next-steps-sheet {
+      background: #fff;
+      width: 100%;
+      max-width: 500px;
+      border-radius: 24px 24px 0 0;
+      padding: 28px 20px 48px;
+      animation: slideUp .35s ease;
+    }
+    .ns-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #dcfce7;
+      color: #16a34a;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+    .ns-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: #111;
+      margin-bottom: 6px;
+    }
+    .ns-subtitle {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 22px;
+    }
+    .ns-ref {
+      background: #f5f6fa;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .ns-ref span { font-weight: 700; color: #333; font-size: 13px; letter-spacing: .5px; }
+    .ns-steps { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+    .ns-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .ns-step-num {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: var(--teal);
+      color: white;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .ns-step-num.done { background: #16a34a; }
+    .ns-step-body strong { font-size: 14px; color: #111; display: block; margin-bottom: 2px; }
+    .ns-step-body p { font-size: 12.5px; color: #888; line-height: 1.5; }
+    .ns-chat-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--teal);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background .2s, transform .15s;
+      box-shadow: 0 6px 20px rgba(11,177,179,.35);
+    }
+    .ns-chat-btn:hover { background: var(--teal-dark); transform: translateY(-1px); }
+    .ns-close {
+      display: block;
+      text-align: center;
+      margin-top: 14px;
+      color: #aaa;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .msg-box {
+      background: #f0fdf4;
+      border: 1.5px solid #bbf7d0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 12.5px;
+      color: #166534;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .msg-box strong { display: block; margin-bottom: 4px; font-size: 13px; }
+    .copy-msg-btn {
+      background: none;
+      border: 1.5px solid #16a34a;
+      color: #16a34a;
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      font-family: 'DM Sans', sans-serif;
+    }
+  </style>
+</head>
+<body>
+
+<!-- AUTH LOADING OVERLAY -->
+<div id="authOverlay" style="position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+  <div style="width:52px;height:52px;border:4px solid #e5e7eb;border-top-color:#0bb1b3;border-radius:50%;animation:rechargeSpinner 1s linear infinite;"></div>
+  <div style="color:#0bb1b3;font-weight:600;font-family:'DM Sans',sans-serif;">Verifying session…</div>
+</div>
+<style>@keyframes rechargeSpinner { to { transform: rotate(360deg); } }</style>
+<div id="rechargePageBody" style="display:none;"></div>
+<script>
+  // Immediately hide page body until auth verified
+  document.addEventListener('DOMContentLoaded', function() {
+    var body = document.body;
+    // Move everything except overlay into a wrapper so we can show/hide
+  });
+</script>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">
+    <div class="header-logo-icon">🛍️</div>
+    <span>ManifestoShop</span>
+  </div>
+  <div class="header-icons">
+    <button class="hdr-btn" title="Support" onclick="openCrispChat()"><i class="fas fa-headset"></i></button>
+    <span class="lang-badge">EN</span>
+  </div>
+</div>
+
+<!-- PAGE BODY -->
+<div class="page-body">
+
+  <p class="amount-label">recharge amount</p>
+
+  <!-- Amount Input -->
+  <div class="amount-input-wrap">
+    <input
+      id="amountInput"
+      class="amount-input"
+      type="number"
+      placeholder="00.00"
+      min="50"
+      step="0.01"
+      oninput="onAmountType()"
+    >
+    <div class="amount-spinners">
+      <button onclick="stepAmount(100)" title="Increase">▲</button>
+      <button onclick="stepAmount(-100)" title="Decrease">▼</button>
+    </div>
+  </div>
+  <div class="error-msg" id="amountError">Please enter a valid amount (min $50)</div>
+
+  <!-- Quick Amount Buttons -->
+  <div class="quick-grid">
+    <button class="quick-btn" onclick="selectAmount(100)">100.00</button>
+    <button class="quick-btn" onclick="selectAmount(200)">200.00</button>
+    <button class="quick-btn" onclick="selectAmount(500)">500.00</button>
+    <button class="quick-btn" onclick="selectAmount(1000)">1000.00</button>
+    <button class="quick-btn" onclick="selectAmount(2000)">2000.00</button>
+    <button class="quick-btn" onclick="selectAmount(3000)">3000.00</button>
+    <button class="quick-btn" onclick="selectAmount(5000)">5000.00</button>
+    <button class="quick-btn" onclick="selectAmount(8000)">8000.00</button>
+  </div>
+
+  <!-- Payment Method -->
+  <p class="section-title">Please select payment method</p>
+  <div class="payment-cards" id="paymentCards">
+    <div class="payment-card active" data-method="USDT" onclick="selectMethod(this)">
+      <div class="payment-card-top">
+        <i class="fas fa-credit-card"></i>
+        RECHARGE
+      </div>
+      <h5>USDT</h5>
+      <p>$50 ~ $1000000</p>
+    </div>
+    <div class="payment-card" data-method="BTC" onclick="selectMethod(this)">
+      <div class="payment-card-top">
+        <i class="fab fa-bitcoin"></i>
+        RECHARGE
+      </div>
+      <h5>Bitcoin</h5>
+      <p>$100 ~ $1000000</p>
+    </div>
+    <div class="payment-card" data-method="ETH" onclick="selectMethod(this)">
+      <div class="payment-card-top">
+        <i class="fas fa-coins"></i>
+        RECHARGE
+      </div>
+      <h5>Ethereum</h5>
+      <p>$50 ~ $1000000</p>
+    </div>
+  </div>
+
+  <!-- Pagination dots -->
+  <div class="swiper-dots">
+    <div class="swiper-dot active" id="dot0"></div>
+    <div class="swiper-dot" id="dot1"></div>
+    <div class="swiper-dot" id="dot2"></div>
+  </div>
+
+  <!-- Notes -->
+  <div class="notes-card">
+    <p><span>*1.</span> The payment amount must be the same as the order amount, otherwise it will not arrive automatically.</p>
+    <p><span>*2.</span> If you do not receive your recharge, please contact customer support to resolve the issue.</p>
+  </div>
+
+  <!-- Submit -->
+  <button class="submit-btn" onclick="handleSubmit()">
+    <i class="fas fa-bolt"></i>&nbsp; Recharge Now
+  </button>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a href="homepage.html" class="nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="recharge.html" class="nav-item active">
+    <i class="fas fa-plus-circle"></i>
+    <span>Recharge</span>
+  </a>
+  <div class="nav-start-wrap">
+    <a class="nav-start-btn" href="grab_an_order.html" title="Start Grabbing Orders">
+      <i class="fas fa-rocket"></i>
+    </a>
+    <span class="nav-start-label">Start</span>
+  </div>
+  <a href="grab_an_order.html" class="nav-item">
+    <i class="fas fa-clipboard-list"></i>
+    <span>Order</span>
+  </a>
+  <a href="my.html" class="nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>My</span>
+  </a>
+</nav>
+
+<!-- CONFIRMATION MODAL -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-sheet">
+    <div class="modal-title">Confirm Recharge</div>
+    <div class="modal-subtitle">Please review your recharge details below.</div>
+    <div class="modal-row">
+      <span>Amount</span>
+      <span class="highlight" id="confirmAmount">–</span>
+    </div>
+    <div class="modal-row">
+      <span>Payment Method</span>
+      <span id="confirmMethod">–</span>
+    </div>
+    <div class="modal-row">
+      <span>Processing Time</span>
+      <span>Instant ~ 10 mins</span>
+    </div>
+    <div class="modal-row">
+      <span>Fee</span>
+      <span>$0.00</span>
+    </div>
+    <button class="modal-confirm-btn" onclick="confirmRecharge()">
+      <i class="fas fa-check"></i>&nbsp; Confirm &amp; Pay
+    </button>
+    <span class="modal-cancel" onclick="closeModal()">Cancel</span>
+  </div>
+</div>
+
+<!-- NEXT STEPS PANEL (shown after confirming recharge) -->
+<div class="next-steps-overlay" id="nextStepsPanel">
+  <div class="next-steps-sheet">
+    <div class="ns-badge"><i class="fas fa-check-circle"></i> Request Submitted</div>
+    <div class="ns-title">Complete Your Recharge</div>
+    <div class="ns-subtitle">Follow these steps to finish your payment</div>
+
+    <!-- Reference box -->
+    <div class="ns-ref">
+      <span style="color:#888;font-weight:500;">Reference ID</span>
+      <span id="nsRefId">–</span>
+    </div>
+
+    <!-- Pre-typed message hint -->
+    <div class="msg-box">
+      <strong>📋 Message to send in chat:</strong>
+      <span id="nsChatMsg">–</span>
+      <br>
+      <button class="copy-msg-btn" onclick="copyMsg()"><i class="fas fa-copy"></i> Copy Message</button>
+    </div>
+
+    <!-- Steps -->
+    <div class="ns-steps">
+      <div class="ns-step">
+        <div class="ns-step-num done"><i class="fas fa-check" style="font-size:11px;"></i></div>
+        <div class="ns-step-body">
+          <strong>Request Saved</strong>
+          <p>Your recharge request has been recorded with a unique reference ID.</p>
+        </div>
+      </div>
+      <div class="ns-step">
+        <div class="ns-step-num">2</div>
+        <div class="ns-step-body">
+          <strong>Open Live Chat &amp; Send Message</strong>
+          <p>Click the button below — chat opens automatically with your details ready to send.</p>
+        </div>
+      </div>
+      <div class="ns-step">
+        <div class="ns-step-num">3</div>
+        <div class="ns-step-body">
+          <strong>Get Payment Account</strong>
+          <p>Our agent will reply with the wallet/account to send your payment to.</p>
+        </div>
+      </div>
+      <div class="ns-step">
+        <div class="ns-step-num">4</div>
+        <div class="ns-step-body">
+          <strong>Admin Approves &amp; Balance Updated</strong>
+          <p>Once your payment is confirmed, admin credits your balance — usually within 10 minutes.</p>
+        </div>
+      </div>
+    </div>
+
+    <button class="ns-chat-btn" onclick="openCrispChat()">
+      <i class="fas fa-headset"></i> Open Live Chat Now
+    </button>
+    <span class="ns-close" onclick="closeNextSteps()">Close — I'll chat later</span>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="auth-guard.js"></script>
+
+<script>
+  let selectedMethod = 'USDT';
+
+  /* ── Quick amount select ── */
+  function selectAmount(val) {
+    const input = document.getElementById('amountInput');
+    input.value = val.toFixed(2);
+    input.classList.remove('input-error');
+    document.getElementById('amountError').style.display = 'none';
+
+    document.querySelectorAll('.quick-btn').forEach(btn => {
+      btn.classList.toggle('active', parseFloat(btn.textContent) === val);
+    });
+  }
+
+  function onAmountType() {
+    document.querySelectorAll('.quick-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('amountInput').classList.remove('input-error');
+    document.getElementById('amountError').style.display = 'none';
+  }
+
+  function stepAmount(delta) {
+    const input = document.getElementById('amountInput');
+    let val = parseFloat(input.value) || 0;
+    val = Math.max(0, val + delta);
+    input.value = val.toFixed(2);
+    onAmountType();
+  }
+
+  /* ── Payment method select ── */
+  function selectMethod(card) {
+    document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    selectedMethod = card.dataset.method;
+
+    // Update dots
+    const cards = document.querySelectorAll('.payment-card');
+    cards.forEach((c, i) => {
+      document.getElementById('dot' + i).classList.toggle('active', c === card);
+    });
+  }
+
+  // Dot-click scrolls to card
+  document.querySelectorAll('.swiper-dot').forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      const cards = document.querySelectorAll('.payment-card');
+      if (cards[i]) {
+        cards[i].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        selectMethod(cards[i]);
+      }
+    });
+  });
+
+  /* ── Submit ── */
+  function handleSubmit() {
+    const input = document.getElementById('amountInput');
+    const val = parseFloat(input.value);
+
+    if (!val || val < 50) {
+      input.classList.add('input-error', 'shake');
+      document.getElementById('amountError').style.display = 'block';
+      setTimeout(() => input.classList.remove('shake'), 400);
+      return;
+    }
+
+    // Populate modal
+    document.getElementById('confirmAmount').textContent = '$' + val.toFixed(2);
+    document.getElementById('confirmMethod').textContent = selectedMethod;
+    document.getElementById('confirmModal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('confirmModal').classList.remove('open');
+  }
+
+  async function confirmRecharge() {
+    const btn = document.querySelector('.modal-confirm-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Submitting…';
+
+    try {
+      const userId    = sessionStorage.getItem('userId');
+      const userPhone = sessionStorage.getItem('userPhone') || sessionStorage.getItem('userEmail') || '–';
+      const userEmail = sessionStorage.getItem('userEmail') || '';
+      const amount    = parseFloat(document.getElementById('amountInput').value);
+
+      if (!userId) { window.location.href = 'login.html'; return; }
+
+      // ── STEP 1: Save request to Firestore ──
+      const docRef = await firebase.firestore().collection('rechargeRequests').add({
+        userId:    userId,
+        userPhone: userPhone,
+        amount:    amount,
+        method:    selectedMethod,
+        status:    'pending',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      closeModal();
+
+      // ── STEP 2: Build the pre-typed chat message ──
+      const refId = docRef.id.substring(0, 10).toUpperCase();
+      const chatMsg = `Hi, I'd like to recharge my account.\n\nAmount: $${amount.toFixed(2)}\nMethod: ${selectedMethod}\nRef ID: ${refId}\nUser: ${userPhone}\n\nPlease send me the payment account details.`;
+
+      // ── STEP 3: Pass recharge info to Crisp ──
+      crispSetRechargeInfo({
+        name:   userPhone,
+        email:  userEmail,
+        amount: amount,
+        method: selectedMethod,
+        refId:  refId,
+        userId: userId
+      });
+
+      // ── STEP 4: Show next-steps panel ──
+      document.getElementById('nsRefId').textContent = refId;
+      document.getElementById('nsChatMsg').textContent = chatMsg;
+      window._pendingChatMsg = chatMsg;
+      document.getElementById('nextStepsPanel').classList.add('open');
+
+      document.getElementById('amountInput').value = '';
+      document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
+
+    } catch (err) {
+      showToast('❌ Failed to submit: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-check"></i>&nbsp; Confirm &amp; Pay';
+    }
+  }
+
+  // ── Crisp helpers ──
+  function crispSetRechargeInfo({ name, email, amount, method, refId, userId }) {
+    if (!window.$crisp) return;
+    try {
+      $crisp.push(["set", "user:nickname", [name || 'User']]);
+      if (email) $crisp.push(["set", "user:email", [email]]);
+      $crisp.push(["set", "session:data", [[
+        ["Recharge Amount", '$' + amount.toFixed(2)],
+        ["Payment Method",  method],
+        ["Reference ID",    refId],
+        ["User ID",         userId]
+      ]]]);
+    } catch(e) { console.warn('Crisp setData failed:', e); }
+  }
+
+  function openCrispChat() {
+    if (window.$crisp) {
+      $crisp.push(["do", "chat:show"]);
+      $crisp.push(["do", "chat:open"]);
+    } else {
+      showToast('⏳ Chat is loading, please try again in a moment…');
+    }
+  }
+
+  function closeNextSteps() {
+    document.getElementById('nextStepsPanel').classList.remove('open');
+  }
+
+  function copyMsg() {
+    const msg = window._pendingChatMsg || '';
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(msg).then(() => showToast('✅ Message copied! Paste it in the chat.'));
+    } else {
+      const el = document.createElement('textarea');
+      el.value = msg;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      showToast('✅ Message copied! Paste it in the chat.');
+    }
+  }
+
+  /* ── Toast ── */
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // Close modal on overlay click
+  document.getElementById('confirmModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // ── AUTH GUARD: Show page only after Firebase auth is confirmed ──
+  firebase.auth().onAuthStateChanged(function(user) {
+    var overlay = document.getElementById('authOverlay');
+    if (!user) {
+      window.location.href = 'login.html';
+    } else {
+      sessionStorage.setItem('userId', user.uid);
+      sessionStorage.setItem('userEmail', user.email || '');
+      if (overlay) overlay.style.display = 'none';
+    }
+  });
+</script>
+<!-- Crisp Live Chat -->
+<script type="text/javascript">
+window.$crisp=[];
+window.CRISP_WEBSITE_ID="e2018a9b-d17d-427b-a6ad-c2d865637f65";
+window.$crisp.push(["do", "chat:hide"]);
+(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();
+</script>
+</body>
+</html>

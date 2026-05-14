@@ -1,0 +1,2861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel – ManifestoShop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #667eea; --primary-dark: #764ba2;
+            --teal: #0bb1b3; --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+            --text: #1f2937; --text-muted: #6b7280;
+            --border: #e5e7eb; --bg: #f3f4f6; --white: #fff;
+            --sidebar-w: 240px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+        /* ── LOGIN ── */
+        .login-screen { position: fixed; inset: 0; z-index: 1000; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; }
+        .login-box { background: white; border-radius: 20px; padding: 44px 40px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); text-align: center; }
+        .login-logo { font-size: 48px; margin-bottom: 12px; }
+        .login-title { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+        .login-sub { font-size: 13.5px; color: var(--text-muted); margin-bottom: 28px; }
+        .login-inp { width: 100%; padding: 13px 16px; border: 2px solid var(--border); border-radius: 12px; font-size: 15px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; margin-bottom: 14px; background: #f9fafb; }
+        .login-inp:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(102,126,234,.1); }
+        .login-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; font-family: 'Outfit', sans-serif; cursor: pointer; transition: all 0.2s; }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(102,126,234,.4); }
+        .login-err { color: var(--danger); font-size: 13px; margin-top: 10px; display: none; }
+
+        /* ── LAYOUT ── */
+        .admin-layout { display: flex; min-height: 100vh; }
+
+        /* ── SIDEBAR ── */
+        .sidebar { width: var(--sidebar-w); background: #1e1e2e; color: white; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; transition: transform 0.3s; }
+        .sidebar-brand { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 12px; }
+        .sidebar-brand-icon { font-size: 28px; }
+        .sidebar-brand-name { font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 800; }
+        .sidebar-brand-sub { font-size: 10.5px; opacity: 0.5; margin-top: 1px; }
+        .sidebar-nav { flex: 1; padding: 16px 0; overflow-y: auto; }
+        .sidebar-section-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.35); padding: 14px 20px 6px; }
+        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; cursor: pointer; border: none; background: none; color: rgba(255,255,255,0.65); font-size: 14px; font-weight: 500; width: 100%; text-align: left; transition: all 0.15s; border-radius: 0; position: relative; }
+        .sidebar-item:hover { background: rgba(255,255,255,0.06); color: white; }
+        .sidebar-item.active { background: rgba(102,126,234,0.2); color: white; }
+        .sidebar-item.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--primary); border-radius: 0 3px 3px 0; }
+        .sidebar-item i { width: 18px; text-align: center; font-size: 15px; }
+        .sidebar-badge { margin-left: auto; background: var(--danger); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-logout { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.5); font-size: 13.5px; cursor: pointer; background: none; border: none; width: 100%; padding: 8px 0; transition: color 0.2s; }
+        .sidebar-logout:hover { color: var(--danger); }
+
+        /* ── MAIN ── */
+        .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+        .topbar { background: white; border-bottom: 1px solid var(--border); padding: 0 28px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+        .topbar-title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 800; color: var(--text); }
+        .topbar-right { display: flex; align-items: center; gap: 14px; }
+        .admin-avatar { width: 36px; height: 36px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 700; }
+        .topbar-admin-name { font-size: 13.5px; font-weight: 600; color: var(--text-muted); }
+        .content { padding: 28px; flex: 1; }
+
+        /* ── PAGES ── */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* ── STAT CARDS ── */
+        .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 28px; }
+        .stat-card { background: white; border-radius: 16px; padding: 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 16px; }
+        .stat-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .stat-icon.blue { background: rgba(102,126,234,.12); color: var(--primary); }
+        .stat-icon.teal { background: rgba(11,177,179,.12); color: var(--teal); }
+        .stat-icon.green { background: rgba(16,185,129,.12); color: var(--success); }
+        .stat-icon.orange { background: rgba(245,158,11,.12); color: var(--warning); }
+        .stat-icon.red { background: rgba(239,68,68,.12); color: var(--danger); }
+        .stat-val { font-family: 'Outfit', sans-serif; font-size: 26px; font-weight: 800; color: var(--text); }
+        .stat-lbl { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+
+        /* ── CARDS ── */
+        .card { background: white; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 22px; }
+        .card-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .card-title { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; }
+
+        /* ── BUTTONS ── */
+        .btn { padding: 8px 16px; border-radius: 10px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-ghost { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+        .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-sm { padding: 5px 12px; font-size: 12px; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── TABLE ── */
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 12px 16px; text-align: left; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); background: #fafafa; border-bottom: 1px solid var(--border); }
+        td { padding: 13px 16px; font-size: 13.5px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafbff; }
+        .badge { padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-pending { background: #fef3c7; color: #b45309; }
+        .badge-approved { background: #d1fae5; color: #059669; }
+        .badge-rejected { background: #fee2e2; color: #dc2626; }
+        .badge-active { background: #dbeafe; color: #1d4ed8; }
+        .badge-free { background: #f3f4f6; color: var(--text-muted); }
+
+        /* ── MODAL ── */
+        .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-bg.open { display: flex; }
+        .modal { background: white; border-radius: 20px; padding: 28px; width: 100%; max-width: 480px; animation: mFade 0.25s ease; }
+        @keyframes mFade { from { opacity:0; transform:scale(.95); } to { opacity:1; transform:scale(1); } }
+        .modal-title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+        .modal-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+        .modal-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .modal-row:last-of-type { border-bottom: none; }
+        .modal-row span:first-child { color: var(--text-muted); }
+        .modal-row span:last-child { font-weight: 600; }
+        .modal-inp { width: 100%; padding: 11px 14px; border: 2px solid var(--border); border-radius: 10px; font-size: 14px; outline: none; margin-top: 14px; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s; }
+        .modal-inp:focus { border-color: var(--primary); }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-actions .btn { flex: 1; justify-content: center; padding: 12px; }
+
+        /* ── FILTER BAR ── */
+        .filter-bar { display: flex; gap: 10px; padding: 16px 22px; border-bottom: 1px solid var(--border); background: #fafafa; flex-wrap: wrap; align-items: center; }
+        .filter-tab { padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid var(--border); background: white; color: var(--text-muted); transition: all 0.15s; }
+        .filter-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .search-inp { padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 13.5px; outline: none; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s; min-width: 200px; }
+        .search-inp:focus { border-color: var(--primary); }
+
+        /* ── EMPTY / LOADING ── */
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+        .empty-state i { font-size: 48px; color: var(--border); display: block; margin-bottom: 14px; }
+        .loader { display: flex; align-items: center; justify-content: center; padding: 50px; gap: 12px; color: var(--text-muted); font-size: 14px; }
+        .spin { animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── TOAST ── */
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 999; display: flex; flex-direction: column; gap: 10px; }
+        .toast-msg { background: #1f2937; color: white; padding: 12px 18px; border-radius: 12px; font-size: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); animation: toastIn 0.3s ease; max-width: 320px; }
+        @keyframes toastIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+
+        /* ── MISC ── */
+        .text-success { color: var(--success); font-weight: 700; }
+        .text-danger { color: var(--danger); font-weight: 700; }
+        .fw7 { font-weight: 700; }
+        .phone-mask { font-family: monospace; font-size: 13px; color: var(--text-muted); }
+
+        /* ── PHASE CONFIG CARD ── */
+        .phase-config-body { padding: 16px; font-size: 12.5px; color: var(--text-muted); line-height: 2; }
+        .phase-config-body b { color: var(--text); }
+
+        /* ── CHAT ── */
+        #activeChatArea { flex-direction: column; height: 100%; }
+
+        @media(max-width: 1200px) { .stats-row { grid-template-columns: repeat(3, 1fr); } } @media(max-width: 900px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+        @media(max-width: 640px) { .sidebar { transform: translateX(-100%); } .main { margin-left: 0; } .stats-row { grid-template-columns: 1fr; } }
+
+        /* ── SIDEBAR COLLAPSE ── */
+        .sidebar-collapse-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 8px; background: rgba(255,255,255,0.08); border: none; color: rgba(255,255,255,0.5); cursor: pointer; margin-left: auto; transition: all 0.2s; flex-shrink: 0; }
+        .sidebar-collapse-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+        body.sidebar-collapsed .sidebar { width: 64px; }
+        body.sidebar-collapsed .sidebar-brand-name,
+        body.sidebar-collapsed .sidebar-brand-sub,
+        body.sidebar-collapsed .sidebar-item > span:not(.sidebar-badge),
+        body.sidebar-collapsed .sidebar-section-label,
+        body.sidebar-collapsed .sidebar-logout span { display: none; }
+        body.sidebar-collapsed .sidebar-item { justify-content: center; padding: 14px; }
+        body.sidebar-collapsed .sidebar-item i { width: auto; font-size: 18px; }
+        body.sidebar-collapsed .sidebar-badge { position: absolute; top: 6px; right: 6px; padding: 2px 5px; font-size: 9px; }
+        body.sidebar-collapsed .main { margin-left: 64px; }
+        body.sidebar-collapsed .sidebar-brand { justify-content: center; }
+        body.sidebar-collapsed .sidebar-brand-icon { font-size: 22px; }
+        body.sidebar-collapsed .sidebar-logout { justify-content: center; }
+        body.sidebar-collapsed .sidebar-collapse-btn i { transform: rotate(180deg); }
+
+        /* ── MOBILE OVERLAY ── */
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+        @media(max-width: 640px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.open { display: block; }
+            .hamburger { display: flex !important; }
+        }
+
+        /* ── HAMBURGER ── */
+        .hamburger { display: none; align-items: center; justify-content: center; width: 36px; height: 36px; border: none; background: var(--bg); border-radius: 10px; cursor: pointer; color: var(--text); font-size: 16px; }
+
+        /* ── TOPBAR DATE ── */
+        .topbar-date { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .topbar-refresh-info { font-size: 11.5px; color: var(--text-muted); }
+
+        /* ── TABLE SCROLL WRAPPER ── */
+        .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+        /* ── ROW COUNT ── */
+        .row-count { font-size: 12px; font-weight: 600; color: var(--text-muted); background: var(--bg); padding: 3px 10px; border-radius: 20px; }
+
+        /* ── TOAST IMPROVEMENTS ── */
+        .toast-msg { position: relative; overflow: hidden; cursor: pointer; }
+        .toast-msg .toast-close { position: absolute; top: 8px; right: 10px; font-size: 14px; opacity: 0.7; }
+        .toast-msg .toast-close:hover { opacity: 1; }
+        .toast-progress { position: absolute; bottom: 0; left: 0; height: 3px; background: rgba(255,255,255,0.4); animation: toastProgress 4s linear forwards; }
+        @keyframes toastProgress { from { width: 100%; } to { width: 0%; } }
+        @keyframes toastOut { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(20px); } }
+
+        /* ── COPY BUTTON ── */
+        .copy-btn { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; background: #f3f4f6; border: 1px solid var(--border); border-radius: 6px; font-size: 11px; font-weight: 600; color: var(--text-muted); cursor: pointer; margin-left: 6px; transition: all 0.15s; vertical-align: middle; }
+        .copy-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .copy-btn.copied { background: var(--success); color: white; border-color: var(--success); }
+
+        /* ── SEARCH IN FILTER BAR ── */
+        .filter-bar .search-inp { margin-left: auto; }
+
+        /* ── EXPORT BTN ── */
+        .btn-export { background: #f0fdf4; color: var(--success); border: 1.5px solid #bbf7d0; }
+        .btn-export:hover { background: var(--success); color: white; border-color: var(--success); }
+
+        /* ── LOGIN LOADING ── */
+        .login-btn:disabled { opacity: 0.75; cursor: not-allowed; transform: none !important; }
+
+        /* ── PENDING BADGE IN TOPBAR ── */
+        .topbar-pending { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: #fef3c7; border-radius: 20px; font-size: 12px; font-weight: 700; color: #b45309; cursor: pointer; transition: all 0.2s; }
+        .topbar-pending:hover { background: #fde68a; }
+        .topbar-pending.has-urgent { background: #fee2e2; color: var(--danger); }
+
+        /* ── STAT CARD TREND ── */
+        .stat-trend { font-size: 11px; margin-top: 2px; }
+        .stat-trend.up { color: var(--success); }
+        .stat-trend.down { color: var(--danger); }
+
+        /* ── CARD ACTION HEADER FLEX ── */
+        .card-header-actions { display: flex; align-items: center; gap: 8px; }
+
+        /* ── LOADING SCREEN ── */
+        .loading-screen { position: fixed; inset: 0; z-index: 2000; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+        .loading-spinner { width: 44px; height: 44px; border: 4px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 8px; }
+        .loading-logo { font-size: 52px; margin-bottom: 4px; }
+        .loading-title { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 800; color: white; }
+        .loading-sub { font-size: 13px; color: rgba(255,255,255,0.7); }
+
+        /* ── SIDEBAR COLLAPSED — TOOLTIPS ── */
+        body.sidebar-collapsed .sidebar-item { position: relative; }
+        body.sidebar-collapsed .sidebar-item[data-tip]::after {
+            content: attr(data-tip);
+            position: absolute;
+            left: calc(100% + 10px);
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1e1e2e;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.18s;
+            z-index: 999;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+            border-left: 3px solid var(--primary);
+        }
+        body.sidebar-collapsed .sidebar-item[data-tip]:hover::after { opacity: 1; }
+
+        /* ── FROZEN BALANCE ── */
+        .frozen-badge { display:inline-flex;align-items:center;gap:5px;padding:3px 10px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:20px;font-size:12px;font-weight:700;color:#1d4ed8; }
+        .frozen-badge.has-frozen { background:#fef3c7;border-color:#fde68a;color:#92400e; }
+        .frozen-tab-bar { display:flex;border:2px solid var(--border);border-radius:12px;overflow:hidden;margin:16px 0 4px; }
+        .frozen-tab { flex:1;padding:10px 6px;border:none;font-size:12.5px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;background:white;color:var(--text-muted);transition:all .2s; }
+        .frozen-tab.active { background:var(--primary);color:white; }
+        .frozen-tab.active.release { background:#10b981; }
+        .frozen-tab.active.setdir { background:#f59e0b;color:white; }
+        .frozen-preview { margin-top:8px;font-size:13px;font-weight:700;padding:10px 14px;background:#fafafa;border-radius:8px;border:1px solid var(--border);color:var(--text-muted); }
+        .frozen-info-box { padding:10px 12px;border-radius:8px;font-size:12px;line-height:1.5;margin-top:10px; }
+        .frozen-info-box.blue { background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af; }
+        .frozen-info-box.amber { background:#fffbeb;border:1px solid #fde68a;color:#92400e; }
+        .frozen-info-box.green { background:#f0fdf4;border:1px solid #bbf7d0;color:#065f46; }
+
+        /* ── MARKETING TAG BADGE ── */
+
+        /* ── AGENT & CLIENT TYPE TAGS ── */
+        .mktag-agent { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 800; background: linear-gradient(135deg, #667eea, #764ba2); color: white; cursor: pointer; gap: 4px; transition: all 0.15s; }
+        .mktag-agent:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(102,126,234,0.4); }
+        .mktag-agent.empty { background: #f3f4f6; color: #9ca3af; border: 1.5px dashed #d1d5db; cursor: pointer; }
+        .mktag-agent.empty:hover { border-color: var(--primary); color: var(--primary); }
+        .mktag-client { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 800; cursor: pointer; gap: 4px; transition: all 0.15s; }
+        .mktag-client.real { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .mktag-client.fake { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+        .mktag-client.empty { background: #f3f4f6; color: #9ca3af; border: 1.5px dashed #d1d5db; cursor: pointer; }
+        .mktag-client.empty:hover { border-color: #10b981; color: #10b981; }
+        .mktag-client:hover { transform: scale(1.05); }
+        .tag-section-title { font-size: 10px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-muted); margin: 14px 0 8px; }
+        .tag-grid-agents { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .tag-grid-client { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 4px; }
+        .tag-opt { padding: 12px 6px; border-radius: 10px; border: 2px solid var(--border); background: white; text-align: center; cursor: pointer; transition: all 0.15s; }
+        .tag-opt:hover { border-color: var(--primary); background: rgba(102,126,234,0.05); }
+        .tag-opt.sel-agent { border-color: #667eea; background: rgba(102,126,234,0.12); }
+        .tag-opt.sel-real { border-color: #10b981; background: rgba(16,185,129,0.1); }
+        .tag-opt.sel-fake { border-color: #ef4444; background: rgba(239,68,68,0.1); }
+        .tag-opt-code { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 800; color: var(--primary); }
+        .tag-opt-code.real { color: #059669; }
+        .tag-opt-code.fake { color: #dc2626; }
+        .tag-opt-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        /* ── CHANGE PASSWORD MODAL ── */
+        .pw-strength { height: 4px; border-radius: 4px; margin-top: 6px; background: #e5e7eb; overflow: hidden; }
+        .pw-strength-bar { height: 100%; border-radius: 4px; width: 0%; transition: all 0.3s; }
+
+        /* ── TAG MODAL ── */
+        .tag-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; }
+        .tag-option { padding: 14px 8px; border-radius: 12px; border: 2px solid var(--border); background: white; text-align: center; cursor: pointer; transition: all 0.15s; }
+        .tag-option:hover { border-color: var(--primary); background: rgba(102,126,234,0.05); }
+        .tag-option.selected { border-color: var(--primary); background: rgba(102,126,234,0.12); }
+        .tag-option-code { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 800; color: var(--primary); }
+        .tag-option-label { font-size: 10.5px; color: var(--text-muted); margin-top: 3px; }
+    </style>
+</head>
+<body>
+
+<!-- ── LOADING SCREEN ── -->
+<div class="loading-screen" id="loadingScreen">
+    <div class="loading-logo">🛡️</div>
+    <div class="loading-title">Admin Panel</div>
+    <div class="loading-sub">Verifying your session…</div>
+    <div class="loading-spinner"></div>
+</div>
+
+<!-- ── ADMIN LOGIN ── -->
+<div class="login-screen" id="loginScreen" style="display:none;">
+    <div class="login-box">
+        <div class="login-logo">🛡️</div>
+        <div class="login-title">Admin Panel</div>
+        <div class="login-sub">ManifestoShop Management System</div>
+        <input type="email" class="login-inp" id="adminEmail" placeholder="Admin Email" autocomplete="username"
+               onkeydown="if(event.key==='Enter') document.getElementById('adminPassword').focus()">
+        <input type="password" class="login-inp" id="adminPassword" placeholder="Admin Password" autocomplete="current-password"
+               onkeydown="if(event.key==='Enter') adminLogin()">
+        <button class="login-btn" id="loginBtn" onclick="adminLogin()">
+            <i class="fas fa-lock" id="loginBtnIcon"></i> <span id="loginBtnText">Login to Admin</span>
+        </button>
+        <div class="login-err" id="loginErr"></div>
+    </div>
+</div>
+
+<!-- ── MAIN LAYOUT ── -->
+<div class="admin-layout" id="adminLayout" style="display:none;">
+
+    <!-- SIDEBAR OVERLAY (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">🛍️</div>
+            <div style="flex:1;">
+                <div class="sidebar-brand-name">ManifestoShop</div>
+                <div class="sidebar-brand-sub">Admin Panel</div>
+            </div>
+            <button class="sidebar-collapse-btn" onclick="toggleSidebar()" title="Collapse sidebar">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-label">Overview</div>
+            <button class="sidebar-item active" data-tip="Dashboard" onclick="showPage('dashboard',this)"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></button>
+            <div class="sidebar-section-label">Users</div>
+            <button class="sidebar-item" data-tip="All Users" onclick="showPage('users',this)"><i class="fas fa-users"></i> <span>All Users</span></button>
+            <div class="sidebar-section-label">Requests</div>
+            <button class="sidebar-item" data-tip="Recharge Requests" onclick="showPage('recharge',this)">
+                <i class="fas fa-arrow-circle-down"></i> <span>Recharge Requests</span>
+                <span class="sidebar-badge" id="rechargeBadge">0</span>
+            </button>
+            <button class="sidebar-item" data-tip="Withdrawal Requests" onclick="showPage('withdrawal',this)">
+                <i class="fas fa-arrow-circle-up"></i> <span>Withdrawal Requests</span>
+                <span class="sidebar-badge" id="withdrawalBadge">0</span>
+            </button>
+            <div class="sidebar-section-label">Network</div>
+            <button class="sidebar-item" data-tip="Referrals" onclick="showPage('referrals',this)"><i class="fas fa-network-wired"></i> <span>Referrals</span></button>
+            <div class="sidebar-section-label">Support</div>
+            <button class="sidebar-item" data-tip="Live Chat" onclick="showPage('livechat',this)"><i class="fas fa-headset"></i> <span>Live Chat</span></button>
+            <div class="sidebar-section-label">Phases</div>
+            <button class="sidebar-item" data-tip="Phase Management" onclick="showPage('phases',this)"><i class="fas fa-layer-group"></i> <span>Phase Management</span></button>
+            <div class="sidebar-section-label">Finance</div>
+            <button class="sidebar-item" data-tip="Frozen Balance" onclick="showPage('frozen',this)"><i class="fas fa-snowflake"></i> <span>Frozen Balance</span></button>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="sidebar-logout" onclick="adminLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+        <div class="topbar">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button class="hamburger" id="hamburgerBtn" onclick="openMobileSidebar()"><i class="fas fa-bars"></i></button>
+                <div>
+                    <div class="topbar-title" id="topbarTitle">Dashboard</div>
+                    <div class="topbar-date" id="topbarDate"></div>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="topbar-pending" id="topbarPendingBadge" style="display:none;" onclick="goToPendingPage()">
+                    <i class="fas fa-bell"></i> <span id="topbarPendingCount">0</span> pending
+                </div>
+                <div class="topbar-admin-name" id="topbarEmail">admin</div>
+                <div class="admin-avatar" id="adminInitial">A</div>
+            </div>
+        </div>
+        <div class="content">
+
+            <!-- ══ DASHBOARD ══ -->
+            <div class="page active" id="page-dashboard">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+                    <div style="font-size:12.5px;color:var(--text-muted);" id="dashLastRefreshed"></div>
+                    <button class="btn btn-ghost btn-sm" onclick="loadDashboard()"><i class="fas fa-sync"></i> Refresh All</button>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-users"></i></div><div><div class="stat-val" id="statUsers">–</div><div class="stat-lbl">Total Users</div></div></div>
+                    <div class="stat-card"><div class="stat-icon teal"><i class="fas fa-wallet"></i></div><div><div class="stat-val" id="statBalance">–</div><div class="stat-lbl">Total Balance (All Users)</div></div></div>
+                    <div class="stat-card"><div class="stat-icon green"><i class="fas fa-chart-line"></i></div><div><div class="stat-val" id="statTotalEarned">–</div><div class="stat-lbl">Total Commissions Paid</div></div></div>
+                    <div class="stat-card"><div class="stat-icon orange"><i class="fas fa-clock"></i></div><div><div class="stat-val" id="statPendingR">–</div><div class="stat-lbl">Pending Recharges</div></div></div>
+                    <div class="stat-card"><div class="stat-icon red"><i class="fas fa-hand-holding-usd"></i></div><div><div class="stat-val" id="statPendingW">–</div><div class="stat-lbl">Pending Withdrawals</div></div></div>
+                    <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-snowflake"></i></div><div><div class="stat-val" id="statFrozen">–</div><div class="stat-lbl">Total Frozen Balance</div></div></div>
+                </div>
+                <!-- Phase distribution mini-card -->
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;" id="phaseDist">
+                    <div style="background:white;border-radius:14px;padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid #0bb1b3;">
+                        <div style="font-size:11px;color:#6b7280;font-weight:700;margin-bottom:4px;">PHASE 1 USERS</div>
+                        <div style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;" id="phaseDistP1">–</div>
+                    </div>
+                    <div style="background:white;border-radius:14px;padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid #667eea;">
+                        <div style="font-size:11px;color:#6b7280;font-weight:700;margin-bottom:4px;">PHASE 2 USERS</div>
+                        <div style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;" id="phaseDistP2">–</div>
+                    </div>
+                    <div style="background:white;border-radius:14px;padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid #f59e0b;">
+                        <div style="font-size:11px;color:#6b7280;font-weight:700;margin-bottom:4px;">PHASE 3 USERS</div>
+                        <div style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;" id="phaseDistP3">–</div>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;">
+                    <div class="card">
+                        <div class="card-header"><div class="card-title">⏳ Latest Pending Recharges</div><button class="btn btn-ghost btn-sm" onclick="showPage('recharge',null)">View All</button></div>
+                        <div id="dashRecharge"><div class="loader"><i class="fas fa-spinner spin"></i> Loading...</div></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><div class="card-title">⏳ Latest Pending Withdrawals</div><button class="btn btn-ghost btn-sm" onclick="showPage('withdrawal',null)">View All</button></div>
+                        <div id="dashWithdraw"><div class="loader"><i class="fas fa-spinner spin"></i> Loading...</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ USERS ══ -->
+            <div class="page" id="page-users">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">👥 All Users <span class="row-count" id="userCountBadge" style="display:none;"></span></div>
+                        <div class="card-header-actions">
+                            <button class="btn btn-export btn-sm" onclick="exportUsersCSV()"><i class="fas fa-download"></i> Export CSV</button>
+                            <button class="btn btn-ghost btn-sm" onclick="loadUsers()"><i class="fas fa-sync"></i> Refresh</button>
+                        </div>
+                    </div>
+                    <div class="filter-bar">
+                        <input type="text" class="search-inp" id="userSearch" placeholder="🔍 Search by phone..." oninput="filterUsers()">
+                    </div>
+                    <div id="usersTable"><div class="loader"><i class="fas fa-spinner spin"></i> Loading users...</div></div>
+                </div>
+            </div>
+
+            <!-- ══ RECHARGE REQUESTS ══ -->
+            <div class="page" id="page-recharge">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">💳 Recharge Requests <span class="row-count" id="rechargeCountBadge" style="display:none;"></span></div>
+                        <button class="btn btn-ghost btn-sm" onclick="loadRechargeRequests()"><i class="fas fa-sync"></i> Refresh</button>
+                    </div>
+                    <div class="filter-bar">
+                        <button class="filter-tab active" onclick="filterRequests('recharge','all',this)">All</button>
+                        <button class="filter-tab" onclick="filterRequests('recharge','pending',this)">Pending</button>
+                        <button class="filter-tab" onclick="filterRequests('recharge','approved',this)">Approved</button>
+                        <button class="filter-tab" onclick="filterRequests('recharge','rejected',this)">Rejected</button>
+                        <input type="text" class="search-inp" id="rechargeSearch" placeholder="🔍 Search phone..." oninput="searchRecharge()" style="margin-left:auto;min-width:180px;">
+                    </div>
+                    <div id="rechargeTable"><div class="loader"><i class="fas fa-spinner spin"></i> Loading...</div></div>
+                </div>
+            </div>
+
+            <!-- ══ WITHDRAWAL REQUESTS ══ -->
+            <div class="page" id="page-withdrawal">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">🏦 Withdrawal Requests <span class="row-count" id="withdrawalCountBadge" style="display:none;"></span></div>
+                        <button class="btn btn-ghost btn-sm" onclick="loadWithdrawalRequests()"><i class="fas fa-sync"></i> Refresh</button>
+                    </div>
+                    <div class="filter-bar">
+                        <button class="filter-tab active" onclick="filterRequests('withdrawal','all',this)">All</button>
+                        <button class="filter-tab" onclick="filterRequests('withdrawal','pending',this)">Pending</button>
+                        <button class="filter-tab" onclick="filterRequests('withdrawal','approved',this)">Approved</button>
+                        <button class="filter-tab" onclick="filterRequests('withdrawal','rejected',this)">Rejected</button>
+                        <input type="text" class="search-inp" id="withdrawalSearch" placeholder="🔍 Search phone..." oninput="searchWithdrawal()" style="margin-left:auto;min-width:180px;">
+                    </div>
+                    <div id="withdrawalTable"><div class="loader"><i class="fas fa-spinner spin"></i> Loading...</div></div>
+                </div>
+            </div>
+
+            <!-- ══ REFERRALS ══ -->
+            <div class="page" id="page-referrals">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">🔗 Referral Network</div>
+                        <button class="btn btn-ghost btn-sm" onclick="loadReferrals()"><i class="fas fa-sync"></i> Refresh</button>
+                    </div>
+                    <div id="referralsTable"><div class="loader"><i class="fas fa-spinner spin"></i> Loading...</div></div>
+                </div>
+            </div>
+
+            <!-- ══ PHASE MANAGEMENT ══ -->
+            <div class="page" id="page-phases">
+
+                <!-- Phase Config Cards -->
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:24px;">
+                    <div class="card" style="padding:0;overflow:hidden;">
+                        <div style="background:linear-gradient(135deg,#0bb1b3,#067b7c);padding:16px 18px;color:white;">
+                            <div style="font-size:11px;opacity:.8;font-weight:700;letter-spacing:.5px;margin-bottom:4px;">PHASE 1</div>
+                            <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;">Training Phase</div>
+                        </div>
+                        <div id="phaseConfig1Display" class="phase-config-body"><div class="loader" style="padding:20px;"><i class="fas fa-spinner spin"></i></div></div>
+                    </div>
+                    <div class="card" style="padding:0;overflow:hidden;">
+                        <div style="background:linear-gradient(135deg,#667eea,#764ba2);padding:16px 18px;color:white;">
+                            <div style="font-size:11px;opacity:.8;font-weight:700;letter-spacing:.5px;margin-bottom:4px;">PHASE 2</div>
+                            <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;">First Deposit</div>
+                        </div>
+                        <div id="phaseConfig2Display" class="phase-config-body"><div class="loader" style="padding:20px;"><i class="fas fa-spinner spin"></i></div></div>
+                    </div>
+                    <div class="card" style="padding:0;overflow:hidden;">
+                        <div style="background:linear-gradient(135deg,#f59e0b,#d97706);padding:16px 18px;color:white;">
+                            <div style="font-size:11px;opacity:.8;font-weight:700;letter-spacing:.5px;margin-bottom:4px;">PHASE 3</div>
+                            <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;">Second Deposit</div>
+                        </div>
+                        <div id="phaseConfig3Display" class="phase-config-body"><div class="loader" style="padding:20px;"><i class="fas fa-spinner spin"></i></div></div>
+                    </div>
+                </div>
+
+                <!-- User Phase Assignment -->
+                <div class="card" style="margin-bottom:22px;">
+                    <div class="card-header">
+                        <div class="card-title">👤 Assign Phase to User</div>
+                        <button class="btn btn-ghost btn-sm" onclick="loadPhaseUsers()"><i class="fas fa-sync"></i> Refresh</button>
+                    </div>
+                    <div class="filter-bar">
+                        <input type="text" class="search-inp" id="phaseUserSearch" placeholder="🔍 Search by phone..." oninput="filterPhaseUsers()">
+                    </div>
+                    <div id="phaseUsersTable"><div class="loader"><i class="fas fa-spinner spin"></i> Loading users...</div></div>
+                </div>
+
+                <!-- Order Logs -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📊 Order Logs (Transparent Calculation History)</div>
+                        <button class="btn btn-ghost btn-sm" onclick="loadOrderLogs()"><i class="fas fa-sync"></i> Refresh</button>
+                    </div>
+                    <div id="orderLogsTable"><div class="loader"><i class="fas fa-spinner spin"></i> Loading logs...</div></div>
+                </div>
+            </div>
+
+            <!-- ══ FROZEN BALANCE ══ -->
+            <div class="page" id="page-frozen">
+
+                <!-- Summary Cards -->
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;" id="frozenSummaryCards">
+                    <div style="background:white;border-radius:14px;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid #3b82f6;">
+                        <div style="font-size:11px;color:#6b7280;font-weight:700;margin-bottom:4px;letter-spacing:.5px;">TOTAL FROZEN (ALL USERS)</div>
+                        <div style="font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;" id="frozenTotalAmt">–</div>
+                    </div>
+                    <div style="background:white;border-radius:14px;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid #f59e0b;">
+                        <div style="font-size:11px;color:#6b7280;font-weight:700;margin-bottom:4px;letter-spacing:.5px;">USERS WITH FROZEN FUNDS</div>
+                        <div style="font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;" id="frozenUserCount">–</div>
+                    </div>
+                    <div style="background:white;border-radius:14px;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid #10b981;">
+                        <div style="font-size:11px;color:#6b7280;font-weight:700;margin-bottom:4px;letter-spacing:.5px;">TOTAL AVAILABLE BALANCE</div>
+                        <div style="font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;" id="frozenTotalBal">–</div>
+                    </div>
+                </div>
+
+                <!-- User Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">❄️ Frozen Balance Management <span class="row-count" id="frozenCountBadge" style="display:none;"></span></div>
+                        <div class="card-header-actions">
+                            <button class="btn btn-ghost btn-sm" onclick="loadFrozenBalances()"><i class="fas fa-sync"></i> Refresh</button>
+                        </div>
+                    </div>
+                    <div class="filter-bar">
+                        <button class="filter-tab active" onclick="filterFrozen('all',this)">All Users</button>
+                        <button class="filter-tab" onclick="filterFrozen('frozen',this)">Has Frozen</button>
+                        <button class="filter-tab" onclick="filterFrozen('none',this)">No Frozen</button>
+                        <input type="text" class="search-inp" id="frozenSearch" placeholder="🔍 Search by phone..." oninput="filterFrozenSearch()" style="margin-left:auto;min-width:180px;">
+                    </div>
+                    <div id="frozenTable"><div class="loader"><i class="fas fa-spinner spin"></i> Loading users...</div></div>
+                </div>
+            </div>
+
+            <!-- ══ LIVE CHAT ══ -->
+            <div class="page" id="page-livechat">
+                <div style="display:grid;grid-template-columns:300px 1fr;gap:22px;height:calc(100vh - 120px);">
+                    <div class="card" style="display:flex;flex-direction:column;overflow:hidden;padding:0;">
+                        <div class="card-header" style="padding:16px 20px;flex-shrink:0;">
+                            <div class="card-title">💬 Conversations</div>
+                            <button class="btn btn-ghost btn-sm" onclick="loadChatConversations()"><i class="fas fa-sync"></i></button>
+                        </div>
+                        <div style="padding:0 12px 10px;flex-shrink:0;">
+                            <input type="text" class="search-inp" id="chatSearchInp" placeholder="🔍 Search users..." oninput="filterChats()" style="width:100%;">
+                        </div>
+                        <div id="chatConvoList" style="flex:1;overflow-y:auto;padding:0 8px 8px;">
+                            <div class="loader"><i class="fas fa-spinner spin"></i> Loading...</div>
+                        </div>
+                    </div>
+                    <div class="card" style="display:flex;flex-direction:column;overflow:hidden;padding:0;">
+                        <div id="noChatSelected" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-muted);text-align:center;padding:40px;">
+                            <div style="font-size:56px;margin-bottom:16px;">💬</div>
+                            <div style="font-size:16px;font-weight:700;margin-bottom:6px;">Select a conversation</div>
+                            <div style="font-size:13px;">Choose a client from the left panel</div>
+                        </div>
+                        <div id="activeChatArea" style="display:none;flex-direction:column;height:100%;">
+                            <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;">
+                                <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:15px;" id="chatAvatarLetter">?</div>
+                                <div>
+                                    <div style="font-weight:700;font-size:15px;" id="chatWindowUser">—</div>
+                                    <div style="font-size:12px;color:var(--text-muted);" id="chatWindowSub">—</div>
+                                </div>
+                            </div>
+                            <div id="adminChatMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;"></div>
+                            <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0;">
+                                <input type="text" class="search-inp" id="adminChatInput" placeholder="Type a message..." style="flex:1;min-width:0;"
+                                       onkeydown="if(event.key==='Enter') adminSendMsg()">
+                                <button class="btn btn-primary" onclick="adminSendMsg()"><i class="fas fa-paper-plane"></i> Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+    </div><!-- /main -->
+</div><!-- /admin-layout -->
+
+<!-- ── PHASE EDIT MODAL ── -->
+<div class="modal-bg" id="phaseEditModal">
+    <div class="modal">
+        <div class="modal-title" id="phaseEditTitle">⚙️ Configure Phase</div>
+        <div class="modal-sub" id="phaseEditSub"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div>
+                <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:5px;">Total Orders</label>
+                <input type="number" class="modal-inp" id="peTotal" min="1" style="margin-top:0;" oninput="updatePhaseCalcPreview()">
+            </div>
+            <div>
+                <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:5px;">Base Rate (%)</label>
+                <input type="number" class="modal-inp" id="peBaseRate" min="0" max="100" step="0.1" style="margin-top:0;" oninput="updatePhaseCalcPreview()">
+            </div>
+        </div>
+        <div style="margin-top:14px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:5px;">Bonus/Lucky Positions (comma-separated)</label>
+            <input type="text" class="modal-inp" id="peBonusPos" placeholder="e.g. 5,9" style="margin-top:0;" oninput="updatePhaseCalcPreview()">
+        </div>
+        <div id="peBonusRateWrap" style="margin-top:14px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:5px;">Lucky Order Rate for ≥$100 deposit (%)</label>
+            <input type="number" class="modal-inp" id="peBonusRate100" placeholder="e.g. 15" style="margin-top:0;">
+        </div>
+        <div id="peBonusRate200Wrap" style="margin-top:14px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:5px;">Lucky Order Rate for ≥$200 deposit (%)</label>
+            <input type="number" class="modal-inp" id="peBonusRate200" placeholder="e.g. 30" style="margin-top:0;">
+        </div>
+        <div id="peBonusMultiWrap" style="margin-top:14px;display:none;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:5px;">Lucky Order Multiplier (×)</label>
+            <input type="number" class="modal-inp" id="peBonusMulti" min="1" max="10" placeholder="e.g. 2" style="margin-top:0;">
+        </div>
+        <!-- Live calculation preview -->
+        <div id="phaseCalcPreview" style="margin-top:14px;padding:12px;background:#f0fdf4;border-radius:10px;border:1px solid #bbf7d0;font-size:12px;color:#065f46;display:none;">
+            <div style="font-weight:700;margin-bottom:6px;">📊 Calculation Preview</div>
+            <div id="phaseCalcPreviewContent"></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closePhaseEditModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="savePhaseConfig()"><i class="fas fa-save"></i> Save Config</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── USER PHASE MODAL ── -->
+<div class="modal-bg" id="userPhaseModal">
+    <div class="modal" style="max-width:400px;">
+        <div class="modal-title">🔄 Change User Phase</div>
+        <div class="modal-sub" id="upmSub"></div>
+        <div class="modal-row"><span>Current Phase</span><span id="upmCurrentPhase">–</span></div>
+        <div style="margin-top:14px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:6px;">New Phase</label>
+            <select class="modal-inp" id="upmPhaseSelect" style="margin-top:0;">
+                <option value="1">Phase 1 – Training (11 orders)</option>
+                <option value="2">Phase 2 – First Deposit (20 orders)</option>
+                <option value="3">Phase 3 – Second Deposit (21 orders)</option>
+            </select>
+        </div>
+        <div style="margin-top:10px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:6px;">Deposit Amount (for bonus rate — $100 or $200)</label>
+            <input type="number" class="modal-inp" id="upmDepositAmount" placeholder="e.g. 100 or 200" style="margin-top:0;" min="0">
+        </div>
+        <div style="margin-top:10px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:6px;">Reset Phase Orders Counter?</label>
+            <select class="modal-inp" id="upmResetOrders" style="margin-top:0;">
+                <option value="yes">Yes – Reset to 0 (recommended when moving to new phase)</option>
+                <option value="no">No – Keep current counter</option>
+            </select>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="document.getElementById('userPhaseModal').classList.remove('open')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveUserPhase()"><i class="fas fa-check"></i> Assign Phase</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── ACTION MODAL (Recharge / Withdrawal) ── -->
+<div class="modal-bg" id="actionModal">
+    <div class="modal">
+        <div class="modal-title" id="modalTitle">Confirm Action</div>
+        <div class="modal-sub" id="modalSub"></div>
+        <div id="modalDetails"></div>
+        <!-- FIX: Deposit tracking for recharge approvals -->
+        <div id="depositTrackingWrap" style="display:none;margin-top:14px;padding:14px;background:#f0fdf4;border-radius:10px;border:1px solid #bbf7d0;">
+            <div style="font-size:12px;font-weight:700;color:#065f46;margin-bottom:8px;">💡 Deposit Tracking (for phase commission)</div>
+            <label style="font-size:12px;color:#059669;display:block;margin-bottom:5px;">This will be the user's:</label>
+            <select class="modal-inp" id="depositTypeSelect" style="margin-top:0;border-color:#bbf7d0;">
+                <option value="auto">Auto-detect (1st or 2nd deposit)</option>
+                <option value="first">First Deposit (sets Lucky Order bonus rate)</option>
+                <option value="second">Second Deposit (unlocks Phase 3)</option>
+                <option value="topup">Top-up (no phase change)</option>
+            </select>
+        </div>
+        <textarea class="modal-inp" id="adminNote" placeholder="Admin note (optional)..." rows="2"></textarea>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-success" id="modalApproveBtn" onclick="executeAction('approve')">
+                <i class="fas fa-check"></i> Approve
+            </button>
+            <button class="btn btn-danger" id="modalRejectBtn" onclick="executeAction('reject')" style="display:none;">
+                <i class="fas fa-times"></i> Reject
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── BALANCE MODAL ── -->
+<div class="modal-bg" id="balanceModal">
+    <div class="modal" style="max-width:400px;">
+        <div class="modal-title">✏️ Adjust Balance</div>
+        <div class="modal-sub" id="balModalSub"></div>
+        <div class="modal-row"><span>Current Balance</span><span id="balCurrentVal" class="text-success">$0.00</span></div>
+
+        <!-- Tab switcher -->
+        <div style="display:flex;gap:0;border:2px solid var(--border);border-radius:12px;overflow:hidden;margin-top:16px;">
+            <button id="balTabSet" onclick="switchBalTab('set')"
+                style="flex:1;padding:10px;border:none;font-size:13.5px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;background:var(--primary);color:white;transition:all .2s;">
+                🔒 Set Balance
+            </button>
+            <button id="balTabAdd" onclick="switchBalTab('add')"
+                style="flex:1;padding:10px;border:none;font-size:13.5px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;background:white;color:var(--text-muted);transition:all .2s;">
+                ➕ Add Amount
+            </button>
+        </div>
+
+        <!-- Tab descriptions -->
+        <div id="balTabSetDesc" style="margin-top:10px;font-size:12px;color:#059669;background:#f0fdf4;border-radius:8px;padding:8px 12px;">
+            ✅ <b>Set:</b> The user's balance will be set to exactly this amount. (e.g. enter $20 → balance becomes $20)
+        </div>
+        <div id="balTabAddDesc" style="margin-top:10px;font-size:12px;color:#1d4ed8;background:#eff6ff;border-radius:8px;padding:8px 12px;display:none;">
+            ➕ <b>Add:</b> This amount will be added to the current balance. (e.g. enter $10 → balance increases by $10)
+        </div>
+
+        <input type="number" class="modal-inp" id="balNewVal" placeholder="Enter amount..." step="0.01" min="0">
+
+        <!-- Live preview -->
+        <div id="balPreview" style="margin-top:8px;font-size:13px;font-weight:700;color:var(--text-muted);padding:8px 12px;background:#fafafa;border-radius:8px;border:1px solid var(--border);">
+            New balance: $–
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="document.getElementById('balanceModal').classList.remove('open')">Cancel</button>
+            <button class="btn btn-primary" id="balSaveBtn" onclick="saveBalance()"><i class="fas fa-save"></i> Save Balance</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── CREDIT SCORE MODAL ── -->
+<div class="modal-bg" id="creditModal">
+    <div class="modal" style="max-width:380px;">
+        <div class="modal-title">⭐ Edit Credit Score</div>
+        <div class="modal-sub" id="creditModalSub"></div>
+        <div class="modal-row"><span>Current Credit Score</span><span id="creditCurrentVal" style="font-weight:700;color:#6366f1;">100</span></div>
+        <div style="margin-top:14px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:6px;">New Credit Score (0 – 100)</label>
+            <input type="number" class="modal-inp" id="creditNewVal" placeholder="e.g. 85" min="0" max="100" step="1" style="margin-top:0;">
+            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-ghost btn-sm" onclick="document.getElementById('creditNewVal').value=100">100 (Max)</button>
+                <button class="btn btn-ghost btn-sm" onclick="document.getElementById('creditNewVal').value=80">80 (Good)</button>
+                <button class="btn btn-ghost btn-sm" onclick="document.getElementById('creditNewVal').value=60">60 (Fair)</button>
+                <button class="btn btn-ghost btn-sm" onclick="document.getElementById('creditNewVal').value=30">30 (Low)</button>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="document.getElementById('creditModal').classList.remove('open')">Cancel</button>
+            <button class="btn btn-primary" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);" onclick="saveCreditScore()"><i class="fas fa-save"></i> Save Credit Score</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── AGENT TAG MODAL ── -->
+<div class="modal-bg" id="agentModal">
+    <div class="modal" style="max-width:480px;">
+        <div class="modal-title">👤 Assign Marketing Agent</div>
+        <div class="modal-sub" id="agentModalSub">Select the agent who referred this user</div>
+        <div class="tag-section-title">Marketing Team Members</div>
+        <div class="tag-grid-agents" id="agentGrid"><!-- Generated by JS --></div>
+        <div style="margin-top:14px;padding:10px 12px;background:#f0f4ff;border-radius:10px;border:1px solid #c7d2fe;font-size:12px;color:#4338ca;">
+            <i class="fas fa-info-circle"></i>
+            Each code (A01–A09+) corresponds to a member of your marketing team.
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="document.getElementById('agentModal').classList.remove('open')">Cancel</button>
+            <button class="btn btn-danger btn-sm" onclick="saveAgentTag(null)" style="flex:0.6;"><i class="fas fa-times"></i> Remove</button>
+            <button class="btn btn-primary" onclick="saveAgentTag(selectedAgentTag)"><i class="fas fa-user-tag"></i> Assign Agent</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── CLIENT TYPE MODAL ── -->
+<div class="modal-bg" id="clientModal">
+    <div class="modal" style="max-width:380px;">
+        <div class="modal-title">🎯 Set Client Type</div>
+        <div class="modal-sub" id="clientModalSub">Is this a real or fake client?</div>
+        <div class="tag-section-title">Client Classification</div>
+        <div class="tag-grid-client" id="clientGrid">
+            <div class="tag-opt" id="clientOptReal" onclick="selectClientType('Real',this)">
+                <div class="tag-opt-code real">✅ Real</div>
+                <div class="tag-opt-label">Genuine Client</div>
+            </div>
+            <div class="tag-opt" id="clientOptFake" onclick="selectClientType('Fake',this)">
+                <div class="tag-opt-code fake">🎭 Fake</div>
+                <div class="tag-opt-label">Test / Fake Account</div>
+            </div>
+        </div>
+        <div style="margin-top:14px;padding:10px 12px;background:#fafafa;border-radius:10px;border:1px solid var(--border);font-size:12px;color:var(--text-muted);">
+            <i class="fas fa-info-circle" style="color:var(--primary);"></i>
+            This is independent of which agent referred them. A user from A01 can still be Real or Fake.
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="document.getElementById('clientModal').classList.remove('open')">Cancel</button>
+            <button class="btn btn-danger btn-sm" onclick="saveClientType(null)" style="flex:0.6;"><i class="fas fa-times"></i> Remove</button>
+            <button class="btn btn-primary" onclick="saveClientType(selectedClientType)"><i class="fas fa-tag"></i> Save Type</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── CHANGE PASSWORD MODAL ── -->
+<div class="modal-bg" id="changePasswordModal">
+    <div class="modal" style="max-width:420px;">
+        <div class="modal-title">🔑 Change User Password</div>
+        <div class="modal-sub" id="cpwModalSub">Set a new password for this account</div>
+        <div style="margin-top:14px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:6px;">New Password</label>
+            <div style="position:relative;">
+                <input type="password" class="modal-inp" id="cpwNewVal" placeholder="Enter new password (min 6 chars)" style="margin-top:0;padding-right:44px;" oninput="updatePwStrength(this.value)">
+                <button type="button" onclick="toggleCpwVisibility('cpwNewVal','cpwEye1')" id="cpwEye1"
+                    style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-muted);">👁️</button>
+            </div>
+            <div class="pw-strength"><div class="pw-strength-bar" id="pwStrengthBar"></div></div>
+            <div id="pwStrengthLabel" style="font-size:11px;color:var(--text-muted);margin-top:3px;"></div>
+        </div>
+        <div style="margin-top:12px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:6px;">Confirm Password</label>
+            <div style="position:relative;">
+                <input type="password" class="modal-inp" id="cpwConfirmVal" placeholder="Re-enter new password" style="margin-top:0;padding-right:44px;">
+                <button type="button" onclick="toggleCpwVisibility('cpwConfirmVal','cpwEye2')" id="cpwEye2"
+                    style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-muted);">👁️</button>
+            </div>
+        </div>
+        <div id="cpwError" style="display:none;margin-top:10px;padding:10px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;font-size:13px;color:#dc2626;"></div>
+        <div id="cpwSuccess" style="display:none;margin-top:10px;padding:10px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:13px;color:#16a34a;"></div>
+        <div style="margin-top:12px;padding:10px 12px;background:#f0fdf4;border-radius:10px;border:1px solid #bbf7d0;font-size:12px;color:#065f46;">
+            <i class="fas fa-check-circle"></i>
+            <b>Instant update.</b> Saves directly to Firestore. The user will be unable to log in until they use the new password you set.
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeChangePasswordModal()">Cancel</button>
+            <button class="btn btn-primary" style="background:linear-gradient(135deg,#f59e0b,#d97706);" id="cpwSaveBtn" onclick="saveNewPassword()"><i class="fas fa-key"></i> Change Password</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── FROZEN BALANCE MODAL ── -->
+<div class="modal-bg" id="frozenModal">
+    <div class="modal" style="max-width:460px;">
+        <div class="modal-title">❄️ Manage Frozen Balance</div>
+        <div class="modal-sub" id="frozenModalSub">Select a user to manage</div>
+
+        <!-- Current balances row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;">
+            <div style="background:#f0fdf4;border-radius:10px;padding:12px 14px;border:1px solid #bbf7d0;">
+                <div style="font-size:11px;font-weight:700;color:#059669;margin-bottom:3px;">CURRENT BALANCE</div>
+                <div style="font-family:'Outfit',sans-serif;font-size:20px;font-weight:800;color:#065f46;" id="frozenModalBal">$0.00</div>
+            </div>
+            <div style="background:#fffbeb;border-radius:10px;padding:12px 14px;border:1px solid #fde68a;">
+                <div style="font-size:11px;font-weight:700;color:#b45309;margin-bottom:3px;">CURRENT FROZEN</div>
+                <div style="font-family:'Outfit',sans-serif;font-size:20px;font-weight:800;color:#92400e;" id="frozenModalFrz">$0.00</div>
+            </div>
+        </div>
+
+        <!-- Tab Bar -->
+        <div class="frozen-tab-bar">
+            <button class="frozen-tab active" id="ftabTransfer" onclick="switchFrozenTab('transfer')">
+                <i class="fas fa-arrow-right"></i> Transfer to Frozen
+            </button>
+            <button class="frozen-tab" id="ftabRelease" onclick="switchFrozenTab('release')">
+                <i class="fas fa-unlock"></i> Release Frozen
+            </button>
+            <button class="frozen-tab" id="ftabSet" onclick="switchFrozenTab('set')">
+                <i class="fas fa-pen"></i> Set Directly
+            </button>
+            <button class="frozen-tab" id="ftabAddbal" onclick="switchFrozenTab('addbal')">
+                <i class="fas fa-plus-circle"></i> Add Balance
+            </button>
+        </div>
+
+        <!-- Transfer Panel -->
+        <div id="frozenPanelTransfer">
+            <div class="frozen-info-box blue">
+                <i class="fas fa-info-circle"></i>
+                <b>Transfer to Frozen:</b> Moves an amount from the user's available balance into frozen. The user can still see both values on their account page.
+            </div>
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-top:14px;margin-bottom:5px;">Amount to Freeze ($)</label>
+            <input type="number" class="modal-inp" id="frozenTransferAmt" placeholder="Enter amount..." min="0.01" step="0.01" style="margin-top:0;" oninput="updateFrozenPreview()">
+            <button class="btn btn-ghost btn-sm" style="margin-top:6px;" onclick="setFrozenTransferMax()">
+                <i class="fas fa-coins"></i> Freeze All Balance
+            </button>
+            <div class="frozen-preview" id="frozenTransferPreview">After transfer — Balance: $– &nbsp;|&nbsp; Frozen: $–</div>
+        </div>
+
+        <!-- Release Panel -->
+        <div id="frozenPanelRelease" style="display:none;">
+            <div class="frozen-info-box green">
+                <i class="fas fa-unlock"></i>
+                <b>Release Frozen:</b> Moves an amount from frozen back into the user's available balance.
+            </div>
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-top:14px;margin-bottom:5px;">Amount to Release ($)</label>
+            <input type="number" class="modal-inp" id="frozenReleaseAmt" placeholder="Enter amount..." min="0.01" step="0.01" style="margin-top:0;" oninput="updateFrozenPreview()">
+            <button class="btn btn-ghost btn-sm" style="margin-top:6px;" onclick="setFrozenReleaseMax()">
+                <i class="fas fa-unlock-alt"></i> Release All Frozen
+            </button>
+            <div class="frozen-preview" id="frozenReleasePreview">After release — Balance: $– &nbsp;|&nbsp; Frozen: $–</div>
+        </div>
+
+        <!-- Set Directly Panel -->
+        <div id="frozenPanelSet" style="display:none;">
+            <div class="frozen-info-box amber">
+                <i class="fas fa-exclamation-triangle"></i>
+                <b>Set Directly:</b> Overrides the frozen amount to exactly this value. Does <b>not</b> adjust the available balance automatically.
+            </div>
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-top:14px;margin-bottom:5px;">New Frozen Amount ($)</label>
+            <input type="number" class="modal-inp" id="frozenSetAmt" placeholder="Enter exact frozen amount..." min="0" step="0.01" style="margin-top:0;" oninput="updateFrozenPreview()">
+            <div class="frozen-preview" id="frozenSetPreview">Frozen will be set to: $–</div>
+        </div>
+
+        <!-- Add Balance Panel -->
+        <div id="frozenPanelAddbal" style="display:none;">
+            <div class="frozen-info-box green">
+                <i class="fas fa-plus-circle"></i>
+                <b>Add Balance:</b> Adds an amount directly to the user's available balance. Frozen amount stays unchanged.
+            </div>
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-top:14px;margin-bottom:5px;">Amount to Add ($)</label>
+            <input type="number" class="modal-inp" id="frozenAddbalAmt" placeholder="Enter amount to add..." min="0.01" step="0.01" style="margin-top:0;" oninput="updateFrozenPreview()">
+            <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+                <button class="btn btn-ghost btn-sm" onclick="document.getElementById('frozenAddbalAmt').value='10';updateFrozenPreview()">+$10</button>
+                <button class="btn btn-ghost btn-sm" onclick="document.getElementById('frozenAddbalAmt').value='50';updateFrozenPreview()">+$50</button>
+                <button class="btn btn-ghost btn-sm" onclick="document.getElementById('frozenAddbalAmt').value='100';updateFrozenPreview()">+$100</button>
+                <button class="btn btn-ghost btn-sm" onclick="document.getElementById('frozenAddbalAmt').value='200';updateFrozenPreview()">+$200</button>
+                <button class="btn btn-ghost btn-sm" onclick="document.getElementById('frozenAddbalAmt').value='500';updateFrozenPreview()">+$500</button>
+            </div>
+            <div class="frozen-preview" id="frozenAddbalPreview">After adding — Balance: $– &nbsp;|&nbsp; Frozen: $–</div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="document.getElementById('frozenModal').classList.remove('open')">Cancel</button>
+            <button class="btn btn-primary" id="frozenSaveBtn" onclick="saveFrozenBalance()">
+                <i class="fas fa-snowflake"></i> Apply
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════
+// GLOBAL STATE
+// ══════════════════════════════════════════════════════════════
+let currentPage = 'dashboard';
+let allUsers = [], allRecharge = [], allWithdrawal = [], allPhaseUsers = [];
+let currentAction = null;
+let currentBalUser = null;
+let currentCreditUser = null;
+let editingPhaseNum = 1;
+let editingUserPhase = null;
+let allChats = [];
+let activeChatUserId = null;
+let activeChatListener = null;
+let phaseConfigs = {};
+let chatConvoUnsubscribe = null; // FIX: track chat list listener for cleanup
+
+// Default phase configs (admin can override via Firestore)
+const DEFAULT_PHASE_CONFIGS = {
+    1: { name:'Training Phase', totalOrders:11, bonusPositions:[5,9], baseRate:0.05,
+         bonusRateFor100:0.15, bonusRateFor200:0.30, bonusType:'rate' },
+    2: { name:'First Deposit Phase', totalOrders:20, bonusPositions:[11], baseRate:0.05,
+         bonusRateFor100:0.15, bonusRateFor200:0.30, bonusType:'rate' },
+    3: { name:'Second Deposit Phase', totalOrders:21, bonusPositions:[4,7,11,14,17,19,21],
+         baseRate:0.05, bonusMultiplier:2, bonusType:'amount' }
+};
+
+// ══════════════════════════════════════════════════════════════
+// INIT ─ Firebase Auth guard
+// ══════════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+    auth.onAuthStateChanged(async user => {
+        // Always hide loading screen once auth state is known
+        document.getElementById('loadingScreen').style.display = 'none';
+        if (!user) { showLogin(); return; }
+        const isAdmin = await checkAdminAccess(user);
+        if (!isAdmin) {
+            auth.signOut();
+            showLoginErr('Access denied. You are not registered as an admin.');
+            showLogin();
+            return;
+        }
+        showAdmin(user);
+    });
+});
+
+async function checkAdminAccess(user) {
+    try {
+        const doc = await db.collection('admins').doc(user.uid).get();
+        return doc.exists;
+    } catch(e) { return false; }
+}
+
+// ── AUTH ──
+async function adminLogin() {
+    const email = document.getElementById('adminEmail').value.trim();
+    const pw    = document.getElementById('adminPassword').value;
+    if (!email || !pw) { showLoginErr('Please enter email and password'); return; }
+    const btn = document.getElementById('loginBtn');
+    const icon = document.getElementById('loginBtnIcon');
+    const txt = document.getElementById('loginBtnText');
+    btn.disabled = true;
+    icon.className = 'fas fa-spinner spin';
+    txt.textContent = 'Signing in…';
+    try {
+        await auth.signInWithEmailAndPassword(email, pw);
+    } catch(e) {
+        showLoginErr('Invalid credentials: ' + e.message);
+        btn.disabled = false;
+        icon.className = 'fas fa-lock';
+        txt.textContent = 'Login to Admin';
+    }
+}
+
+async function adminLogout() { await auth.signOut(); showLogin(); }
+
+function showLogin() {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('adminLayout').style.display = 'none';
+}
+
+function showLoginErr(msg) {
+    const el = document.getElementById('loginErr');
+    el.textContent = msg; el.style.display = 'block';
+}
+
+function showAdmin(user) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminLayout').style.display = 'flex';
+    document.getElementById('topbarEmail').textContent = user.email;
+    document.getElementById('adminInitial').textContent = user.email[0].toUpperCase();
+    // Set date
+    updateTopbarDate();
+    setInterval(updateTopbarDate, 60000);
+    loadDashboard();
+}
+
+function updateTopbarDate() {
+    const now = new Date();
+    document.getElementById('topbarDate').textContent = now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+}
+
+// ── NAVIGATION ──
+function showPage(page, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    if (btn) btn.classList.add('active');
+    const titles = {
+        dashboard:'Dashboard', users:'All Users', recharge:'Recharge Requests',
+        withdrawal:'Withdrawal Requests', referrals:'Referral Network',
+        livechat:'Live Chat Support', phases:'Phase Management',
+        frozen:'Frozen Balance Management'
+    };
+    document.getElementById('topbarTitle').textContent = titles[page] || page;
+
+    // FIX: Unsubscribe chat list listener when navigating away to prevent listener leak
+    if (currentPage === 'livechat' && page !== 'livechat' && chatConvoUnsubscribe) {
+        chatConvoUnsubscribe();
+        chatConvoUnsubscribe = null;
+    }
+
+    currentPage = page;
+    if (page === 'users') loadUsers();
+    else if (page === 'recharge') loadRechargeRequests();
+    else if (page === 'withdrawal') loadWithdrawalRequests();
+    else if (page === 'referrals') loadReferrals();
+    else if (page === 'livechat') loadChatConversations();
+    else if (page === 'phases') loadPhaseManagement();
+    else if (page === 'frozen') loadFrozenBalances();
+}
+
+// ── DASHBOARD ──
+async function loadDashboard() {
+    // Update refresh timestamp
+    const refreshEl = document.getElementById('dashLastRefreshed');
+    if (refreshEl) refreshEl.textContent = '⟳ Loading…';
+
+    // ── Run all 3 queries independently so one failure never silences the others ──
+    const [usersResult, rechargeResult, withdrawResult] = await Promise.allSettled([
+        db.collection('users').get(),
+        fetchPendingDocs('rechargeRequests'),
+        fetchPendingDocs('withdrawalRequests')
+    ]);
+
+    if (refreshEl) {
+        const now = new Date();
+        refreshEl.textContent = 'Last refreshed: ' + now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    }
+
+    // ── Users / stats ──
+    if (usersResult.status === 'fulfilled') {
+        const usersSnap = usersResult.value;
+        const totalBal    = usersSnap.docs.reduce((s,d) => s + (parseFloat(d.data().balance)||0), 0);
+        const totalEarned = usersSnap.docs.reduce((s,d) => s + (parseFloat(d.data().totalEarned)||0), 0);
+        const totalFrozen = usersSnap.docs.reduce((s,d) => s + (parseFloat(d.data().frozenAmount)||0), 0);
+        document.getElementById('statUsers').textContent = usersSnap.size;
+        document.getElementById('statBalance').textContent = '$' + totalBal.toFixed(2);
+        if (document.getElementById('statFrozen'))
+            document.getElementById('statFrozen').textContent = '$' + totalFrozen.toFixed(2);
+        if (document.getElementById('statTotalEarned'))
+            document.getElementById('statTotalEarned').textContent = '$' + totalEarned.toFixed(2);
+        const p1 = usersSnap.docs.filter(d => parseInt(d.data().currentPhase||d.data().phase||1)===1).length;
+        const p2 = usersSnap.docs.filter(d => parseInt(d.data().currentPhase||d.data().phase||1)===2).length;
+        const p3 = usersSnap.docs.filter(d => parseInt(d.data().currentPhase||d.data().phase||1)===3).length;
+        if (document.getElementById('phaseDistP1')) {
+            document.getElementById('phaseDistP1').textContent = p1;
+            document.getElementById('phaseDistP2').textContent = p2;
+            document.getElementById('phaseDistP3').textContent = p3;
+        }
+    }
+
+    // ── Recharge panel (independent — never blocked by withdrawal failure) ──
+    if (rechargeResult.status === 'fulfilled') {
+        const docs = rechargeResult.value;
+        document.getElementById('statPendingR').textContent  = docs.length;
+        document.getElementById('rechargeBadge').textContent = docs.length;
+        updateTopbarPending();
+        const rHtml = docs.length === 0
+            ? '<div class="empty-state"><i class="fas fa-check-circle"></i><p>No pending recharges</p></div>'
+            : '<table><tr><th>Phone</th><th>Amount</th><th>Method</th><th>Action</th></tr>'
+              + docs.slice(0,5).map(d => {
+                    const r = d.data();
+                    return `<tr><td class="phone-mask">${esc(r.userPhone||'–')}</td>
+                        <td class="text-success">$${parseFloat(r.amount||0).toFixed(2)}</td>
+                        <td>${esc(r.method||'–')}</td>
+                        <td><button class="btn btn-success btn-sm" onclick="openAction('recharge','${d.id}','${r.userId||''}',${parseFloat(r.amount||0)})">Approve</button></td></tr>`;
+                }).join('') + '</table>';
+        document.getElementById('dashRecharge').innerHTML = rHtml;
+    } else {
+        console.warn('Recharge fetch failed:', rechargeResult.reason);
+        document.getElementById('dashRecharge').innerHTML =
+            '<div class="empty-state"><i class="fas fa-exclamation-circle" style="color:var(--warning)"></i>' +
+            '<p>Could not load recharges</p><button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="loadDashboard()"><i class="fas fa-sync"></i> Retry</button></div>';
+    }
+
+    // ── Withdrawal panel (independent — never blocked by recharge failure) ──
+    if (withdrawResult.status === 'fulfilled') {
+        const docs = withdrawResult.value;
+        document.getElementById('statPendingW').textContent   = docs.length;
+        document.getElementById('withdrawalBadge').textContent = docs.length;
+        updateTopbarPending();
+        const wHtml = docs.length === 0
+            ? '<div class="empty-state"><i class="fas fa-check-circle"></i><p>No pending withdrawals</p></div>'
+            : '<table><tr><th>Phone</th><th>Amount</th><th>Bank</th><th>Action</th></tr>'
+              + docs.slice(0,5).map(d => {
+                    const r = d.data();
+                    return `<tr><td class="phone-mask">${esc(r.userPhone||'–')}</td>
+                        <td class="text-danger">$${parseFloat(r.amount||0).toFixed(2)}</td>
+                        <td>${esc(r.bankName||'–')}</td>
+                        <td><button class="btn btn-success btn-sm" onclick="openAction('withdrawal','${d.id}','${r.userId||''}',${parseFloat(r.amount||0)})">Approve</button></td></tr>`;
+                }).join('') + '</table>';
+        document.getElementById('dashWithdraw').innerHTML = wHtml;
+    } else {
+        console.warn('Withdrawal fetch failed:', withdrawResult.reason);
+        document.getElementById('dashWithdraw').innerHTML =
+            '<div class="empty-state"><i class="fas fa-exclamation-circle" style="color:var(--warning)"></i>' +
+            '<p>Could not load withdrawals</p><button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="loadDashboard()"><i class="fas fa-sync"></i> Retry</button></div>';
+    }
+}
+
+// Fetch pending docs: tries server-side filter first, falls back to client-side filter
+// so a missing Firestore index never causes an empty dashboard.
+async function fetchPendingDocs(collection) {
+    try {
+        const snap = await db.collection(collection).where('status','==','pending').get();
+        return snap.docs;
+    } catch(e) {
+        // Fallback: fetch all and filter client-side (handles missing index / rules edge cases)
+        console.warn(collection + ' server filter failed, falling back to client filter:', e.message);
+        const snap = await db.collection(collection).get();
+        return snap.docs.filter(d => (d.data().status || 'pending') === 'pending');
+    }
+}
+
+// ── USERS ──
+async function loadUsers() {
+    document.getElementById('usersTable').innerHTML = '<div class="loader"><i class="fas fa-spinner spin"></i> Loading users...</div>';
+    try {
+        const snap = await db.collection('users').orderBy('createdAt','desc').get();
+        allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderUsersTable(allUsers);
+    } catch(e) {
+        document.getElementById('usersTable').innerHTML = '<div class="empty-state"><p>Error: ' + esc(e.message) + '</p></div>';
+    }
+}
+
+function filterUsers() {
+    const q = document.getElementById('userSearch').value.toLowerCase();
+    const filtered = q ? allUsers.filter(u => (u.phone||'').includes(q) || (u.inviteCode||'').toLowerCase().includes(q)) : allUsers;
+    renderUsersTable(filtered);
+}
+
+function renderUsersTable(users) {
+    if (!users.length) {
+        document.getElementById('usersTable').innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div>';
+        return;
+    }
+    // Update count badge
+    const countBadge = document.getElementById('userCountBadge');
+    if (countBadge) { countBadge.textContent = users.length + ' users'; countBadge.style.display = 'inline-flex'; }
+    // FIX: Support both 'currentPhase' and legacy 'phase' field
+    const rows = users.map(u => {
+        const phase = parseInt(u.currentPhase || u.phase || 1);
+        const date = u.createdAt ? new Date(u.createdAt.seconds * 1000).toLocaleDateString() : '–';
+        const bal = parseFloat(u.balance || 0).toFixed(2);
+        const credit = parseInt(u.creditScore !== undefined ? u.creditScore : 100);
+        const creditColor = credit >= 80 ? 'var(--success)' : credit >= 50 ? 'var(--warning)' : 'var(--danger)';
+        const phaseColors = { 1:'#0bb1b3', 2:'#667eea', 3:'#f59e0b' };
+        const phaseColor = phaseColors[phase] || '#6b7280';
+        // Agent tag (A01-A09+)
+        const agentTag = u.agentTag || (u.marketingTag && !['Real','Fake'].includes(u.marketingTag) ? u.marketingTag : '');
+        // Client type (Real / Fake)
+        const clientType = u.clientType || (u.marketingTag && ['Real','Fake'].includes(u.marketingTag) ? u.marketingTag : '');
+        const agentHtml = agentTag
+            ? `<span class="mktag-agent" onclick="openAgentModal('${u.id}','${esc(u.phone||'')}','${agentTag}')" title="Agent: ${agentTag}">${agentTag}</span>`
+            : `<span class="mktag-agent empty" onclick="openAgentModal('${u.id}','${esc(u.phone||'')}','')" title="Assign agent"><i class="fas fa-plus" style="font-size:9px;"></i> Agent</span>`;
+        const clientHtml = clientType
+            ? `<span class="mktag-client ${clientType.toLowerCase()}" onclick="openClientModal('${u.id}','${esc(u.phone||'')}','${clientType}')" title="Client type: ${clientType}">${clientType === 'Real' ? '✅ Real' : '🎭 Fake'}</span>`
+            : `<span class="mktag-client empty" onclick="openClientModal('${u.id}','${esc(u.phone||'')}','')" title="Set client type"><i class="fas fa-plus" style="font-size:9px;"></i> Type</span>`;
+        return `<tr>
+            <td class="phone-mask">${esc(u.phone||'–')}</td>
+            <td>${agentHtml}</td>
+            <td>${clientHtml}</td>
+            <td><span style="background:${phaseColor}20;color:${phaseColor};font-weight:700;font-size:11px;padding:3px 9px;border-radius:20px;">Phase ${phase}</span></td>
+            <td>${u.phaseOrdersCompleted||0}</td>
+            <td class="text-success">$${bal}</td>
+            <td><span style="color:${creditColor};font-weight:700;font-size:13px;">${credit}</span></td>
+            <td><code style="font-size:12px;background:#f3f4f6;padding:2px 6px;border-radius:4px;">${esc(u.inviteCode||'–')}</code></td>
+            <td style="color:var(--text-muted);font-size:12px;">${date}</td>
+            <td>
+                <button class="btn btn-ghost btn-sm" onclick="openBalanceModal('${u.id}','${esc(u.phone||'')}',${parseFloat(u.balance||0)})"><i class="fas fa-edit"></i> Balance</button>
+                <button class="btn btn-ghost btn-sm" style="margin-left:4px;border-color:#6366f1;color:#6366f1;" onclick="openCreditModal('${u.id}','${esc(u.phone||'')}',${credit})"><i class="fas fa-star"></i> Credit</button>
+                <button class="btn btn-ghost btn-sm" style="margin-left:4px;border-color:#f59e0b;color:#d97706;" onclick="openChangePasswordModal('${u.id}','${esc(u.phone||'')}')" title="Change Password"><i class="fas fa-key"></i> Password</button>
+                <button class="btn btn-${u.isActive!==false?'danger':'success'} btn-sm" style="margin-left:4px;" onclick="toggleUserStatus('${u.id}',${u.isActive===false})">
+                    ${u.isActive !== false ? 'Suspend' : 'Activate'}
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+    document.getElementById('usersTable').innerHTML = `
+        <div class="table-scroll">
+        <table>
+            <tr><th>Phone</th><th>Agent</th><th>Client</th><th>Phase</th><th>Phase Orders</th><th>Balance</th><th>Credit Score</th><th>Invite Code</th><th>Joined</th><th>Actions</th></tr>
+            ${rows}
+        </table></div>`;
+}
+
+async function toggleUserStatus(uid, active) {
+    try {
+        await db.collection('users').doc(uid).update({ isActive: active });
+        toast('✅ User status updated');
+        loadUsers();
+    } catch(e) { toast('❌ Error: ' + e.message, 'error'); }
+}
+
+// ── RECHARGE REQUESTS ──
+async function loadRechargeRequests() {
+    document.getElementById('rechargeTable').innerHTML = '<div class="loader"><i class="fas fa-spinner spin"></i> Loading...</div>';
+    try {
+        const snap = await db.collection('rechargeRequests').orderBy('createdAt','desc').get();
+        allRecharge = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderRechargeTable(allRecharge);
+        const pending = allRecharge.filter(r => r.status === 'pending').length;
+        document.getElementById('rechargeBadge').textContent = pending;
+    } catch(e) {
+        document.getElementById('rechargeTable').innerHTML = '<div class="empty-state"><p>Error: ' + esc(e.message) + '</p></div>';
+    }
+}
+
+function renderRechargeTable(items) {
+    if (!items.length) {
+        document.getElementById('rechargeTable').innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No recharge requests</p></div>';
+        const cb = document.getElementById('rechargeCountBadge'); if(cb) cb.style.display='none';
+        return;
+    }
+    const cb = document.getElementById('rechargeCountBadge');
+    if(cb) { cb.textContent = items.length + ' records'; cb.style.display='inline-flex'; }
+    const rows = items.map(r => {
+        const date = r.createdAt ? new Date(r.createdAt.seconds * 1000).toLocaleString() : '–';
+        const badge = `<span class="badge badge-${r.status}">${r.status}</span>`;
+        const depositLabel = r.depositType ? `<br><span style="font-size:11px;color:var(--teal);">${r.depositType}</span>` : '';
+        const actions = r.status === 'pending'
+            ? `<button class="btn btn-success btn-sm" onclick="openAction('recharge','${r.id}','${r.userId}',${r.amount})"><i class="fas fa-check"></i> Approve</button>
+               <button class="btn btn-danger btn-sm" style="margin-left:4px;" onclick="openAction('recharge_reject','${r.id}','${r.userId}',${r.amount})"><i class="fas fa-times"></i> Reject</button>`
+            : `<span style="font-size:12px;color:var(--text-muted);">${esc(r.adminNote||r.status)}</span>`;
+        return `<tr>
+            <td class="phone-mask">${esc(r.userPhone||'–')}</td>
+            <td class="text-success fw7">$${parseFloat(r.amount).toFixed(2)}${depositLabel}</td>
+            <td>${esc(r.method||'–')}</td>
+            <td>${badge}</td>
+            <td style="font-size:12px;color:var(--text-muted);">${date}</td>
+            <td>${actions}</td>
+        </tr>`;
+    }).join('');
+    document.getElementById('rechargeTable').innerHTML = `
+        <div class="table-scroll">
+        <table>
+            <tr><th>Phone</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th><th>Actions</th></tr>
+            ${rows}
+        </table></div>`;
+}
+
+// ── WITHDRAWAL REQUESTS ──
+async function loadWithdrawalRequests() {
+    document.getElementById('withdrawalTable').innerHTML = '<div class="loader"><i class="fas fa-spinner spin"></i> Loading...</div>';
+    try {
+        let snap;
+        try {
+            // Try ordered query first (requires Firestore index)
+            snap = await db.collection('withdrawalRequests').orderBy('createdAt','desc').get();
+        } catch(orderErr) {
+            console.warn('Ordered withdrawal query failed, falling back to unordered:', orderErr.message);
+            // Fallback: fetch all without ordering (works even without index)
+            snap = await db.collection('withdrawalRequests').get();
+        }
+        allWithdrawal = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        // Always sort client-side as safety net
+        allWithdrawal.sort((a, b) => {
+            const ta = a.createdAt?.seconds || 0;
+            const tb = b.createdAt?.seconds || 0;
+            return tb - ta;
+        });
+        renderWithdrawalTable(allWithdrawal);
+        const pending = allWithdrawal.filter(r => r.status === 'pending').length;
+        document.getElementById('withdrawalBadge').textContent = pending;
+    } catch(e) {
+        console.error('loadWithdrawalRequests error:', e);
+        document.getElementById('withdrawalTable').innerHTML =
+            '<div class="empty-state"><i class="fas fa-exclamation-circle" style="color:var(--danger)"></i><p>Error loading withdrawal requests: ' + esc(e.message) + '</p><button class="btn btn-ghost btn-sm" style="margin-top:12px;" onclick="loadWithdrawalRequests()"><i class="fas fa-sync"></i> Retry</button></div>';
+    }
+}
+
+function renderWithdrawalTable(items) {
+    if (!items.length) {
+        document.getElementById('withdrawalTable').innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No withdrawal requests</p></div>';
+        const cb = document.getElementById('withdrawalCountBadge'); if(cb) cb.style.display='none';
+        return;
+    }
+    const cb = document.getElementById('withdrawalCountBadge');
+    if(cb) { cb.textContent = items.length + ' records'; cb.style.display='inline-flex'; }
+    const rows = items.map(r => {
+        const date = r.createdAt ? new Date(r.createdAt.seconds * 1000).toLocaleString() : '–';
+        const badge = `<span class="badge badge-${r.status}">${r.status}</span>`;
+        const chatBadge = r.source === 'chat_assisted'
+            ? `<span style="font-size:10px;background:#e0f7f7;color:#0bb1b3;font-weight:700;padding:2px 6px;border-radius:20px;margin-left:4px;">💬 Chat</span>` : '';
+        const bankInfo = `<strong>${esc(r.bankName||'–')}</strong><br>
+            <span style="font-size:11.5px;color:#1f2937;font-family:monospace;font-weight:700;">${esc(String(r.accountNumber||'–'))}</span><br>
+            <span style="font-size:11px;color:var(--text-muted);">${esc(r.beneficiaryName||r.holderName||'')}${r.ifscCode ? ' · ' + esc(r.ifscCode) : ''}</span>`;
+        const bName = (r.bankName||'').replace(/'/g,"\\'");
+        const bAcc  = String(r.accountNumber||'').replace(/'/g,"\\'");
+        const bHold = (r.beneficiaryName||r.holderName||'').replace(/'/g,"\\'");
+        const bIfsc = (r.ifscCode||'').replace(/'/g,"\\'");
+        const actions = r.status === 'pending'
+            ? `<button class="btn btn-success btn-sm" onclick="openAction('withdrawal','${r.id}','${r.userId}',${r.amount},'${bName}','${bAcc}','${bHold}','${bIfsc}')"><i class="fas fa-check"></i> Approve & Deduct</button>
+               <button class="btn btn-danger btn-sm" style="margin-left:4px;" onclick="openAction('withdrawal_reject','${r.id}','${r.userId}',${r.amount},'${bName}','${bAcc}','${bHold}','${bIfsc}')"><i class="fas fa-times"></i> Reject</button>`
+            : `<span style="font-size:12px;color:var(--text-muted);">${esc(r.adminNote||r.status)}</span>`;
+        return `<tr>
+            <td class="phone-mask">${esc(r.userPhone||'–')}</td>
+            <td class="text-danger fw7">$${parseFloat(r.amount).toFixed(2)}</td>
+            <td>${bankInfo}</td>
+            <td>${badge}${chatBadge}</td>
+            <td style="font-size:12px;color:var(--text-muted);">${date}</td>
+            <td>${actions}</td>
+        </tr>`;
+    }).join('');
+    document.getElementById('withdrawalTable').innerHTML = `
+        <div class="table-scroll">
+        <table>
+            <tr><th>Phone</th><th>Amount</th><th>Bank Details</th><th>Status</th><th>Date</th><th>Actions</th></tr>
+            ${rows}
+        </table></div>`;
+}
+
+// ── ACTION MODAL ──
+function openAction(type, docId, userId, amount, bankName, accountNumber, holderName, ifscCode) {
+    currentAction = { type, docId, userId, amount: parseFloat(amount) };
+    const isApprove = !type.includes('reject');
+    const isRecharge = type.includes('recharge');
+
+    document.getElementById('modalTitle').textContent = isApprove
+        ? (isRecharge ? '✅ Approve Recharge' : '✅ Approve Withdrawal')
+        : (isRecharge ? '❌ Reject Recharge' : '❌ Reject Withdrawal');
+
+    document.getElementById('modalSub').textContent = isApprove
+        ? (isRecharge ? `This will add $${parseFloat(amount).toFixed(2)} to the user's balance.` : `This will DEDUCT $${parseFloat(amount).toFixed(2)} from the user's balance and mark as paid. Verify the payment was sent before approving.`)
+        : 'This request will be rejected.';
+
+    const bankDetailsHtml = (!isRecharge && bankName) ? `
+        <div style="background:#fff8e1;border:1.5px solid #f59e0b;border-radius:10px;padding:14px 16px;margin-bottom:4px;">
+            <div style="font-size:11px;font-weight:800;color:#b45309;letter-spacing:.5px;margin-bottom:10px;">🏦 SEND MONEY TO THIS ACCOUNT</div>
+            <div class="modal-row" style="border-color:#fde68a;"><span>Bank Name</span><span style="font-weight:700;">${esc(bankName||'–')}</span></div>
+            <div class="modal-row" style="border-color:#fde68a;"><span>Account Number</span><span style="font-family:monospace;font-size:15px;font-weight:800;color:#1f2937;letter-spacing:1px;">${esc(accountNumber||'–')}<button class="copy-btn" onclick="copyText('${(accountNumber||'').replace(/'/g,"\\'")}',this)" title="Copy account number"><i class="fas fa-copy"></i></button></span></div>
+            <div class="modal-row" style="border-color:#fde68a;"><span>Account Holder</span><span style="font-weight:700;">${esc(holderName||'–')}</span></div>
+            <div class="modal-row" style="border-color:#fde68a;border-bottom:none;"><span>IFSC / Code</span><span style="font-family:monospace;font-weight:700;">${esc(ifscCode||'–')}</span></div>
+        </div>` : '';
+    document.getElementById('modalDetails').innerHTML = `
+        <div class="modal-row"><span>${isRecharge ? 'Recharge' : 'Withdrawal'} Amount</span><span class="${isRecharge ? 'text-success' : 'text-danger'}" style="font-size:18px;">$${parseFloat(amount).toFixed(2)}</span></div>
+        ${bankDetailsHtml}
+        <div class="modal-row"><span>User ID</span><span style="font-size:12px;color:var(--text-muted);">${esc(userId)}</span></div>`;
+
+    // FIX: Show deposit tracking only for recharge approvals
+    const depositWrap = document.getElementById('depositTrackingWrap');
+    depositWrap.style.display = (isApprove && isRecharge) ? 'block' : 'none';
+
+    document.getElementById('modalApproveBtn').style.display = isApprove ? 'flex' : 'none';
+    document.getElementById('modalRejectBtn').style.display = isApprove ? 'none' : 'flex';
+    // ── FIX: Always reset button states in case previous action left them disabled ──
+    document.getElementById('modalApproveBtn').disabled = false;
+    document.getElementById('modalApproveBtn').innerHTML = '<i class="fas fa-check"></i> Approve';
+    document.getElementById('modalRejectBtn').disabled = false;
+    document.getElementById('modalRejectBtn').innerHTML = '<i class="fas fa-times"></i> Reject';
+    document.getElementById('adminNote').value = '';
+    document.getElementById('actionModal').classList.add('open');
+}
+
+function closeModal() {
+    document.getElementById('actionModal').classList.remove('open');
+    currentAction = null;
+    // ── FIX: Always reset button states so "Processing..." never sticks ──
+    const aBtn = document.getElementById('modalApproveBtn');
+    const rBtn = document.getElementById('modalRejectBtn');
+    if (aBtn) { aBtn.disabled = false; aBtn.innerHTML = '<i class="fas fa-check"></i> Approve'; }
+    if (rBtn) { rBtn.disabled = false; rBtn.innerHTML = '<i class="fas fa-times"></i> Reject'; }
+}
+
+async function executeAction(decision) {
+    if (!currentAction) return;
+    const { type, docId, userId, amount } = currentAction;
+    const adminNote = document.getElementById('adminNote').value.trim();
+    const btn = document.getElementById(decision === 'approve' ? 'modalApproveBtn' : 'modalRejectBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner spin"></i> Processing...';
+
+    try {
+        if (decision === 'approve') {
+            if (type === 'recharge') {
+                // ═════════════════════════════════════════════
+                // FIX: Use Firestore transaction for atomic balance update
+                // FIX: Track deposit type for phase commission calculation
+                // ═════════════════════════════════════════════
+                const depositType = document.getElementById('depositTypeSelect').value;
+                const userRef = db.collection('users').doc(userId);
+
+                await db.runTransaction(async (tx) => {
+                    const userSnap = await tx.get(userRef);
+                    if (!userSnap.exists) throw new Error('User not found');
+
+                    const data = userSnap.data();
+                    const currentBal = parseFloat(data.balance || 0);
+                    const newBal = parseFloat((currentBal + amount).toFixed(2));
+
+                    // FIX: Determine deposit count and set firstDepositAmount
+                    const depositCount = parseInt(data.depositCount || 0) + 1;
+                    const updateData = {
+                        balance: newBal,
+                        depositCount: depositCount,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+
+                    // Determine which deposit this is for phase tracking
+                    let resolvedDepositType = depositType;
+                    if (depositType === 'auto') {
+                        resolvedDepositType = depositCount === 1 ? 'first'
+                            : depositCount === 2 ? 'second' : 'topup';
+                    }
+
+                    // Set firstDepositAmount for Phase 1 & 2 bonus rate calculation
+                    if (resolvedDepositType === 'first' && !data.firstDepositAmount) {
+                        updateData.firstDepositAmount = amount;
+                    } else if (resolvedDepositType === 'second' && !data.secondDepositAmount) {
+                        updateData.secondDepositAmount = amount;
+                    }
+
+                    tx.update(userRef, updateData);
+                    tx.update(db.collection('rechargeRequests').doc(docId), {
+                        status: 'approved',
+                        adminNote: adminNote || 'Approved by admin',
+                        depositType: resolvedDepositType,
+                        approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        balanceAfter: newBal
+                    });
+                });
+
+                toast('✅ Recharge approved! $' + amount.toFixed(2) + ' added to user balance.');
+
+            } else if (type === 'withdrawal') {
+                // NEW FLOW: Balance was NOT deducted upfront — deduct now on approval
+                const userRef = db.collection('users').doc(userId);
+                await db.runTransaction(async (tx) => {
+                    const userSnap = await tx.get(userRef);
+                    if (!userSnap.exists) throw new Error('User not found');
+                    const currentBal = parseFloat(userSnap.data().balance || 0);
+                    if (currentBal < amount) throw new Error(`Insufficient user balance ($${currentBal.toFixed(2)}) for withdrawal of $${amount.toFixed(2)}`);
+                    const newBal = parseFloat((currentBal - amount).toFixed(2));
+                    tx.update(userRef, {
+                        balance: newBal,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    tx.update(db.collection('withdrawalRequests').doc(docId), {
+                        status: 'approved',
+                        adminNote: adminNote || 'Approved and paid by admin',
+                        approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        balanceBefore: currentBal,
+                        balanceAfter: newBal
+                    });
+                });
+                toast('✅ Withdrawal approved! $' + amount.toFixed(2) + ' deducted from user balance.');
+            }
+
+        } else {
+            // ── REJECT ──
+            if (type.includes('withdrawal')) {
+                // NEW FLOW: Balance was NOT deducted upfront — just mark as rejected, no restore needed
+                await db.collection('withdrawalRequests').doc(docId).update({
+                    status: 'rejected',
+                    adminNote: adminNote || 'Rejected by admin',
+                    rejectedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                toast('❌ Withdrawal request rejected. No balance change (balance was never deducted).');
+            } else {
+                // Recharge rejection — no balance change needed
+                await db.collection('rechargeRequests').doc(docId).update({
+                    status: 'rejected',
+                    adminNote: adminNote || 'Rejected by admin',
+                    rejectedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                toast('❌ Recharge request rejected.');
+            }
+        }
+
+        closeModal();
+        if (currentPage === 'dashboard') loadDashboard();
+        else if (currentPage === 'recharge') loadRechargeRequests();
+        else if (currentPage === 'withdrawal') loadWithdrawalRequests();
+
+    } catch(e) {
+        toast('❌ Error: ' + e.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = decision === 'approve' ? '<i class="fas fa-check"></i> Approve' : '<i class="fas fa-times"></i> Reject';
+    }
+}
+
+// ── BALANCE MODAL ──
+let balMode = 'set'; // 'set' or 'add'
+
+function switchBalTab(mode) {
+    balMode = mode;
+    const isSet = mode === 'set';
+    document.getElementById('balTabSet').style.background = isSet ? 'var(--primary)' : 'white';
+    document.getElementById('balTabSet').style.color = isSet ? 'white' : 'var(--text-muted)';
+    document.getElementById('balTabAdd').style.background = isSet ? 'white' : 'var(--success)';
+    document.getElementById('balTabAdd').style.color = isSet ? 'var(--text-muted)' : 'white';
+    document.getElementById('balTabSetDesc').style.display = isSet ? 'block' : 'none';
+    document.getElementById('balTabAddDesc').style.display = isSet ? 'none' : 'block';
+    document.getElementById('balNewVal').placeholder = isSet ? 'Enter exact new balance (e.g. 20.00)' : 'Enter amount to add (e.g. 10.00)';
+    document.getElementById('balSaveBtn').innerHTML = isSet ? '<i class="fas fa-save"></i> Set Balance' : '<i class="fas fa-plus"></i> Add to Balance';
+    updateBalPreview();
+}
+
+function updateBalPreview() {
+    if (!currentBalUser) return;
+    const val = parseFloat(document.getElementById('balNewVal').value);
+    const cur = currentBalUser.currentBal;
+    if (isNaN(val) || val < 0) {
+        document.getElementById('balPreview').textContent = 'New balance: $–';
+        return;
+    }
+    const result = balMode === 'set' ? val : parseFloat((cur + val).toFixed(2));
+    const label = balMode === 'set'
+        ? `Set to: $${result.toFixed(2)}`
+        : `$${cur.toFixed(2)} + $${val.toFixed(2)} = $${result.toFixed(2)}`;
+    document.getElementById('balPreview').textContent = '→ ' + label;
+    document.getElementById('balPreview').style.color = '#059669';
+}
+
+function openBalanceModal(uid, phone, currentBal) {
+    currentBalUser = { uid, phone, currentBal: parseFloat(currentBal || 0) };
+    document.getElementById('balModalSub').textContent = 'Adjusting balance for: ' + phone;
+    document.getElementById('balCurrentVal').textContent = '$' + parseFloat(currentBal || 0).toFixed(2);
+    document.getElementById('balNewVal').value = '';
+    document.getElementById('balPreview').textContent = 'New balance: $–';
+    document.getElementById('balPreview').style.color = 'var(--text-muted)';
+    // Reset to 'set' tab
+    balMode = 'set';
+    switchBalTab('set');
+    document.getElementById('balanceModal').classList.add('open');
+    // Attach live preview listener
+    document.getElementById('balNewVal').oninput = updateBalPreview;
+}
+
+async function saveBalance() {
+    if (!currentBalUser) return;
+    const inputVal = parseFloat(document.getElementById('balNewVal').value);
+    if (isNaN(inputVal) || inputVal < 0) { toast('❌ Enter a valid amount (≥ 0)', 'error'); return; }
+    const oldBal = currentBalUser.currentBal;
+    const newBal = balMode === 'set'
+        ? parseFloat(inputVal.toFixed(2))
+        : parseFloat((oldBal + inputVal).toFixed(2));
+    try {
+        const batch = db.batch();
+        batch.update(db.collection('users').doc(currentBalUser.uid), {
+            balance: newBal,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        batch.set(db.collection('balanceAdjustments').doc(), {
+            userId: currentBalUser.uid,
+            userPhone: currentBalUser.phone,
+            previousBalance: oldBal,
+            newBalance: newBal,
+            mode: balMode,
+            inputAmount: inputVal,
+            adjustedBy: auth.currentUser?.email || 'admin',
+            adjustedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        await batch.commit();
+        const msg = balMode === 'set'
+            ? `✅ Balance set to $${newBal.toFixed(2)}`
+            : `✅ $${inputVal.toFixed(2)} added → New balance: $${newBal.toFixed(2)}`;
+        toast(msg);
+        document.getElementById('balanceModal').classList.remove('open');
+        currentBalUser = null;
+        if (currentPage === 'users') loadUsers();
+        else if (currentPage === 'phases') loadPhaseUsers();
+    } catch(e) { toast('❌ Error: ' + e.message, 'error'); }
+}
+
+// ── CREDIT SCORE MODAL ──
+function openCreditModal(uid, phone, currentCredit) {
+    currentCreditUser = { uid, phone, currentCredit: parseInt(currentCredit || 100) };
+    document.getElementById('creditModalSub').textContent = 'Editing credit score for: ' + phone;
+    document.getElementById('creditCurrentVal').textContent = currentCredit;
+    document.getElementById('creditNewVal').value = currentCredit;
+    document.getElementById('creditModal').classList.add('open');
+}
+
+async function saveCreditScore() {
+    if (!currentCreditUser) return;
+    const newScore = parseInt(document.getElementById('creditNewVal').value);
+    if (isNaN(newScore) || newScore < 0 || newScore > 100) {
+        toast('❌ Credit score must be between 0 and 100', 'error'); return;
+    }
+    try {
+        await db.collection('users').doc(currentCreditUser.uid).update({
+            creditScore: newScore,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        toast('✅ Credit score updated to ' + newScore + ' for ' + currentCreditUser.phone);
+        document.getElementById('creditModal').classList.remove('open');
+        currentCreditUser = null;
+        if (currentPage === 'users') loadUsers();
+    } catch(e) { toast('❌ Error: ' + e.message, 'error'); }
+}
+async function loadReferrals() {
+    document.getElementById('referralsTable').innerHTML = '<div class="loader"><i class="fas fa-spinner spin"></i> Loading...</div>';
+    try {
+        const snap = await db.collection('referrals').orderBy('createdAt','desc').get();
+        if (snap.empty) {
+            document.getElementById('referralsTable').innerHTML = '<div class="empty-state"><i class="fas fa-network-wired"></i><p>No referrals yet</p></div>';
+            return;
+        }
+        const rows = snap.docs.map(d => {
+            const r = d.data();
+            const date = r.createdAt ? new Date(r.createdAt.seconds * 1000).toLocaleDateString() : '–';
+            return `<tr>
+                <td class="phone-mask">${esc(r.referrerPhone||'–')}</td>
+                <td><code style="font-size:12px;background:#f3f4f6;padding:2px 6px;border-radius:4px;">${esc(r.referrerCode||'–')}</code></td>
+                <td class="phone-mask">${esc(r.newUserPhone||'–')}</td>
+                <td style="font-size:12px;color:var(--text-muted);">${date}</td>
+            </tr>`;
+        }).join('');
+        document.getElementById('referralsTable').innerHTML = `
+            <table>
+                <tr><th>Referrer Phone</th><th>Code</th><th>New User Phone</th><th>Date</th></tr>
+                ${rows}
+            </table>`;
+    } catch(e) {
+        document.getElementById('referralsTable').innerHTML = '<div class="empty-state"><p>Error: ' + esc(e.message) + '</p></div>';
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// PHASE MANAGEMENT
+// ══════════════════════════════════════════════════════════════
+async function loadPhaseManagement() {
+    await Promise.all([loadAllPhaseConfigs(), loadPhaseUsers(), loadOrderLogs()]);
+}
+
+async function loadAllPhaseConfigs() {
+    for (let p = 1; p <= 3; p++) {
+        try {
+            const doc = await db.collection('phaseConfigs').doc('phase' + p).get();
+            phaseConfigs[p] = doc.exists
+                ? { ...DEFAULT_PHASE_CONFIGS[p], ...doc.data() }
+                : { ...DEFAULT_PHASE_CONFIGS[p] };
+        } catch(e) {
+            phaseConfigs[p] = { ...DEFAULT_PHASE_CONFIGS[p] };
+        }
+        renderPhaseConfigCard(p);
+    }
+}
+
+function renderPhaseConfigCard(p) {
+    const cfg = phaseConfigs[p];
+    if (!cfg) return;
+    const el = document.getElementById('phaseConfig' + p + 'Display');
+    if (!el) return;
+    const bp = Array.isArray(cfg.bonusPositions) ? cfg.bonusPositions.join(', ') : '–';
+    el.innerHTML = `
+        <div class="phase-config-body">
+            <div>📋 Orders: <b>${cfg.totalOrders}</b></div>
+            <div>⭐ Lucky Positions: <b style="color:#d97706;">#${bp}</b></div>
+            <div>💰 Base Rate: <b style="color:var(--teal);">${(cfg.baseRate * 100).toFixed(1)}%</b></div>
+            ${cfg.bonusType === 'rate'
+                ? `<div>🎯 Bonus ≥$100: <b>${((cfg.bonusRateFor100||0) * 100).toFixed(0)}%</b></div>
+                   <div>🎯 Bonus ≥$200: <b>${((cfg.bonusRateFor200||0) * 100).toFixed(0)}%</b></div>`
+                : `<div>⚡ Lucky Multiplier: <b>${cfg.bonusMultiplier || 2}× prev amount</b></div>`}
+        </div>
+        <div style="padding:0 16px 14px;">
+            <button class="btn btn-ghost btn-sm" style="width:100%;" onclick="openPhaseEdit(${p})">
+                <i class="fas fa-cog"></i> Configure Phase ${p}
+            </button>
+        </div>`;
+}
+
+function openPhaseEdit(p) {
+    editingPhaseNum = p;
+    const cfg = phaseConfigs[p] || DEFAULT_PHASE_CONFIGS[p];
+    const names = { 1:'Training Phase', 2:'First Deposit Phase', 3:'Second Deposit Phase' };
+    document.getElementById('phaseEditTitle').textContent = '⚙️ Configure Phase ' + p;
+    document.getElementById('phaseEditSub').textContent = names[p];
+    document.getElementById('peTotal').value = cfg.totalOrders || '';
+    document.getElementById('peBaseRate').value = ((cfg.baseRate || 0) * 100).toFixed(1);
+    document.getElementById('peBonusPos').value = Array.isArray(cfg.bonusPositions) ? cfg.bonusPositions.join(',') : '';
+
+    const isRate = cfg.bonusType !== 'amount';
+    document.getElementById('peBonusRateWrap').style.display = isRate ? 'block' : 'none';
+    document.getElementById('peBonusRate200Wrap').style.display = isRate ? 'block' : 'none';
+    document.getElementById('peBonusMultiWrap').style.display = isRate ? 'none' : 'block';
+
+    if (isRate) {
+        document.getElementById('peBonusRate100').value = ((cfg.bonusRateFor100 || 0) * 100).toFixed(0);
+        document.getElementById('peBonusRate200').value = ((cfg.bonusRateFor200 || 0) * 100).toFixed(0);
+    } else {
+        document.getElementById('peBonusMulti').value = cfg.bonusMultiplier || 2;
+    }
+    document.getElementById('phaseEditModal').classList.add('open');
+    updatePhaseCalcPreview();
+}
+
+function closePhaseEditModal() {
+    document.getElementById('phaseEditModal').classList.remove('open');
+}
+
+function updatePhaseCalcPreview() {
+    const p = editingPhaseNum;
+    const preview = document.getElementById('phaseCalcPreview');
+    const previewContent = document.getElementById('phaseCalcPreviewContent');
+    if (!preview) return;
+    const total = parseInt(document.getElementById('peTotal').value) || 0;
+    const baseRate = parseFloat(document.getElementById('peBaseRate').value) || 0;
+    const bonusPositions = (document.getElementById('peBonusPos').value||'').split(',').map(s=>parseInt(s.trim())).filter(n=>!isNaN(n));
+    const samplePrice = 100;
+    const baseComm = (samplePrice * baseRate / 100).toFixed(2);
+    let bonusNote = '';
+    if (p === 3) {
+        const mult = parseFloat(document.getElementById('peBonusMulti').value) || 2;
+        bonusNote = `Lucky Order: $${samplePrice} × ${mult} = $${(samplePrice*mult).toFixed(2)} → commission $${(samplePrice*mult*baseRate/100).toFixed(2)} (${baseRate}%)`;
+    } else {
+        const r100 = parseFloat(document.getElementById('peBonusRate100').value) || 0;
+        const r200 = parseFloat(document.getElementById('peBonusRate200').value) || 0;
+        bonusNote = `Lucky Order (≥$100 deposit): $${(samplePrice*r100/100).toFixed(2)} (${r100}%) | Lucky (≥$200): $${(samplePrice*r200/100).toFixed(2)} (${r200}%)`;
+    }
+    previewContent.innerHTML = `
+        Sample product price: <b>$${samplePrice}</b> | 
+        Base commission: <b>$${baseComm}</b> (${baseRate}%) | 
+        Lucky positions: <b>${bonusPositions.length > 0 ? bonusPositions.join(', ') : 'none'}</b><br>
+        ${bonusNote}`;
+    preview.style.display = 'block';
+}
+
+async function savePhaseConfig() {
+    const p = editingPhaseNum;
+    const cfg = phaseConfigs[p] || {};
+    const totalOrders = parseInt(document.getElementById('peTotal').value) || cfg.totalOrders;
+    const baseRate = parseFloat(document.getElementById('peBaseRate').value) / 100 || cfg.baseRate;
+
+    const bonusPositions = document.getElementById('peBonusPos').value
+        .split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0);
+
+    // FIX: Validate that all bonus positions are within the totalOrders range
+    const invalidPositions = bonusPositions.filter(pos => pos > totalOrders);
+    if (invalidPositions.length > 0) {
+        toast(`❌ Bonus positions [${invalidPositions.join(', ')}] exceed totalOrders (${totalOrders}). Fix before saving.`, 'error');
+        return;
+    }
+    if (bonusPositions.length === 0 && document.getElementById('peBonusPos').value.trim() !== '') {
+        toast('❌ No valid bonus positions parsed. Use comma-separated numbers, e.g. 5,9', 'error');
+        return;
+    }
+
+    const newCfg = {
+        ...cfg,
+        totalOrders,
+        baseRate,
+        bonusPositions,
+    };
+
+    if (cfg.bonusType !== 'amount') {
+        const rate100 = parseFloat(document.getElementById('peBonusRate100').value) / 100 || cfg.bonusRateFor100;
+        const rate200 = parseFloat(document.getElementById('peBonusRate200').value) / 100 || cfg.bonusRateFor200;
+        newCfg.bonusRateFor100 = rate100;
+        newCfg.bonusRateFor200 = rate200;
+        // FIX: Also save bonusRates as an object so grab_an_order can read it directly
+        newCfg.bonusRates = { 100: rate100, 200: rate200 };
+        newCfg.bonusType = 'rate';
+    } else {
+        newCfg.bonusMultiplier = parseFloat(document.getElementById('peBonusMulti').value) || 2;
+        newCfg.bonusType = 'amount';
+    }
+
+    try {
+        await db.collection('phaseConfigs').doc('phase' + p).set(newCfg, { merge: true });
+        phaseConfigs[p] = newCfg;
+        renderPhaseConfigCard(p);
+        closePhaseEditModal();
+        toast('✅ Phase ' + p + ' config saved!');
+    } catch(e) { toast('❌ Error: ' + e.message, 'error'); }
+}
+
+// ── PHASE USERS TABLE ──
+async function loadPhaseUsers() {
+    document.getElementById('phaseUsersTable').innerHTML = '<div class="loader"><i class="fas fa-spinner spin"></i> Loading users...</div>';
+    try {
+        const snap = await db.collection('users').orderBy('createdAt','desc').get();
+        allPhaseUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderPhaseUsersTable(allPhaseUsers);
+    } catch(e) {
+        document.getElementById('phaseUsersTable').innerHTML = '<div class="empty-state"><p>Error: ' + esc(e.message) + '</p></div>';
+    }
+}
+
+function filterPhaseUsers() {
+    const q = document.getElementById('phaseUserSearch').value.toLowerCase();
+    const filtered = q ? allPhaseUsers.filter(u => (u.phone||'').includes(q) || (u.inviteCode||'').toLowerCase().includes(q)) : allPhaseUsers;
+    renderPhaseUsersTable(filtered);
+}
+
+function renderPhaseUsersTable(users) {
+    if (!users.length) {
+        document.getElementById('phaseUsersTable').innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div>';
+        return;
+    }
+    const phaseColors = { 1:'#0bb1b3', 2:'#667eea', 3:'#f59e0b' };
+    const rows = users.map(u => {
+        // FIX: Support both 'currentPhase' (new) and 'phase' (legacy) field names
+        const p = parseInt(u.currentPhase || u.phase || 1);
+        const color = phaseColors[p] || '#6b7280';
+        const cfg = DEFAULT_PHASE_CONFIGS[p];
+        const totalForPhase = cfg ? cfg.totalOrders : '?';
+        const deposit = parseFloat(u.firstDepositAmount || 0);
+        return `<tr>
+            <td class="phone-mask">${esc(u.phone||'–')}</td>
+            <td><span style="background:${color}20;color:${color};font-weight:700;font-size:12px;padding:3px 10px;border-radius:20px;">Phase ${p}</span></td>
+            <td>${u.phaseOrdersCompleted || 0} / ${totalForPhase}</td>
+            <td class="text-success fw7">$${parseFloat(u.balance||0).toFixed(2)}</td>
+            <td style="color:var(--text-muted);">$${parseFloat(u.totalEarned||0).toFixed(2)}</td>
+            <td style="color:var(--teal);font-weight:600;">$${deposit.toFixed(2)}</td>
+            <td>
+                <button class="btn btn-primary btn-sm" onclick="openUserPhaseModal('${u.id}','${esc(u.phone||'')}',${p})">
+                    <i class="fas fa-layer-group"></i> Phase
+                </button>
+                <button class="btn btn-ghost btn-sm" style="margin-left:4px;" onclick="openBalanceModal('${u.id}','${esc(u.phone||'')}',${parseFloat(u.balance||0)})">
+                    <i class="fas fa-edit"></i> Bal
+                </button>
+                <button class="btn btn-ghost btn-sm" style="margin-left:4px;" onclick="viewUserOrderLog('${u.id}')">
+                    <i class="fas fa-list"></i> Logs
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+    document.getElementById('phaseUsersTable').innerHTML = `
+        <table>
+            <tr><th>Phone</th><th>Phase</th><th>Orders Done</th><th>Balance</th><th>Total Earned</th><th>Deposit Amount</th><th>Actions</th></tr>
+            ${rows}
+        </table>`;
+}
+
+function openUserPhaseModal(uid, phone, currentPhase) {
+    editingUserPhase = { uid, phone, currentPhase };
+    document.getElementById('upmSub').textContent = 'User: ' + phone;
+    document.getElementById('upmCurrentPhase').textContent = 'Phase ' + currentPhase;
+    document.getElementById('upmPhaseSelect').value = String(currentPhase);
+    document.getElementById('upmDepositAmount').value = '';
+    document.getElementById('upmResetOrders').value = 'yes';
+    document.getElementById('userPhaseModal').classList.add('open');
+}
+
+async function saveUserPhase() {
+    if (!editingUserPhase) return;
+    const { uid, phone } = editingUserPhase;
+    const newPhase = parseInt(document.getElementById('upmPhaseSelect').value);
+    const depositAmount = parseFloat(document.getElementById('upmDepositAmount').value) || 0;
+    const resetOrders = document.getElementById('upmResetOrders').value === 'yes';
+
+    // Write both field names for compatibility
+    const updateData = {
+        currentPhase: newPhase,
+        phase: newPhase,
+        phaseAssignedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    if (resetOrders) {
+        updateData.phaseOrdersCompleted = 0;
+        updateData.lastOrderAmount = 0;
+        // FIX: Write phaseResetAt so grab_an_order only counts orders AFTER this point.
+        // Without this, cross-validation in loadOrders() would restore the old count.
+        updateData.phaseResetAt = firebase.firestore.FieldValue.serverTimestamp();
+    }
+
+    // FIX: Store deposit amount per phase so Phase 2 and Phase 3 don't clobber Phase 1's amount
+    if (depositAmount > 0) {
+        updateData.firstDepositAmount = depositAmount; // used by Phase 1 & 2 bonus rate calc
+        // Track per-phase deposit separately for auditing
+        updateData['depositAmountPhase' + newPhase] = depositAmount;
+    }
+
+    try {
+        await db.collection('users').doc(uid).update(updateData);
+        const resetNote = resetOrders ? ' (orders reset, history preserved in logs)' : '';
+        const depositNote = depositAmount > 0 ? ` | Deposit: $${depositAmount.toFixed(2)}` : '';
+        toast('✅ ' + phone + ' → Phase ' + newPhase + resetNote + depositNote);
+        document.getElementById('userPhaseModal').classList.remove('open');
+        editingUserPhase = null;
+        loadPhaseUsers();
+    } catch(e) { toast('❌ Error: ' + e.message, 'error'); }
+}
+
+async function viewUserOrderLog(uid) {
+    try {
+        const snap = await db.collection('orderLogs')
+            .where('userId', '==', uid)
+            .orderBy('timestamp', 'desc')
+            .limit(30)
+            .get();
+        if (snap.empty) { toast('No orders found for this user.'); return; }
+        const rows = snap.docs.map(d => {
+            const o = d.data();
+            const ts = o.timestamp ? new Date(o.timestamp.seconds * 1000).toLocaleDateString() : '–';
+            return `<tr>
+                <td><span style="background:${o.phase===1?'#e0f7f7':o.phase===2?'#ede9fe':'#fef3c7'};color:${o.phase===1?'#0bb1b3':o.phase===2?'#7c3aed':'#d97706'};font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;">Phase ${o.phase||'–'}</span></td>
+                <td>#${o.orderNumber||'–'}</td>
+                <td>${o.isBonus ? '<span style="color:#d97706;font-weight:700;">⭐ Lucky</span>' : 'Regular'}</td>
+                <td>$${parseFloat(o.orderAmount||0).toFixed(2)}</td>
+                <td>${((o.commissionRate||0)*100).toFixed(0)}%</td>
+                <td class="text-success fw7">+$${parseFloat(o.commission||0).toFixed(2)}</td>
+                <td><span class="badge badge-${o.status==='completed'?'approved':'pending'}">${o.status}</span></td>
+                <td style="font-size:11px;color:var(--text-muted);">${ts}</td>
+                <td style="font-size:10px;color:var(--text-muted);max-width:200px;overflow:hidden;text-overflow:ellipsis;">${esc(o.calculationLog||'')}</td>
+            </tr>`;
+        }).join('');
+        document.getElementById('orderLogsTable').innerHTML = `
+            <div style="padding:12px 18px 8px;font-size:13px;font-weight:700;color:var(--primary);">Showing logs for user: <span class="phone-mask">${uid.slice(0,12)}…</span></div>
+            <table>
+                <tr><th>Phase</th><th>Order#</th><th>Type</th><th>Amount</th><th>Rate</th><th>Commission</th><th>Status</th><th>Date</th><th>Calculation Log</th></tr>
+                ${rows}
+            </table>`;
+        // Show phases tab and scroll to logs
+        const phasesBtn = Array.from(document.querySelectorAll('.sidebar-item')).find(b => b.textContent.includes('Phase'));
+        showPage('phases', phasesBtn);
+        setTimeout(() => document.getElementById('orderLogsTable').scrollIntoView({ behavior:'smooth' }), 100);
+    } catch(e) { toast('❌ Error: ' + e.message, 'error'); }
+}
+
+async function loadOrderLogs() {
+    document.getElementById('orderLogsTable').innerHTML = '<div class="loader"><i class="fas fa-spinner spin"></i> Loading...</div>';
+    try {
+        const snap = await db.collection('orderLogs').orderBy('timestamp','desc').limit(50).get();
+        if (snap.empty) {
+            document.getElementById('orderLogsTable').innerHTML = '<div class="empty-state"><i class="fas fa-list"></i><p>No order logs yet</p></div>';
+            return;
+        }
+        const rows = snap.docs.map(d => {
+            const o = d.data();
+            const ts = o.timestamp ? new Date(o.timestamp.seconds * 1000).toLocaleString() : '–';
+            return `<tr>
+                <td class="phone-mask">${esc(o.userPhone||'–')}</td>
+                <td><span style="background:${o.phase===1?'#e0f7f7':o.phase===2?'#ede9fe':'#fef3c7'};color:${o.phase===1?'#0bb1b3':o.phase===2?'#7c3aed':'#d97706'};font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;">Phase ${o.phase||'–'}</span></td>
+                <td>#${o.orderNumber||'–'}</td>
+                <td>${o.isBonus ? '<span style="color:#d97706;font-weight:700;">⭐ Lucky</span>' : 'Regular'}</td>
+                <td>$${parseFloat(o.orderAmount||0).toFixed(2)}</td>
+                <td>${((o.commissionRate||0)*100).toFixed(0)}%</td>
+                <td class="text-success fw7">+$${parseFloat(o.commission||0).toFixed(2)}</td>
+                <td><span class="badge badge-${o.status==='completed'?'approved':'pending'}">${o.status}</span></td>
+                <td style="font-size:11px;color:var(--text-muted);">${ts}</td>
+            </tr>`;
+        }).join('');
+        document.getElementById('orderLogsTable').innerHTML = `
+            <table>
+                <tr><th>User</th><th>Phase</th><th>Order#</th><th>Type</th><th>Amount</th><th>Rate</th><th>Commission</th><th>Status</th><th>Time</th></tr>
+                ${rows}
+            </table>`;
+    } catch(e) {
+        document.getElementById('orderLogsTable').innerHTML = '<div class="empty-state"><p>Error: ' + esc(e.message) + '</p></div>';
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// LIVE CHAT
+// ══════════════════════════════════════════════════════════════
+function loadChatConversations() {
+    const list = document.getElementById('chatConvoList');
+    list.innerHTML = '<div class="loader"><i class="fas fa-spinner spin"></i> Loading...</div>';
+    // FIX: Unsubscribe any existing listener before attaching a new one
+    if (chatConvoUnsubscribe) { chatConvoUnsubscribe(); chatConvoUnsubscribe = null; }
+    chatConvoUnsubscribe = db.collection('chats').orderBy('lastMessageTime','desc')
+        .onSnapshot(snap => {
+            allChats = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderChatList(allChats);
+        }, err => {
+            list.innerHTML = '<div class="empty-state"><p>Error: ' + esc(err.message) + '</p></div>';
+        });
+}
+
+function renderChatList(chats) {
+    const list = document.getElementById('chatConvoList');
+    if (!chats.length) {
+        list.innerHTML = '<div style="text-align:center;padding:30px 10px;color:var(--text-muted);font-size:13px;"><i class="fas fa-comments" style="font-size:32px;opacity:.3;display:block;margin-bottom:8px;"></i>No conversations yet</div>';
+        return;
+    }
+    list.innerHTML = chats.map(c => {
+        const phone = c.userPhone || c.userId?.substring(0,8) || 'User';
+        const initial = phone[0].toUpperCase();
+        const last = c.lastMessage ? esc(c.lastMessage.substring(0,35) + (c.lastMessage.length > 35 ? '…' : '')) : 'No messages';
+        const time = c.lastMessageTime ? new Date(c.lastMessageTime.seconds * 1000).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) : '';
+        const unreadDot = c.hasUnread ? '<span style="width:8px;height:8px;border-radius:50%;background:var(--primary);display:inline-block;margin-left:6px;flex-shrink:0;"></span>' : '';
+        const isActive = activeChatUserId === c.id;
+        return `<div onclick="openChat('${c.id}','${phone.replace(/'/g,"\\'")}')"
+            style="display:flex;align-items:center;gap:10px;padding:12px 10px;border-radius:12px;cursor:pointer;transition:background .15s;${isActive?'background:rgba(102,126,234,.1);':''}"
+            onmouseover="this.style.background='rgba(102,126,234,.08)'" onmouseout="this.style.background='${isActive?'rgba(102,126,234,.1)':'transparent'}'">
+            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:15px;flex-shrink:0;">${initial}</div>
+            <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                    <span style="font-weight:${c.hasUnread?'700':'600'};font-size:13.5px;">${esc(phone)}</span>
+                    <span style="font-size:11px;color:var(--text-muted);">${time}</span>
+                </div>
+                <div style="display:flex;align-items:center;">
+                    <span style="font-size:12px;color:var(--text-muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${last}</span>
+                    ${unreadDot}
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function filterChats() {
+    const q = document.getElementById('chatSearchInp').value.toLowerCase();
+    renderChatList(q ? allChats.filter(c => (c.userPhone||'').toLowerCase().includes(q)) : allChats);
+}
+
+function openChat(userId, phone) {
+    activeChatUserId = userId;
+    document.getElementById('noChatSelected').style.display = 'none';
+    document.getElementById('activeChatArea').style.display = 'flex';
+    document.getElementById('chatWindowUser').textContent = phone;
+    document.getElementById('chatWindowSub').textContent = 'User ID: ' + userId.substring(0,12) + '…';
+    document.getElementById('chatAvatarLetter').textContent = phone[0].toUpperCase();
+    document.getElementById('adminChatMessages').innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:20px;">Loading messages…</div>';
+    db.collection('chats').doc(userId).update({ hasUnread: false }).catch(() => {});
+    if (activeChatListener) { activeChatListener(); activeChatListener = null; }
+    activeChatListener = db.collection('chats').doc(userId)
+        .collection('messages').orderBy('timestamp','asc')
+        .onSnapshot(snap => renderAdminMessages(snap.docs.map(d => ({ id:d.id, ...d.data() }))));
+    renderChatList(allChats);
+}
+
+function renderAdminMessages(msgs) {
+    const container = document.getElementById('adminChatMessages');
+    if (!msgs.length) {
+        container.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:30px;">No messages yet</div>';
+        return;
+    }
+    container.innerHTML = msgs.map(m => {
+        const time = m.timestamp ? new Date(m.timestamp.seconds * 1000).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) : '';
+        const isAgent = m.sender === 'agent';
+        return `<div style="display:flex;flex-direction:column;align-items:${isAgent?'flex-end':'flex-start'};margin-bottom:8px;">
+            <div style="max-width:75%;padding:10px 14px;border-radius:16px;${isAgent?'background:linear-gradient(135deg,#667eea,#764ba2);color:white;border-bottom-right-radius:4px':'background:var(--bg);color:var(--text);border-bottom-left-radius:4px'};font-size:13.5px;line-height:1.5;">${esc(m.text||'')}</div>
+            <div style="font-size:10.5px;color:var(--text-muted);margin-top:3px;">${isAgent?'You (Admin)':'Client'} · ${time}</div>
+        </div>`;
+    }).join('');
+    container.scrollTop = container.scrollHeight;
+}
+
+async function adminSendMsg() {
+    const inp = document.getElementById('adminChatInput');
+    const text = inp.value.trim();
+    if (!text || !activeChatUserId) return;
+    inp.value = '';
+    try {
+        await db.collection('chats').doc(activeChatUserId).collection('messages').add({
+            text, sender: 'agent',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(), read: true
+        });
+        await db.collection('chats').doc(activeChatUserId).update({
+            lastMessage: text,
+            lastMessageTime: firebase.firestore.FieldValue.serverTimestamp(),
+            hasUnread: false
+        });
+    } catch(e) { toast('❌ Failed to send: ' + e.message, 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════════════════════════════
+function toast(msg, type = 'success') {
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast-msg';
+    t.style.background = type === 'error' ? '#dc2626' : type === 'warning' ? '#d97706' : '#1f2937';
+    t.innerHTML = `<span>${esc(msg)}</span><span class="toast-close" onclick="this.parentElement.remove()">✕</span><div class="toast-progress"></div>`;
+    c.appendChild(t);
+    t.addEventListener('click', e => { if (!e.target.classList.contains('toast-close')) return; t.remove(); });
+    setTimeout(() => {
+        t.style.animation = 'toastOut 0.3s ease forwards';
+        setTimeout(() => t.remove(), 300);
+    }, 4000);
+}
+
+function esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Close modals on backdrop click
+document.getElementById('actionModal').addEventListener('click', e => { if (e.target === document.getElementById('actionModal')) closeModal(); });
+document.getElementById('phaseEditModal').addEventListener('click', e => { if (e.target === document.getElementById('phaseEditModal')) closePhaseEditModal(); });
+document.getElementById('userPhaseModal').addEventListener('click', e => { if (e.target === document.getElementById('userPhaseModal')) document.getElementById('userPhaseModal').classList.remove('open'); });
+document.getElementById('balanceModal').addEventListener('click', e => { if (e.target === document.getElementById('balanceModal')) document.getElementById('balanceModal').classList.remove('open'); });
+document.getElementById('creditModal').addEventListener('click', e => { if (e.target === document.getElementById('creditModal')) document.getElementById('creditModal').classList.remove('open'); });
+document.getElementById('agentModal').addEventListener('click', e => { if (e.target === document.getElementById('agentModal')) document.getElementById('agentModal').classList.remove('open'); });
+document.getElementById('clientModal').addEventListener('click', e => { if (e.target === document.getElementById('clientModal')) document.getElementById('clientModal').classList.remove('open'); });
+document.getElementById('changePasswordModal').addEventListener('click', e => { if (e.target === document.getElementById('changePasswordModal')) closeChangePasswordModal(); });
+document.getElementById('frozenModal').addEventListener('click', e => { if (e.target === document.getElementById('frozenModal')) document.getElementById('frozenModal').classList.remove('open'); });
+
+// ══════════════════════════════════════════════════════════════
+// SIDEBAR COLLAPSE & MOBILE TOGGLE
+// ══════════════════════════════════════════════════════════════
+function toggleSidebar() {
+    document.body.classList.toggle('sidebar-collapsed');
+    try { localStorage.setItem('sidebarCollapsed', document.body.classList.contains('sidebar-collapsed')); } catch(e) {}
+}
+
+function openMobileSidebar() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sidebarOverlay').classList.add('open');
+}
+
+function closeMobileSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+// Restore sidebar state
+try { if (localStorage.getItem('sidebarCollapsed') === 'true') document.body.classList.add('sidebar-collapsed'); } catch(e) {}
+
+// ══════════════════════════════════════════════════════════════
+// TOPBAR PENDING BADGE
+// ══════════════════════════════════════════════════════════════
+function updateTopbarPending() {
+    const rBadge = document.getElementById('rechargeBadge');
+    const wBadge = document.getElementById('withdrawalBadge');
+    const rCount = parseInt(rBadge?.textContent || 0);
+    const wCount = parseInt(wBadge?.textContent || 0);
+    const total = rCount + wCount;
+    const el = document.getElementById('topbarPendingBadge');
+    const countEl = document.getElementById('topbarPendingCount');
+    if (!el) return;
+    if (total > 0) {
+        el.style.display = 'flex';
+        countEl.textContent = total;
+        el.className = 'topbar-pending' + (total >= 5 ? ' has-urgent' : '');
+    } else {
+        el.style.display = 'none';
+    }
+}
+
+let _pendingPage = 'recharge';
+function goToPendingPage() {
+    const rCount = parseInt(document.getElementById('rechargeBadge')?.textContent || 0);
+    const wCount = parseInt(document.getElementById('withdrawalBadge')?.textContent || 0);
+    // Navigate to whichever has more pending
+    const target = rCount >= wCount ? 'recharge' : 'withdrawal';
+    const btn = Array.from(document.querySelectorAll('.sidebar-item')).find(b => b.textContent.includes(target === 'recharge' ? 'Recharge' : 'Withdrawal'));
+    showPage(target, btn);
+}
+
+// ══════════════════════════════════════════════════════════════
+// SEARCH RECHARGE / WITHDRAWAL
+// ══════════════════════════════════════════════════════════════
+let currentRechargeFilter = 'all';
+let currentWithdrawalFilter = 'all';
+
+function searchRecharge() {
+    const q = document.getElementById('rechargeSearch')?.value.toLowerCase() || '';
+    let base = currentRechargeFilter === 'all' ? allRecharge : allRecharge.filter(r => r.status === currentRechargeFilter);
+    if (q) base = base.filter(r => (r.userPhone||'').toLowerCase().includes(q));
+    renderRechargeTable(base);
+}
+
+function searchWithdrawal() {
+    const q = document.getElementById('withdrawalSearch')?.value.toLowerCase() || '';
+    let base = currentWithdrawalFilter === 'all' ? allWithdrawal : allWithdrawal.filter(r => r.status === currentWithdrawalFilter);
+    if (q) base = base.filter(r => (r.userPhone||'').toLowerCase().includes(q));
+    renderWithdrawalTable(base);
+}
+
+// Override filterRequests to also track current filter state and support search
+function filterRequests(type, status, btn) {
+    const allBtns = btn?.closest('.filter-bar')?.querySelectorAll('.filter-tab');
+    allBtns?.forEach(b => b.classList.remove('active'));
+    btn?.classList.add('active');
+    if (type === 'recharge') {
+        currentRechargeFilter = status;
+        const q = document.getElementById('rechargeSearch')?.value.toLowerCase() || '';
+        let base = status === 'all' ? allRecharge : allRecharge.filter(r => r.status === status);
+        if (q) base = base.filter(r => (r.userPhone||'').toLowerCase().includes(q));
+        renderRechargeTable(base);
+    } else {
+        currentWithdrawalFilter = status;
+        const q = document.getElementById('withdrawalSearch')?.value.toLowerCase() || '';
+        let base = status === 'all' ? allWithdrawal : allWithdrawal.filter(r => r.status === status);
+        if (q) base = base.filter(r => (r.userPhone||'').toLowerCase().includes(q));
+        renderWithdrawalTable(base);
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// AGENT TAGS (A01 – A09+)   — stored as agentTag in Firestore
+// ══════════════════════════════════════════════════════════════
+const AGENT_TAGS = ['A01','A02','A03','A04','A05','A06','A07','A08','A09','A10'];
+var selectedAgentTag = '';
+var currentAgentUser = null;
+
+function openAgentModal(uid, phone, currentTag) {
+    currentAgentUser = { uid, phone };
+    selectedAgentTag = currentTag || '';
+    document.getElementById('agentModalSub').textContent = 'Agent assignment for: ' + phone;
+    document.getElementById('agentGrid').innerHTML = AGENT_TAGS.map(tag => `
+        <div class="tag-opt${selectedAgentTag === tag ? ' sel-agent' : ''}" onclick="selectAgentTag('${tag}',this)">
+            <div class="tag-opt-code">${tag}</div>
+            <div class="tag-opt-label">Agent ${tag.replace('A','')}</div>
+        </div>
+    `).join('');
+    document.getElementById('agentModal').classList.add('open');
+}
+
+function selectAgentTag(tag, el) {
+    document.querySelectorAll('#agentGrid .tag-opt').forEach(o => o.classList.remove('sel-agent'));
+    el.classList.add('sel-agent');
+    selectedAgentTag = tag;
+}
+
+async function saveAgentTag(tag) {
+    if (!currentAgentUser) return;
+    try {
+        const updateData = { agentTag: tag || firebase.firestore.FieldValue.delete() };
+        await db.collection('users').doc(currentAgentUser.uid).update(updateData);
+        toast(tag ? `✅ ${currentAgentUser.phone} assigned to Agent ${tag}` : `✅ Agent tag removed from ${currentAgentUser.phone}`);
+        document.getElementById('agentModal').classList.remove('open');
+        currentAgentUser = null; selectedAgentTag = '';
+        if (currentPage === 'users') loadUsers();
+    } catch(e) { toast('❌ Error: ' + e.message, 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// CLIENT TYPE (Real / Fake)  — stored as clientType in Firestore
+// ══════════════════════════════════════════════════════════════
+var selectedClientType = '';
+var currentClientUser = null;
+
+function openClientModal(uid, phone, currentType) {
+    currentClientUser = { uid, phone };
+    selectedClientType = currentType || '';
+    document.getElementById('clientModalSub').textContent = 'Client classification for: ' + phone;
+    // Reset styles
+    document.getElementById('clientOptReal').classList.remove('sel-real');
+    document.getElementById('clientOptFake').classList.remove('sel-fake');
+    if (currentType === 'Real') document.getElementById('clientOptReal').classList.add('sel-real');
+    if (currentType === 'Fake') document.getElementById('clientOptFake').classList.add('sel-fake');
+    document.getElementById('clientModal').classList.add('open');
+}
+
+function selectClientType(type, el) {
+    document.querySelectorAll('#clientGrid .tag-opt').forEach(o => o.classList.remove('sel-real','sel-fake'));
+    el.classList.add(type === 'Real' ? 'sel-real' : 'sel-fake');
+    selectedClientType = type;
+}
+
+async function saveClientType(type) {
+    if (!currentClientUser) return;
+    try {
+        const updateData = { clientType: type || firebase.firestore.FieldValue.delete() };
+        await db.collection('users').doc(currentClientUser.uid).update(updateData);
+        toast(type ? `✅ ${currentClientUser.phone} marked as ${type}` : `✅ Client type removed from ${currentClientUser.phone}`);
+        document.getElementById('clientModal').classList.remove('open');
+        currentClientUser = null; selectedClientType = '';
+        if (currentPage === 'users') loadUsers();
+    } catch(e) { toast('❌ Error: ' + e.message, 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// CHANGE USER PASSWORD
+// ──────────────────────────────────────────────────────────────
+// REQUIRES this Cloud Function deployed in Firebase:
+//
+// exports.adminChangePassword = functions.https.onCall(async (data, context) => {
+//   const adminDoc = await admin.firestore().collection('admins').doc(context.auth.uid).get();
+//   if (!adminDoc.exists) throw new functions.https.HttpsError('permission-denied', 'Not admin');
+//   await admin.auth().updateUser(data.uid, { password: data.newPassword });
+//   return { success: true };
+// });
+// ══════════════════════════════════════════════════════════════
+var currentCpwUser = null;
+
+function openChangePasswordModal(uid, phone) {
+    currentCpwUser = { uid, phone };
+    document.getElementById('cpwModalSub').textContent = 'Changing password for: ' + phone;
+    document.getElementById('cpwNewVal').value = '';
+    document.getElementById('cpwConfirmVal').value = '';
+    document.getElementById('cpwError').style.display = 'none';
+    document.getElementById('cpwSuccess').style.display = 'none';
+    document.getElementById('pwStrengthBar').style.width = '0%';
+    document.getElementById('pwStrengthLabel').textContent = '';
+    document.getElementById('changePasswordModal').classList.add('open');
+}
+
+function closeChangePasswordModal() {
+    document.getElementById('changePasswordModal').classList.remove('open');
+    currentCpwUser = null;
+}
+
+function toggleCpwVisibility(inputId, btnId) {
+    const inp = document.getElementById(inputId);
+    const btn = document.getElementById(btnId);
+    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+    else { inp.type = 'password'; btn.textContent = '👁️'; }
+}
+
+function updatePwStrength(pw) {
+    const bar = document.getElementById('pwStrengthBar');
+    const lbl = document.getElementById('pwStrengthLabel');
+    let score = 0;
+    if (pw.length >= 6) score++;
+    if (pw.length >= 10) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    const levels = [
+        { w:'0%', c:'#e5e7eb', l:'' },
+        { w:'25%', c:'#ef4444', l:'Weak' },
+        { w:'50%', c:'#f59e0b', l:'Fair' },
+        { w:'75%', c:'#3b82f6', l:'Good' },
+        { w:'100%', c:'#10b981', l:'Strong' }
+    ];
+    const lvl = levels[Math.min(score, 4)];
+    bar.style.width = lvl.w; bar.style.background = lvl.c;
+    lbl.textContent = lvl.l; lbl.style.color = lvl.c;
+}
+
+async function saveNewPassword() {
+    if (!currentCpwUser) return;
+    const pw = document.getElementById('cpwNewVal').value;
+    const confirmPw = document.getElementById('cpwConfirmVal').value;
+    const errEl = document.getElementById('cpwError');
+    const sucEl = document.getElementById('cpwSuccess');
+    errEl.style.display = 'none'; sucEl.style.display = 'none';
+
+    if (!pw || pw.length < 6) {
+        errEl.textContent = '❌ Password must be at least 6 characters.';
+        errEl.style.display = 'block'; return;
+    }
+    if (pw !== confirmPw) {
+        errEl.textContent = '❌ Passwords do not match.';
+        errEl.style.display = 'block'; return;
+    }
+
+    const btn = document.getElementById('cpwSaveBtn');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...';
+
+    try {
+        // ══════════════════════════════════════════════════════
+        // STEP 1: Save new password to Firestore
+        // login.html reads this and blocks login if it doesn't
+        // match — giving you instant control from admin panel.
+        // ══════════════════════════════════════════════════════
+        await db.collection('users').doc(currentCpwUser.uid).update({
+            password: pw,
+            passwordChangedByAdmin: true,
+            passwordChangedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            passwordChangedBy: auth.currentUser?.email || 'admin'
+        });
+
+        // ══════════════════════════════════════════════════════
+        // STEP 2: Also update Firebase Auth via REST API
+        // This syncs Firebase Auth so the user can actually log
+        // in with the new password after Firestore check passes.
+        // Uses the stored old password to get a token first.
+        // ══════════════════════════════════════════════════════
+        try {
+            const apiKey = firebase.app().options.apiKey;
+            const userDoc = await db.collection('users').doc(currentCpwUser.uid).get();
+            const userData = userDoc.data();
+            const oldPassword = userData.oldPassword || userData.registerPassword || null;
+            const fakeEmail = currentCpwUser.phone.replace(/\D/g, '') + '@manifestoshop.app';
+
+            if (oldPassword) {
+                // Sign in as user with old password to get their token
+                const signInResp = await fetch(
+                    `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: fakeEmail, password: oldPassword, returnSecureToken: true })
+                    }
+                );
+                const signInJson = await signInResp.json();
+                if (signInJson.idToken) {
+                    // Update Firebase Auth password using their token
+                    await fetch(
+                        `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${apiKey}`,
+                        {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ idToken: signInJson.idToken, password: pw, returnSecureToken: false })
+                        }
+                    );
+                    // Save new password as old for next time
+                    await db.collection('users').doc(currentCpwUser.uid).update({ oldPassword: pw });
+                }
+            }
+        } catch(syncErr) {
+            // Firebase Auth sync failed — Firestore block still works
+            console.warn('Firebase Auth sync skipped:', syncErr.message);
+        }
+
+        sucEl.innerHTML =
+            '✅ Password changed for <b>' + esc(currentCpwUser.phone) + '</b><br>' +
+            '<span style="font-size:12px;color:#059669;">New password: <b>' + esc(pw) + '</b><br>' +
+            'User will get "Incorrect password" if they type the old one.</span>';
+        sucEl.style.display = 'block';
+        document.getElementById('cpwNewVal').value = '';
+        document.getElementById('cpwConfirmVal').value = '';
+        document.getElementById('pwStrengthBar').style.width = '0%';
+        document.getElementById('pwStrengthLabel').textContent = '';
+        setTimeout(() => closeChangePasswordModal(), 3000);
+
+    } catch(e) {
+        errEl.textContent = '❌ ' + (e.message || 'Failed to update password.');
+        errEl.style.display = 'block';
+    } finally {
+        btn.disabled = false; btn.innerHTML = '<i class="fas fa-key"></i> Change Password';
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// EXPORT USERS CSV
+// ══════════════════════════════════════════════════════════════
+function exportUsersCSV() {
+    if (!allUsers.length) { toast('⚠️ No users to export. Load users first.', 'warning'); return; }
+    const headers = ['Phone', 'Phase', 'Phase Orders', 'Balance', 'Credit Score', 'Invite Code', 'Joined', 'Status'];
+    const rows = allUsers.map(u => {
+        const phase = parseInt(u.currentPhase || u.phase || 1);
+        const date = u.createdAt ? new Date(u.createdAt.seconds * 1000).toLocaleDateString() : '';
+        const status = u.isActive === false ? 'Suspended' : 'Active';
+        return [
+            u.phone || '',
+            'Phase ' + phase,
+            u.phaseOrdersCompleted || 0,
+            parseFloat(u.balance || 0).toFixed(2),
+            u.creditScore !== undefined ? u.creditScore : 100,
+            u.inviteCode || '',
+            date,
+            status
+        ].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',');
+    });
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'manifesto_users_' + new Date().toISOString().split('T')[0] + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('✅ CSV exported: ' + allUsers.length + ' users');
+}
+
+// ══════════════════════════════════════════════════════════════
+// COPY TO CLIPBOARD
+// ══════════════════════════════════════════════════════════════
+function copyText(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+        if (btn) {
+            btn.classList.add('copied');
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.innerHTML = '<i class="fas fa-copy"></i>';
+            }, 2000);
+        }
+        toast('✅ Copied: ' + text);
+    }).catch(() => {
+        // Fallback
+        const el = document.createElement('textarea');
+        el.value = text; el.style.position = 'fixed'; el.style.opacity = '0';
+        document.body.appendChild(el); el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        toast('✅ Copied!');
+    });
+}
+
+// ══════════════════════════════════════════════════════════════
+// FROZEN BALANCE MANAGEMENT
+// ══════════════════════════════════════════════════════════════
+let allFrozenUsers = [];
+let currentFrozenFilter = 'all';
+let currentFrozenUser = null;   // { uid, phone, balance, frozenAmount }
+let currentFrozenTab = 'transfer';
+
+async function loadFrozenBalances() {
+    document.getElementById('frozenTable').innerHTML = '<div class="loader"><i class="fas fa-spinner spin"></i> Loading users...</div>';
+    try {
+        const snap = await db.collection('users').orderBy('createdAt','desc').get();
+        allFrozenUsers = snap.docs.map(d => ({
+            id: d.id,
+            phone: d.data().phone || '–',
+            balance: parseFloat(d.data().balance || 0),
+            frozenAmount: parseFloat(d.data().frozenAmount || 0)
+        }));
+
+        // Summary stats
+        const totalFrz = allFrozenUsers.reduce((s,u) => s + u.frozenAmount, 0);
+        const totalBal = allFrozenUsers.reduce((s,u) => s + u.balance, 0);
+        const frozenUsers = allFrozenUsers.filter(u => u.frozenAmount > 0).length;
+        document.getElementById('frozenTotalAmt').textContent  = '$' + totalFrz.toFixed(2);
+        document.getElementById('frozenTotalBal').textContent  = '$' + totalBal.toFixed(2);
+        document.getElementById('frozenUserCount').textContent = frozenUsers;
+
+        renderFrozenTable(allFrozenUsers);
+    } catch(e) {
+        document.getElementById('frozenTable').innerHTML =
+            '<div class="empty-state"><i class="fas fa-exclamation-circle" style="color:var(--danger)"></i><p>Error: ' + esc(e.message) + '</p>' +
+            '<button class="btn btn-ghost btn-sm" style="margin-top:12px;" onclick="loadFrozenBalances()"><i class="fas fa-sync"></i> Retry</button></div>';
+    }
+}
+
+function filterFrozen(type, btn) {
+    document.querySelectorAll('#page-frozen .filter-tab').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    currentFrozenFilter = type;
+    let base = allFrozenUsers;
+    if (type === 'frozen') base = allFrozenUsers.filter(u => u.frozenAmount > 0);
+    if (type === 'none')   base = allFrozenUsers.filter(u => u.frozenAmount === 0);
+    const q = document.getElementById('frozenSearch').value.toLowerCase();
+    if (q) base = base.filter(u => u.phone.toLowerCase().includes(q));
+    renderFrozenTable(base);
+}
+
+function filterFrozenSearch() {
+    const q = document.getElementById('frozenSearch').value.toLowerCase();
+    let base = allFrozenUsers;
+    if (currentFrozenFilter === 'frozen') base = allFrozenUsers.filter(u => u.frozenAmount > 0);
+    if (currentFrozenFilter === 'none')   base = allFrozenUsers.filter(u => u.frozenAmount === 0);
+    if (q) base = base.filter(u => u.phone.toLowerCase().includes(q));
+    renderFrozenTable(base);
+}
+
+function renderFrozenTable(users) {
+    if (!users.length) {
+        document.getElementById('frozenTable').innerHTML =
+            '<div class="empty-state"><i class="fas fa-snowflake"></i><p>No users found</p></div>';
+        const cb = document.getElementById('frozenCountBadge'); if(cb) cb.style.display='none';
+        return;
+    }
+    const cb = document.getElementById('frozenCountBadge');
+    if(cb) { cb.textContent = users.length + ' users'; cb.style.display='inline-flex'; }
+
+    const rows = users.map(u => {
+        const frozenClass = u.frozenAmount > 0 ? 'has-frozen' : '';
+        const frozenDisplay = u.frozenAmount > 0
+            ? `<span class="frozen-badge has-frozen"><i class="fas fa-snowflake" style="font-size:10px;"></i> $${u.frozenAmount.toFixed(2)}</span>`
+            : `<span class="frozen-badge">$0.00</span>`;
+        return `<tr>
+            <td class="phone-mask">${esc(u.phone)}</td>
+            <td class="text-success fw7">$${u.balance.toFixed(2)}</td>
+            <td>${frozenDisplay}</td>
+            <td style="font-weight:700;color:var(--text);">$${(u.balance + u.frozenAmount).toFixed(2)}</td>
+            <td>
+                <button class="btn btn-primary btn-sm" onclick="openFrozenModal('${u.id}','${esc(u.phone)}',${u.balance},${u.frozenAmount},'transfer')" title="Move balance to frozen">
+                    <i class="fas fa-snowflake"></i> Freeze
+                </button>
+                <button class="btn btn-success btn-sm" style="margin-left:4px;" onclick="openFrozenModal('${u.id}','${esc(u.phone)}',${u.balance},${u.frozenAmount},'release')" title="Release frozen back to balance"${u.frozenAmount === 0 ? ' disabled' : ''}>
+                    <i class="fas fa-unlock"></i> Release
+                </button>
+                <button class="btn btn-ghost btn-sm" style="margin-left:4px;" onclick="openFrozenModal('${u.id}','${esc(u.phone)}',${u.balance},${u.frozenAmount},'set')" title="Set frozen amount directly">
+                    <i class="fas fa-pen"></i> Set
+                </button>
+                <button class="btn btn-sm" style="margin-left:4px;background:#f0fdf4;color:#059669;border:1.5px solid #bbf7d0;" onclick="openFrozenModal('${u.id}','${esc(u.phone)}',${u.balance},${u.frozenAmount},'addbal')" title="Add balance to user">
+                    <i class="fas fa-plus-circle"></i> Add Balance
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+
+    document.getElementById('frozenTable').innerHTML = `
+        <div class="table-scroll">
+        <table>
+            <tr>
+                <th>Phone</th>
+                <th>Available Balance</th>
+                <th>Frozen Amount</th>
+                <th>Total (Balance + Frozen)</th>
+                <th>Actions</th>
+            </tr>
+            ${rows}
+        </table></div>`;
+}
+
+function openFrozenModal(uid, phone, balance, frozen, tab) {
+    currentFrozenUser = { uid, phone, balance, frozen };
+    document.getElementById('frozenModalSub').textContent = 'Managing: ' + phone;
+    document.getElementById('frozenModalBal').textContent = '$' + balance.toFixed(2);
+    document.getElementById('frozenModalFrz').textContent = '$' + frozen.toFixed(2);
+    // Clear inputs
+    document.getElementById('frozenTransferAmt').value = '';
+    document.getElementById('frozenReleaseAmt').value  = '';
+    document.getElementById('frozenSetAmt').value      = '';
+    document.getElementById('frozenAddbalAmt').value   = '';
+    // Update previews
+    document.getElementById('frozenTransferPreview').textContent = 'After transfer — Balance: $– | Frozen: $–';
+    document.getElementById('frozenReleasePreview').textContent  = 'After release — Balance: $– | Frozen: $–';
+    document.getElementById('frozenSetPreview').textContent      = 'Frozen will be set to: $–';
+    document.getElementById('frozenAddbalPreview').textContent   = 'After adding — Balance: $– | Frozen: $–';
+    switchFrozenTab(tab || 'transfer');
+    document.getElementById('frozenModal').classList.add('open');
+}
+
+function switchFrozenTab(tab) {
+    tab = tab.toLowerCase();
+    currentFrozenTab = tab;
+    // Deactivate all tabs
+    ['Transfer','Release','Set','Addbal'].forEach(t => {
+        const btn = document.getElementById('ftab' + t);
+        if (btn) btn.classList.remove('active', 'release', 'setdir', 'addbaldir');
+        const panel = document.getElementById('frozenPanel' + t);
+        if (panel) panel.style.display = 'none';
+    });
+    // Activate selected
+    const key = tab.charAt(0).toUpperCase() + tab.slice(1);
+    const activeBtn = document.getElementById('ftab' + key);
+    const activePanel = document.getElementById('frozenPanel' + key);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+        if (tab === 'release') activeBtn.classList.add('release');
+        if (tab === 'set') activeBtn.classList.add('setdir');
+        if (tab === 'addbal') activeBtn.style.background = '#10b981';
+    }
+    if (activePanel) activePanel.style.display = 'block';
+    // Update save button label
+    const labels = {
+        transfer: '<i class="fas fa-snowflake"></i> Freeze Funds',
+        release:  '<i class="fas fa-unlock"></i> Release Funds',
+        set:      '<i class="fas fa-pen"></i> Set Frozen',
+        addbal:   '<i class="fas fa-plus-circle"></i> Add Balance'
+    };
+    document.getElementById('frozenSaveBtn').innerHTML = labels[tab] || '<i class="fas fa-save"></i> Apply';
+    if (tab === 'addbal') {
+        document.getElementById('frozenSaveBtn').style.background = 'linear-gradient(135deg,#10b981,#059669)';
+    } else {
+        document.getElementById('frozenSaveBtn').style.background = '';
+    }
+}
+
+function updateFrozenPreview() {
+    if (!currentFrozenUser) return;
+    const { balance, frozen } = currentFrozenUser;
+    if (currentFrozenTab === 'transfer') {
+        const amt = parseFloat(document.getElementById('frozenTransferAmt').value) || 0;
+        const newBal = balance - amt;
+        const newFrz = frozen + amt;
+        document.getElementById('frozenTransferPreview').textContent =
+            `After freeze — Balance: $${newBal.toFixed(2)}  |  Frozen: $${newFrz.toFixed(2)}`;
+    } else if (currentFrozenTab === 'release') {
+        const amt = parseFloat(document.getElementById('frozenReleaseAmt').value) || 0;
+        const newBal = balance + amt;
+        const newFrz = frozen - amt;
+        document.getElementById('frozenReleasePreview').textContent =
+            `After release — Balance: $${newBal.toFixed(2)}  |  Frozen: $${newFrz.toFixed(2)}`;
+    } else if (currentFrozenTab === 'set') {
+        const amt = parseFloat(document.getElementById('frozenSetAmt').value);
+        document.getElementById('frozenSetPreview').textContent =
+            isNaN(amt) ? 'Frozen will be set to: $–' : `Frozen will be set to: $${amt.toFixed(2)}`;
+    } else if (currentFrozenTab === 'addbal') {
+        const amt = parseFloat(document.getElementById('frozenAddbalAmt').value) || 0;
+        const newBal = balance + amt;
+        document.getElementById('frozenAddbalPreview').textContent =
+            `After adding — Balance: $${newBal.toFixed(2)}  |  Frozen: $${frozen.toFixed(2)}`;
+    }
+}
+
+function setFrozenTransferMax() {
+    if (!currentFrozenUser) return;
+    document.getElementById('frozenTransferAmt').value = currentFrozenUser.balance.toFixed(2);
+    updateFrozenPreview();
+}
+
+function setFrozenReleaseMax() {
+    if (!currentFrozenUser) return;
+    document.getElementById('frozenReleaseAmt').value = currentFrozenUser.frozen.toFixed(2);
+    updateFrozenPreview();
+}
+
+async function saveFrozenBalance() {
+    if (!currentFrozenUser) return;
+    const { uid, phone, balance, frozen } = currentFrozenUser;
+    const btn = document.getElementById('frozenSaveBtn');
+    btn.disabled = true;
+
+    try {
+        let updateData = {};
+
+        if (currentFrozenTab === 'transfer') {
+            const amt = parseFloat(document.getElementById('frozenTransferAmt').value);
+            if (isNaN(amt) || amt <= 0) { toast('⚠️ Enter a valid amount to freeze', 'warning'); btn.disabled=false; return; }
+            if (amt > balance) { toast('❌ Amount exceeds available balance ($' + balance.toFixed(2) + ')', 'error'); btn.disabled=false; return; }
+            updateData = {
+                balance:       parseFloat((balance - amt).toFixed(2)),
+                frozenAmount:  parseFloat((frozen + amt).toFixed(2))
+            };
+            await db.collection('users').doc(uid).update(updateData);
+            toast(`✅ $${amt.toFixed(2)} frozen for ${phone}. Balance: $${updateData.balance.toFixed(2)} | Frozen: $${updateData.frozenAmount.toFixed(2)}`);
+
+        } else if (currentFrozenTab === 'release') {
+            const amt = parseFloat(document.getElementById('frozenReleaseAmt').value);
+            if (isNaN(amt) || amt <= 0) { toast('⚠️ Enter a valid amount to release', 'warning'); btn.disabled=false; return; }
+            if (amt > frozen) { toast('❌ Amount exceeds frozen balance ($' + frozen.toFixed(2) + ')', 'error'); btn.disabled=false; return; }
+            updateData = {
+                balance:       parseFloat((balance + amt).toFixed(2)),
+                frozenAmount:  parseFloat((frozen - amt).toFixed(2))
+            };
+            await db.collection('users').doc(uid).update(updateData);
+            toast(`✅ $${amt.toFixed(2)} released for ${phone}. Balance: $${updateData.balance.toFixed(2)} | Frozen: $${updateData.frozenAmount.toFixed(2)}`);
+
+        } else if (currentFrozenTab === 'set') {
+            const amt = parseFloat(document.getElementById('frozenSetAmt').value);
+            if (isNaN(amt) || amt < 0) { toast('⚠️ Enter a valid frozen amount (0 or more)', 'warning'); btn.disabled=false; return; }
+            if (amt > balance + frozen) { toast('❌ Frozen amount cannot exceed total funds ($' + (balance + frozen).toFixed(2) + ')', 'error'); btn.disabled=false; return; }
+            updateData = { frozenAmount: parseFloat(amt.toFixed(2)) };
+            await db.collection('users').doc(uid).update(updateData);
+            toast(`✅ Frozen balance set to $${amt.toFixed(2)} for ${phone}`);
+
+        } else if (currentFrozenTab === 'addbal') {
+            const amt = parseFloat(document.getElementById('frozenAddbalAmt').value);
+            if (isNaN(amt) || amt <= 0) { toast('⚠️ Enter a valid amount to add', 'warning'); btn.disabled=false; return; }
+            updateData = { balance: parseFloat((balance + amt).toFixed(2)) };
+            await db.collection('users').doc(uid).update(updateData);
+            toast(`✅ $${amt.toFixed(2)} added to ${phone}. New balance: $${updateData.balance.toFixed(2)}`);
+        }
+
+        document.getElementById('frozenModal').classList.remove('open');
+        currentFrozenUser = null;
+        // Reload the page data
+        loadFrozenBalances();
+
+    } catch(e) {
+        toast('❌ Error saving frozen balance: ' + e.message, 'error');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// SETUP INSTRUCTIONS (Run Once in Firebase Console)
+// ══════════════════════════════════════════════════════════════
+// 1. Go to Firebase Console > Authentication > Add user (admin@yourdomain.com)
+// 2. Copy the UID of that user
+// 3. Go to Firestore > Create collection "admins"
+// 4. Add document with that UID as doc ID, field: { email: "admin@...", role: "super" }
+// 5. Refresh — admin access granted!
+</script>
+</body>
+</html>

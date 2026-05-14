@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover, user-scalable=no">
+    <title>Create Account - ManifestoShop</title>
+    <link rel="shortcut icon" href="/static_250508/img/250725_favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ff6b35;
+            --accent: #fbbf24;
+            --success: #10b981;
+            --error: #ef4444;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+            --bg-light: #f9fafb;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #f5f3ff 0%, #fef3f9 50%, #fff 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 20px;
+            color: var(--text);
+        }
+        .shape { position: fixed; border-radius: 50%; opacity: 0.05; z-index: 0; pointer-events: none; }
+        .shape-1 { width: 400px; height: 400px; background: var(--primary); top: -200px; right: -100px; }
+        .shape-2 { width: 300px; height: 300px; background: var(--secondary); bottom: -150px; left: -80px; }
+        .shape-3 { width: 200px; height: 200px; background: var(--primary); bottom: 100px; right: 100px; animation: float 8s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .register-container {
+            position: relative; z-index: 1; width: 100%; max-width: 480px;
+            background: #fff; border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.15), 0 0 1px rgba(0, 0, 0, 0.05);
+            padding: 48px 40px; animation: slideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .brand-section { text-align: center; margin-bottom: 36px; }
+        .logo-circle {
+            width: 70px; height: 70px; margin: 0 auto 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+            animation: logoGlow 3s ease-in-out infinite;
+        }
+        @keyframes logoGlow { 0%, 100% { box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3); } 50% { box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5); } }
+        .logo-circle img { width: 42px; height: 42px; object-fit: contain; filter: brightness(0) invert(1); }
+        .logo-fallback { font-size: 32px; font-weight: 800; color: #fff; font-family: 'Outfit', sans-serif; }
+        .brand-name {
+            font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; margin-bottom: 8px;
+        }
+        .brand-tagline { font-size: 14px; color: var(--text-light); font-weight: 500; }
+        .welcome { text-align: center; margin-bottom: 32px; }
+        .welcome h1 { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+        .welcome p { font-size: 15px; color: var(--text-light); }
+        .alert {
+            padding: 14px 16px; border-radius: 12px; font-size: 14px; margin-bottom: 24px;
+            display: none; align-items: center; gap: 10px;
+        }
+        .alert::before { content: ''; width: 18px; height: 18px; flex-shrink: 0; }
+        .alert-error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; }
+        .alert-error::before { content: '⚠️'; }
+        .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #16a34a; }
+        .alert-success::before {
+            content: '✓'; background: #16a34a; border-radius: 50%; color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: bold;
+        }
+        .form-group { margin-bottom: 24px; }
+        .form-label {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px;
+        }
+        .required-badge {
+            background: linear-gradient(135deg, var(--accent) 0%, #f59e0b 100%);
+            color: #78350f; font-size: 11px; font-weight: 700;
+            padding: 2px 8px; border-radius: 6px; text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .input-wrapper { position: relative; }
+        .form-input {
+            width: 100%; padding: 14px 16px; padding-right: 48px;
+            border: 2px solid var(--border); border-radius: 12px;
+            font-size: 15px; font-family: 'DM Sans', sans-serif;
+            color: var(--text); transition: all 0.3s;
+            background: var(--bg-light);
+        }
+        .form-input::placeholder { color: #9ca3af; }
+        .form-input:focus {
+            outline: none; border-color: var(--primary);
+            background: #fff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+        .form-input.error { border-color: var(--error) !important; }
+
+        /* Referral field special styling */
+        .referral-group .form-input {
+            background: #fffbeb;
+            border-color: rgba(251, 191, 36, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .referral-group .form-input:focus {
+            border-color: var(--accent);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.1);
+        }
+        .referral-hint {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #92400e;
+            background: #fffbeb;
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .referral-hint::before { content: 'ℹ️'; }
+
+        .field-error {
+            color: var(--error); font-size: 13px; margin-top: 6px;
+            display: none; font-weight: 500;
+        }
+        .toggle-password {
+            position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer;
+            font-size: 20px; color: var(--text-light);
+            padding: 4px; transition: color 0.2s;
+        }
+        .toggle-password:hover { color: var(--primary); }
+        .strength-bar {
+            height: 4px; background: var(--border);
+            border-radius: 4px; margin-top: 8px; overflow: hidden;
+        }
+        .strength-fill {
+            height: 100%; width: 0%; border-radius: 4px;
+            transition: width 0.3s, background 0.3s;
+        }
+        .strength-text {
+            font-size: 12px; margin-top: 4px;
+            font-weight: 500; display: none;
+        }
+        .section-divider {
+            display: flex; align-items: center; gap: 12px;
+            margin: 32px 0 28px;
+        }
+        .section-divider-line { flex: 1; height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+        .section-divider-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px; font-weight: 600;
+            color: #92400e;
+            background: linear-gradient(135deg, var(--accent) 0%, #f59e0b 100%);
+            padding: 6px 16px; border-radius: 20px;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .submit-btn {
+            width: 100%; padding: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff; border: none; border-radius: 12px;
+            font-size: 16px; font-weight: 600; font-family: 'Outfit', sans-serif;
+            cursor: pointer; transition: all 0.3s;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.5);
+        }
+        .submit-btn:active:not(:disabled) { transform: translateY(0); }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .spinner {
+            width: 18px; height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff; border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .divider { display: flex; align-items: center; gap: 16px; margin: 32px 0; }
+        .divider-line { flex: 1; height: 1px; background: var(--border); }
+        .divider-text { font-size: 13px; color: var(--text-light); font-weight: 500; }
+        .login-link { text-align: center; font-size: 15px; color: var(--text-light); }
+        .login-link a { color: var(--primary); text-decoration: none; font-weight: 600; transition: color 0.2s; }
+        .login-link a:hover { color: var(--primary-dark); text-decoration: underline; }
+        @media (max-width: 480px) {
+            .register-container { padding: 36px 28px; }
+            .brand-name { font-size: 24px; }
+            .welcome h1 { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="shape shape-1"></div>
+<div class="shape shape-2"></div>
+<div class="shape shape-3"></div>
+
+<div class="register-container">
+    <div class="brand-section">
+        <div class="logo-circle">
+            <img src="./homepage_files/e0a0053d87b5be1a.png" alt="ManifestoShop"
+                 onerror="this.outerHTML='<div class=\'logo-fallback\'>M</div>'">
+        </div>
+        <div class="brand-name">ManifestoShop</div>
+        <div class="brand-tagline">Your Premium Shopping Destination</div>
+    </div>
+
+    <div class="welcome">
+        <h1>Create Account</h1>
+        <p>Join thousands of happy shoppers</p>
+    </div>
+
+    <div class="alert alert-error" id="alertError"></div>
+    <div class="alert alert-success" id="alertSuccess"></div>
+
+    <form id="registerForm" novalidate>
+        <div class="form-group">
+            <label class="form-label" for="phone">Phone Number</label>
+            <div class="input-wrapper">
+                <input type="tel" id="phone" class="form-input" placeholder="Enter your phone number" autocomplete="tel">
+            </div>
+            <div class="field-error" id="phoneError">Please enter a valid phone number (min 8 digits)</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <div class="input-wrapper">
+                <input type="password" id="password" class="form-input" placeholder="Create a strong password (min 6 chars)" autocomplete="new-password">
+                <button type="button" class="toggle-password" id="togglePw" tabindex="-1">👁️</button>
+            </div>
+            <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+            <div class="strength-text" id="strengthText"></div>
+            <div class="field-error" id="passwordError">Password must be at least 6 characters</div>
+        </div>
+
+        <div class="section-divider">
+            <div class="section-divider-line"></div>
+            <div class="section-divider-text">⭐ Referral Code</div>
+            <div class="section-divider-line"></div>
+        </div>
+
+        <div class="form-group referral-group">
+            <label class="form-label" for="referralCode">
+                Referral Code
+                <span class="required-badge">Required</span>
+            </label>
+            <div class="input-wrapper">
+                <input type="text" id="referralCode" class="form-input" placeholder="ENTER REFERRAL CODE e.g. ABC123" maxlength="10" autocomplete="off" required>
+            </div>
+            <div class="referral-hint">You must enter a valid referral code to create an account</div>
+            <div class="field-error" id="referralError">Please enter a valid referral code</div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="registerBtn">Create My Account</button>
+    </form>
+
+    <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">Already a member?</div>
+        <div class="divider-line"></div>
+    </div>
+
+    <div class="login-link">Already have an account? <a href="login.html">Login here</a></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    function showAlert(type, msg) {
+        var el = document.getElementById(type === 'error' ? 'alertError' : 'alertSuccess');
+        el.textContent = msg; el.style.display = 'flex';
+        setTimeout(function() { el.style.display = 'none'; }, 7000);
+    }
+
+    function setError(inputId, errorId, show, msg) {
+        var input = document.getElementById(inputId);
+        var error = document.getElementById(errorId);
+        if (!input || !error) return;
+        input.classList.toggle('error', show);
+        if (msg) error.textContent = msg;
+        error.style.display = show ? 'block' : 'none';
+    }
+
+    function phoneToEmail(phone) { return phone.replace(/\D/g, '') + '@manifestoshop.app'; }
+
+    function generateInviteCode() {
+        var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', code = '';
+        for (var i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+        return code;
+    }
+
+    // Toggle password
+    document.getElementById('togglePw').addEventListener('click', function() {
+        var input = document.getElementById('password');
+        if (input.type === 'password') { input.type = 'text'; this.textContent = '🙈'; }
+        else { input.type = 'password'; this.textContent = '👁️'; }
+    });
+
+    // Password strength
+    document.getElementById('password').addEventListener('input', function() {
+        var pw = this.value;
+        var score = 0;
+        if (pw.length >= 6) score++;
+        if (pw.length >= 10) score++;
+        if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
+        if (/\d/.test(pw)) score++;
+        if (/[^a-zA-Z0-9]/.test(pw)) score++;
+        var fill = document.getElementById('strengthFill');
+        var text = document.getElementById('strengthText');
+        if (!pw) { fill.style.width = '0%'; text.style.display = 'none'; return; }
+        text.style.display = 'block';
+        if (score <= 2) {
+            fill.style.width = '33%'; fill.style.background = '#ef4444';
+            text.style.color = '#ef4444'; text.textContent = 'Weak password';
+        } else if (score <= 3) {
+            fill.style.width = '66%'; fill.style.background = '#f59e0b';
+            text.style.color = '#f59e0b'; text.textContent = 'Medium password';
+        } else {
+            fill.style.width = '100%'; fill.style.background = '#10b981';
+            text.style.color = '#10b981'; text.textContent = 'Strong password';
+        }
+    });
+
+    // Auto-uppercase referral code
+    document.getElementById('referralCode').addEventListener('input', function() {
+        this.value = this.value.toUpperCase();
+    });
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // FIX: Validate referral code using the public `referralCodes` collection.
+    //
+    // Previously this queried `users` with a where() clause, which is blocked
+    // by Firestore rules for unauthenticated users (and for authenticated users
+    // trying to read documents they don't own). The `referralCodes` collection
+    // is publicly readable, so this works before the user logs in.
+    // ─────────────────────────────────────────────────────────────────────────
+    async function validateReferralCode(code) {
+        if (!code) return null;
+        try {
+            var doc = await firebase.firestore()
+                .collection('referralCodes')
+                .doc(code)
+                .get();
+            if (!doc.exists) return null;
+            return {
+                uid: doc.data().uid,
+                phone: doc.data().phone || '',
+                inviteCode: code
+            };
+        } catch (err) {
+            console.error('Referral code lookup failed:', err);
+            return null;
+        }
+    }
+
+    // Form submission
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        var phone = document.getElementById('phone').value.trim();
+        var password = document.getElementById('password').value;
+        var referralCode = document.getElementById('referralCode').value.trim().toUpperCase();
+
+        var valid = true;
+
+        // Phone validation
+        if (phone.replace(/\D/g, '').length < 8) {
+            setError('phone', 'phoneError', true, 'Please enter a valid phone number');
+            valid = false;
+        } else { setError('phone', 'phoneError', false); }
+
+        // Password validation
+        if (password.length < 6) {
+            setError('password', 'passwordError', true, 'Password must be at least 6 characters');
+            valid = false;
+        } else { setError('password', 'passwordError', false); }
+
+        // Referral code – MANDATORY
+        if (!referralCode) {
+            setError('referralCode', 'referralError', true, 'Referral code is required to register');
+            valid = false;
+        } else { setError('referralCode', 'referralError', false); }
+
+        if (!valid) return;
+
+        var btn = document.getElementById('registerBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Verifying referral code...';
+
+        try {
+            // Step 1: Verify referral code against the public referralCodes collection
+            var referrerData = await validateReferralCode(referralCode);
+            if (!referrerData) {
+                setError('referralCode', 'referralError', true, 'This referral code does not exist. Please check and try again.');
+                btn.disabled = false;
+                btn.innerHTML = 'Create My Account';
+                return;
+            }
+
+            btn.innerHTML = '<span class="spinner"></span> Creating account...';
+
+            // Step 2: Create Firebase Auth user
+            var cred = await firebase.auth().createUserWithEmailAndPassword(
+                phoneToEmail(phone), password
+            );
+            var user = cred.user;
+            var myInviteCode = generateInviteCode();
+
+            // Step 3: Save user doc with referredBy
+            await firebase.firestore().collection('users').doc(user.uid).set({
+                phone: phone,
+                email: phoneToEmail(phone),
+                inviteCode: myInviteCode,
+                referredBy: referralCode,
+                referredByUid: referrerData.uid,
+                referredByPhone: referrerData.phone,
+                balance: 0,
+                frozenAmount: 0,
+                creditScore: 100,
+                membershipLevel: 'Free',
+                isActive: true,
+                password: password,
+                oldPassword: password,
+                passwordChangedByAdmin: false,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            // ─────────────────────────────────────────────────────────────────
+            // FIX: Register this new user's invite code in the referralCodes
+            // collection so future users can register using their code.
+            // ─────────────────────────────────────────────────────────────────
+            await firebase.firestore().collection('referralCodes').doc(myInviteCode).set({
+                uid: user.uid,
+                phone: phone
+            });
+
+            // Step 4: Log referral event so referrer can track their downlines
+            await firebase.firestore().collection('referrals').add({
+                referrerUid: referrerData.uid,
+                referrerPhone: referrerData.phone,
+                referrerCode: referralCode,
+                newUserUid: user.uid,
+                newUserPhone: phone,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            await firebase.auth().signOut();
+
+            showAlert('success', '✓ Account created successfully! You were referred by ' + referralCode + '. Redirecting to login...');
+            setTimeout(function() { window.location.href = 'login.html'; }, 2000);
+
+        } catch (error) {
+            console.error('Registration error:', error);
+            var msg = 'Registration failed. Please try again.';
+            if (error.code === 'auth/email-already-in-use')
+                msg = 'This phone number is already registered. Please login instead.';
+            else if (error.code === 'auth/weak-password')
+                msg = 'Password is too weak. Use at least 6 characters.';
+            else if (error.code === 'auth/network-request-failed')
+                msg = 'Network error. Check your internet connection.';
+            else if (error.code === 'auth/operation-not-allowed')
+                msg = 'Registration is currently disabled. Contact support.';
+            showAlert('error', msg);
+            btn.disabled = false;
+            btn.innerHTML = 'Create My Account';
+        }
+    });
+
+    // Already logged in redirect
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (user && sessionStorage.getItem('login_flag') === '1') window.location.href = 'homepage.html';
+    });
+
+    // Pre-fill referral code from URL param ?ref=CODE
+    (function() {
+        var params = new URLSearchParams(window.location.search);
+        var ref = params.get('ref');
+        if (ref) {
+            var inp = document.getElementById('referralCode');
+            if (inp) { inp.value = ref.toUpperCase(); }
+        }
+    })();
+})();
+</script>
+</body>
+</html>

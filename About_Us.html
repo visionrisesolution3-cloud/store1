@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover, user-scalable=no">
+    <title>About Us – ManifestoShop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #764ba2;
+            --primary-grad: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --bg: #f5f6fa;
+            --card-shadow: 0 2px 12px rgba(102,126,234,0.10);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+        .wrapper { max-width: 500px; margin: 0 auto; background: white; min-height: 100vh; }
+
+        .header {
+            background: var(--primary-grad);
+            color: white; padding: 14px 16px;
+            display: flex; align-items: center; gap: 12px;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .back-btn {
+            width: 36px; height: 36px; background: rgba(255,255,255,0.2);
+            border-radius: 10px; border: none; color: white;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 18px; text-decoration: none;
+        }
+        .header-title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 700; }
+
+        .about-hero {
+            background: var(--primary-grad);
+            color: white; padding: 40px 20px 36px; text-align: center;
+        }
+        .hero-icon { font-size: 60px; margin-bottom: 14px; display: block; }
+        .hero-name { font-family: 'Outfit', sans-serif; font-size: 30px; font-weight: 800; margin-bottom: 6px; }
+        .hero-tag { font-size: 14px; opacity: 0.9; }
+
+        .body-wrap { padding: 16px; padding-bottom: 32px; }
+        .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 14px; box-shadow: var(--card-shadow); }
+        .card h3 { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; color: var(--primary-dark); margin-bottom: 10px; }
+        .card p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+        .feature-list { list-style: none; padding: 0; }
+        .feature-list li { padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-muted); }
+        .feature-list li:last-child { border-bottom: none; }
+        .feature-list i { color: #10b981; font-size: 17px; flex-shrink: 0; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 14px; }
+        .stat-card { background: white; border-radius: 16px; padding: 20px; text-align: center; box-shadow: var(--card-shadow); }
+        .stat-num {
+            font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 800;
+            background: var(--primary-grad); -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 4px;
+        }
+        .stat-lbl { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+        .contact-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text-muted); }
+        .contact-row:last-child { border-bottom: none; }
+        .contact-row i { color: var(--primary); font-size: 17px; width: 22px; text-align: center; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="header">
+        <a class="back-btn" href="homepage.html"><i class="fas fa-arrow-left"></i></a>
+        <div class="header-title">About Us</div>
+    </div>
+
+    <div class="about-hero">
+        <span class="hero-icon">🛍️</span>
+        <div class="hero-name">ManifestoShop</div>
+        <div class="hero-tag">Your Premium Shopping Destination</div>
+    </div>
+
+    <div class="body-wrap">
+        <div class="card">
+            <h3>Who We Are</h3>
+            <p>ManifestoShop is a premium digital shopping platform dedicated to bringing you the best products from around the world. Since 2020, we've been committed to making luxury shopping simple, secure, and accessible to everyone — from fashion and beauty to lifestyle and accessories.</p>
+        </div>
+
+        <div class="card">
+            <h3>Our Mission</h3>
+            <p>To revolutionize the way people shop by providing an innovative, secure, and user-friendly marketplace that empowers individuals to discover and purchase premium products with total confidence.</p>
+        </div>
+
+        <div class="card">
+            <h3>Key Features</h3>
+            <ul class="feature-list">
+                <li><i class="fas fa-check-circle"></i> Curated premium product catalog</li>
+                <li><i class="fas fa-check-circle"></i> Bank-level security & encryption</li>
+                <li><i class="fas fa-check-circle"></i> 24/7 customer support</li>
+                <li><i class="fas fa-check-circle"></i> Multi-currency payment support</li>
+                <li><i class="fas fa-check-circle"></i> Fast, secure withdrawals</li>
+                <li><i class="fas fa-check-circle"></i> Mobile & web access</li>
+            </ul>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-num">5M+</div><div class="stat-lbl">Happy Customers</div></div>
+            <div class="stat-card"><div class="stat-num">$2B+</div><div class="stat-lbl">Total Transactions</div></div>
+            <div class="stat-card"><div class="stat-num">150+</div><div class="stat-lbl">Countries Served</div></div>
+            <div class="stat-card"><div class="stat-num">99.9%</div><div class="stat-lbl">Platform Uptime</div></div>
+        </div>
+
+        <div class="card">
+            <h3>Contact Us</h3>
+            <div class="contact-row"><i class="fas fa-envelope"></i> support@manifestoshop.app</div>
+            <div class="contact-row"><i class="fas fa-phone"></i> +1 (800) 123-4567</div>
+            <div class="contact-row"><i class="fas fa-globe"></i> www.manifestoshop.app</div>
+            <div class="contact-row"><i class="fas fa-map-marker-alt"></i> 123 Commerce Avenue, New York, NY 10001</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

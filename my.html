@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover, user-scalable=no">
+    <title>My Account – ManifestoShop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --teal: #0bb1b3;
+            --teal-dark: #089496;
+            --primary-grad: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --danger: #ef4444;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --bg: #f5f6fa;
+            --white: #ffffff;
+            --nav-h: 64px;
+            --dark: #1a1f2e;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        .wrapper {
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--white);
+            min-height: 100vh;
+            box-shadow: 0 0 40px rgba(102,126,234,0.15);
+            position: relative;
+            padding-bottom: calc(var(--nav-h) + 20px);
+        }
+
+        /* ── TOP PROFILE SECTION ── */
+        .profile-header {
+            background: linear-gradient(160deg, var(--dark) 0%, #2a3050 100%);
+            padding: 24px 20px 30px;
+            position: relative;
+        }
+        .profile-top-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .avatar {
+            width: 60px; height: 60px;
+            background: var(--teal);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+            color: white;
+            flex-shrink: 0;
+            border: 3px solid rgba(255,255,255,0.2);
+        }
+        .profile-info { flex: 1; }
+        .profile-phone {
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .badge-free {
+            background: var(--dark);
+            color: #aaa;
+            border: 1px solid #444;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+        .invite-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        .invite-label {
+            color: rgba(255,255,255,0.65);
+            font-size: 13px;
+        }
+        .invite-code {
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .copy-btn {
+            background: #444;
+            color: #ccc;
+            border: none;
+            border-radius: 6px;
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.5px;
+        }
+        .copy-btn:hover { background: var(--teal); color: white; }
+        .credit-row {
+            color: rgba(255,255,255,0.65);
+            font-size: 13px;
+        }
+        .credit-val { color: white; font-weight: 700; }
+
+        /* ── SUPPORT BUTTON ── */
+        .support-btn {
+            position: absolute;
+            top: 16px; right: 16px;
+            width: 38px; height: 38px;
+            background: rgba(255,255,255,0.12);
+            border: 1.5px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 17px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .support-btn:hover { background: var(--teal); border-color: var(--teal); }
+
+        /* ── BALANCE CARD ── */
+        .balance-card {
+            background: var(--teal);
+            margin: 20px 16px 0;
+            border-radius: 18px;
+            padding: 22px 20px;
+            box-shadow: 0 8px 30px rgba(11,177,179,0.35);
+        }
+        .balance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .bal-item {}
+        .bal-item-label {
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        .bal-item-value {
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+        }
+        .balance-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .bal-action-btn {
+            background: var(--dark);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .bal-action-btn:hover { background: #2a3050; transform: translateY(-1px); }
+        .bal-action-btn i { font-size: 14px; }
+
+        /* ── MENU GRID ── */
+        .menu-section {
+            padding: 24px 16px 16px;
+        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+        .menu-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text);
+            padding: 8px 4px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+        .menu-item:hover { background: #f0f9ff; }
+        .menu-icon-circle {
+            width: 58px; height: 58px;
+            background: var(--dark);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white;
+            font-size: 22px;
+            transition: all 0.2s;
+        }
+        .menu-item:hover .menu-icon-circle { background: var(--teal); }
+        .menu-label {
+            font-size: 11.5px;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.3;
+            color: var(--text);
+        }
+
+        /* ── LOGOUT BUTTON ── */
+        .logout-section {
+            padding: 8px 16px 20px;
+        }
+        .logout-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 16px rgba(239,68,68,0.3);
+        }
+        .logout-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(239,68,68,0.45); }
+
+        /* ── BOTTOM NAV ── */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 100%; max-width: 500px;
+            height: var(--nav-h);
+            background: white;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            z-index: 200;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        }
+        .nav-item {
+            display: flex; flex-direction: column;
+            align-items: center; gap: 3px;
+            cursor: pointer; text-decoration: none;
+            color: #aaa; font-size: 10.5px; font-weight: 600;
+            flex: 1; padding: 6px 0;
+            transition: color 0.15s;
+        }
+        .nav-item.active, .nav-item:hover { color: var(--teal); }
+        .nav-item i { font-size: 21px; }
+        .nav-start-wrap {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; gap: 2px;
+        }
+        .nav-start-btn {
+            width: 58px; height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(138deg, rgba(0,0,0,.15) 0%, transparent 70%), var(--teal);
+            border: 4px solid white;
+            outline: 3px solid var(--teal);
+            box-shadow: 0 4px 16px rgba(11,177,179,0.45);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; margin-top: -28px;
+            transition: all 0.2s;
+            color: white; font-size: 24px; text-decoration: none;
+        }
+        .nav-start-btn:hover { transform: scale(1.08); }
+        .nav-start-label { font-size: 10.5px; font-weight: 700; color: var(--teal); }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed; bottom: calc(var(--nav-h) + 16px); left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #1f2937; color: white;
+            padding: 12px 24px; border-radius: 100px;
+            font-size: 14px; font-weight: 500;
+            opacity: 0; transition: all 0.3s;
+            z-index: 3000; white-space: nowrap; max-width: 90%;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ── CONFIRM MODAL ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 3000; display: none;
+            align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: white; border-radius: 20px;
+            padding: 28px 24px; width: 100%; max-width: 340px;
+            text-align: center;
+            animation: scaleIn 0.25s cubic-bezier(0.22,1,0.36,1);
+        }
+        @keyframes scaleIn { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
+        .modal-icon { font-size: 48px; margin-bottom: 14px; }
+        .modal-title { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+        .modal-text { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
+        .modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-cancel {
+            padding: 13px; border: 2px solid var(--border);
+            background: var(--bg); color: var(--text);
+            border-radius: 12px; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-cancel:hover { border-color: var(--text-muted); }
+        .btn-logout-confirm {
+            padding: 13px; background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white; border: none;
+            border-radius: 12px; font-size: 15px; font-weight: 700;
+            cursor: pointer; transition: all 0.2s;
+            font-family: 'Outfit', sans-serif;
+        }
+        .btn-logout-confirm:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(239,68,68,0.4); }
+
+        @media (min-width: 501px) { body { background: #1a1a2e; } }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+
+        <button class="support-btn" onclick="openCrispChat()" title="Support">
+            <i class="fas fa-headset"></i>
+        </button>
+
+        <div class="profile-top-row">
+            <div class="avatar"><i class="fas fa-user"></i></div>
+            <div class="profile-info">
+                <div class="profile-phone">
+                    <span id="userPhone">Loading...</span>
+                    <span class="badge-free" id="memberBadge">Free</span>
+                </div>
+                <div class="invite-row">
+                    <span class="invite-label">Invite Code:</span>
+                    <span class="invite-code" id="inviteCodeDisplay">···</span>
+                    <button class="copy-btn" onclick="copyCode()">copy</button>
+                </div>
+                <div class="credit-row">Credit Score: <span class="credit-val" id="creditScore">100</span></div>
+            </div>
+        </div>
+
+        <!-- Balance Card inside header area -->
+        <div class="balance-card">
+            <div class="balance-grid">
+                <div class="bal-item">
+                    <div class="bal-item-label">my balance</div>
+                    <div class="bal-item-value" id="myBalance">0.00$</div>
+                </div>
+                <div class="bal-item" style="text-align:right;">
+                    <div class="bal-item-label">frozen amount</div>
+                    <div class="bal-item-value" id="myFrozen">0.00$</div>
+                </div>
+            </div>
+            <div class="balance-btns">
+                <button class="bal-action-btn" onclick="window.location.href='withdrawal_record.html'">
+                    <i class="fas fa-credit-card"></i> Withdraw
+                </button>
+                <button class="bal-action-btn" onclick="window.location.href='recharge.html'">
+                    <i class="fas fa-exchange-alt"></i> Recharge
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Grid -->
+    <div class="menu-section">
+        <div class="menu-grid">
+            <a class="menu-item" onclick="showToast('Personal info coming soon')">
+                <div class="menu-icon-circle"><i class="fas fa-id-card"></i></div>
+                <span class="menu-label">Personal</span>
+            </a>
+            <a class="menu-item" href="grab_an_order.html">
+                <div class="menu-icon-circle"><i class="fas fa-receipt"></i></div>
+                <span class="menu-label">get order</span>
+            </a>
+            <a class="menu-item" onclick="showToast('Account details coming soon')">
+                <div class="menu-icon-circle"><i class="fas fa-dollar-sign"></i></div>
+                <span class="menu-label">account details</span>
+            </a>
+            <a class="menu-item" onclick="showToast('Fund details coming soon')">
+                <div class="menu-icon-circle"><i class="fas fa-wallet"></i></div>
+                <span class="menu-label">Fund details</span>
+            </a>
+            <a class="menu-item" href="withdrawal_record.html">
+                <div class="menu-icon-circle"><i class="fas fa-file-invoice-dollar"></i></div>
+                <span class="menu-label">Withdrawal records</span>
+            </a>
+            <a class="menu-item" onclick="showToast('Wallet address coming soon')">
+                <div class="menu-icon-circle"><i class="fas fa-fingerprint"></i></div>
+                <span class="menu-label">Wallet address</span>
+            </a>
+            <a class="menu-item" onclick="showToast('Change password coming soon')">
+                <div class="menu-icon-circle"><i class="fas fa-lock"></i></div>
+                <span class="menu-label">change password</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Logout -->
+    <div class="logout-section">
+        <button class="logout-btn" onclick="confirmLogout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <a href="homepage.html" class="nav-item">
+            <i class="fas fa-home"></i><span>Home</span>
+        </a>
+        <a href="recharge.html" class="nav-item">
+            <i class="fas fa-plus-circle"></i><span>Recharge</span>
+        </a>
+        <div class="nav-start-wrap">
+            <a class="nav-start-btn" href="grab_an_order.html" title="Start Grabbing Orders">
+                <i class="fas fa-rocket"></i>
+            </a>
+            <span class="nav-start-label">Start</span>
+        </div>
+        <a href="grab_an_order.html" class="nav-item">
+            <i class="fas fa-clipboard-list"></i><span>Order</span>
+        </a>
+        <a href="my.html" class="nav-item active">
+            <i class="fas fa-user-circle"></i><span>My</span>
+        </a>
+    </nav>
+</div>
+
+<!-- Logout Confirm Modal -->
+<div class="modal-overlay" id="logoutModal">
+    <div class="modal-box">
+        <div class="modal-icon">👋</div>
+        <div class="modal-title">Logout?</div>
+        <div class="modal-text">Are you sure you want to logout from your ManifestoShop account?</div>
+        <div class="modal-btns">
+            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+            <button class="btn-logout-confirm" onclick="doLogout()">Logout</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script type="text/javascript">
+window.$crisp=[];
+window.CRISP_WEBSITE_ID="e2018a9b-d17d-427b-a6ad-c2d865637f65";
+window.$crisp.push(["config", "hide:on:mobile", false]);
+window.$crisp.push(["do", "chat:hide"]);
+window.$crisp.push(["on", "session:loaded", function() {
+    window.$crisp.push(["do", "chat:hide"]);
+}]);
+window.$crisp.push(["on", "chat:closed", function() {
+    window.$crisp.push(["do", "chat:hide"]);
+}]);
+(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();
+</script>
+<script src="auth-guard.js"></script>
+
+<script>
+(function() {
+    // Populate from sessionStorage
+    function loadProfile() {
+        const phone = sessionStorage.getItem('userPhone') || sessionStorage.getItem('userEmail') || 'User';
+        const balance = parseFloat(sessionStorage.getItem('userBalance') || '0');
+        const frozen = parseFloat(sessionStorage.getItem('userFrozenAmount') || '0');
+        const credit = sessionStorage.getItem('userCreditScore') || '100';
+        const invite = sessionStorage.getItem('userInviteCode') || '···';
+        const level = sessionStorage.getItem('userMembershipLevel') || 'Free';
+
+        document.getElementById('userPhone').textContent = phone;
+        document.getElementById('myBalance').textContent = '$' + balance.toFixed(2);
+        document.getElementById('myFrozen').textContent = '$' + frozen.toFixed(2);
+        document.getElementById('creditScore').textContent = credit;
+        document.getElementById('inviteCodeDisplay').textContent = invite;
+        document.getElementById('memberBadge').textContent = level;
+    }
+
+    loadProfile();
+
+    // Also refresh after Firebase loads user data
+    window.addEventListener('userDataLoaded', loadProfile);
+
+    // Live Firestore read — ensures frozenAmount is always current even if
+    // auth-guard.js hasn't stored it in sessionStorage yet.
+    window.addEventListener('load', function() {
+        if (typeof firebase === 'undefined') return;
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (!user) return;
+            firebase.firestore().collection('users').doc(user.uid).get()
+                .then(function(doc) {
+                    if (!doc.exists) return;
+                    const data = doc.data();
+                    const balance = parseFloat(data.balance || 0);
+                    const frozen  = parseFloat(data.frozenAmount || 0);
+                    // Update sessionStorage so loadProfile can use it
+                    sessionStorage.setItem('userBalance', balance.toString());
+                    sessionStorage.setItem('userFrozenAmount', frozen.toString());
+                    // Directly update DOM for instant rendering
+                    document.getElementById('myBalance').textContent = '$' + balance.toFixed(2);
+                    document.getElementById('myFrozen').textContent  = '$' + frozen.toFixed(2);
+                })
+                .catch(function(e) { console.warn('Frozen fetch failed:', e); });
+        });
+    });
+
+    // Copy invite code
+    window.copyCode = function() {
+        const code = sessionStorage.getItem('userInviteCode') || '';
+        if (!code || code === '···') { showToast('No invite code found'); return; }
+        navigator.clipboard.writeText(code).then(() => {
+            showToast('✅ Invite code copied: ' + code);
+        }).catch(() => {
+            const el = document.createElement('textarea');
+            el.value = code; document.body.appendChild(el);
+            el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            showToast('✅ Invite code copied: ' + code);
+        });
+    };
+
+    // Logout
+    window.confirmLogout = function() {
+        document.getElementById('logoutModal').classList.add('open');
+    };
+    window.closeModal = function() {
+        document.getElementById('logoutModal').classList.remove('open');
+    };
+    window.doLogout = async function() {
+        try {
+            await firebase.auth().signOut();
+        } catch(e) {}
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+    };
+
+    // Toast
+    window.showToast = function(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    };
+})();
+</script>
+
+
+<script>
+function openCrispChat() {
+    if (window.$crisp) {
+        $crisp.push(["do", "chat:show"]);
+        $crisp.push(["do", "chat:open"]);
+    }
+}
+</script>
+</body>
+</html>

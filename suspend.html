@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover, user-scalable=no">
+    <title>Account Suspended – ManifestoShop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --teal: #0bb1b3;
+            --danger: #ef4444;
+            --text-muted: rgba(255,255,255,0.6);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow: hidden;
+        }
+
+        /* Floating background circles */
+        .bg-circle {
+            position: fixed;
+            border-radius: 50%;
+            opacity: 0.06;
+            animation: floatCircle 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+        .bg-circle-1 { width: 400px; height: 400px; background: #ef4444; top: -100px; right: -100px; animation-delay: 0s; }
+        .bg-circle-2 { width: 300px; height: 300px; background: #667eea; bottom: -80px; left: -80px; animation-delay: 3s; }
+        .bg-circle-3 { width: 200px; height: 200px; background: #0bb1b3; top: 40%; left: 50%; animation-delay: 5s; }
+        @keyframes floatCircle {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+
+        .card {
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            animation: cardIn 0.5s ease-out both;
+        }
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.96); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Logo at top */
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 32px;
+            opacity: 0.6;
+        }
+        .logo-icon {
+            width: 34px; height: 34px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        .logo-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px; font-weight: 800;
+            color: white; letter-spacing: -0.5px;
+        }
+
+        /* Lock icon */
+        .lock-wrap {
+            width: 90px; height: 90px;
+            background: rgba(239,68,68,0.12);
+            border: 2px solid rgba(239,68,68,0.45);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px;
+            position: relative;
+            animation: lockPulse 2.5s ease-in-out infinite;
+        }
+        @keyframes lockPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.2); }
+            50% { box-shadow: 0 0 0 16px rgba(239,68,68,0); }
+        }
+        .lock-icon {
+            font-size: 38px;
+            color: #ef4444;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 26px; font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.75;
+            margin-bottom: 32px;
+        }
+
+        /* IMPROVED: Suspension reason box */
+        .reason-box {
+            background: rgba(239,68,68,0.08);
+            border: 1.5px solid rgba(239,68,68,0.2);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .reason-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(239,68,68,0.7);
+            margin-bottom: 6px;
+        }
+        .reason-text {
+            font-size: 13px;
+            color: rgba(255,255,255,0.85);
+            line-height: 1.6;
+        }
+
+        /* Info box */
+        .info-box {
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 24px;
+        }
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            text-align: left;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-row-icon {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .icon-red   { background: rgba(239,68,68,0.15); }
+        .icon-teal  { background: rgba(11,177,179,0.15); }
+        .icon-amber { background: rgba(245,158,11,0.15); }
+        .info-row-text { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+        .info-row-text strong { color: rgba(255,255,255,0.85); }
+
+        /* Buttons */
+        .btn-chat {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%;
+            background: linear-gradient(135deg, #0bb1b3, #089a9c);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px; font-weight: 700;
+            border: none; cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 20px rgba(11,177,179,0.35);
+            text-decoration: none;
+        }
+        .btn-chat:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(11,177,179,0.45); }
+
+        .btn-back {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%;
+            background: rgba(255,255,255,0.07);
+            border: 1.5px solid rgba(255,255,255,0.14);
+            color: rgba(255,255,255,0.65);
+            padding: 13px 20px;
+            border-radius: 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.12); color: white; }
+
+        .footer-note {
+            margin-top: 24px;
+            font-size: 11.5px;
+            color: rgba(255,255,255,0.2);
+        }
+
+        /* Ticket ID display */
+        .ticket-id {
+            margin-top: 14px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.25);
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background decorations -->
+    <div class="bg-circle bg-circle-1"></div>
+    <div class="bg-circle bg-circle-2"></div>
+    <div class="bg-circle bg-circle-3"></div>
+
+    <div class="card">
+
+        <!-- Brand -->
+        <div class="logo-wrap">
+            <div class="logo-icon">🛍️</div>
+            <div class="logo-text">ManifestoShop</div>
+        </div>
+
+        <!-- Lock icon -->
+        <div class="lock-wrap">
+            <i class="fas fa-lock lock-icon"></i>
+        </div>
+
+        <h1>Account Suspended</h1>
+        <p class="subtitle">
+            Your account has been suspended by the administrator.<br>
+            Please contact our support team to resolve this.
+        </p>
+
+        <!-- IMPROVED: Show suspension reason -->
+        <div class="reason-box" id="reasonBox" style="display: none;">
+            <div class="reason-label">Suspension Reason</div>
+            <div class="reason-text" id="reasonText"></div>
+        </div>
+
+        <!-- Info box -->
+        <div class="info-box">
+            <div class="info-row">
+                <div class="info-row-icon icon-red"><i class="fas fa-ban" style="color:#ef4444;"></i></div>
+                <div class="info-row-text"><strong>Access Blocked</strong><br>You cannot log in or access any features until your account is reinstated.</div>
+            </div>
+            <div class="info-row">
+                <div class="info-row-icon icon-teal"><i class="fas fa-headset" style="color:#0bb1b3;"></i></div>
+                <div class="info-row-text"><strong>Contact Support</strong><br>Use the button below to reach our team via live chat.</div>
+            </div>
+            <div class="info-row">
+                <div class="info-row-icon icon-amber"><i class="fas fa-clock" style="color:#f59e0b;"></i></div>
+                <div class="info-row-text"><strong>Resolution Time</strong><br>Most cases are resolved within 24–48 hours after review.</div>
+            </div>
+        </div>
+
+        <!-- Contact Support button -->
+        <button class="btn-chat" onclick="openSupport()">
+            <i class="fas fa-headset"></i> Contact Support
+        </button>
+
+        <!-- Back to Login -->
+        <button class="btn-back" onclick="goToLogin()">
+            <i class="fas fa-arrow-left"></i> Back to Login
+        </button>
+
+        <div class="footer-note">ManifestoShop · Support Team</div>
+        <div class="ticket-id" id="ticketRef"></div>
+    </div>
+
+    <!-- Firebase (for sign-out) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+
+    <!-- Crisp Live Chat -->
+    <script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="e2018a9b-d17d-427b-a6ad-c2d865637f65";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
+
+    <script>
+        // IMPROVED: Show suspension reason if available
+        const suspensionReason = sessionStorage.getItem('suspensionReason');
+        if (suspensionReason && suspensionReason.trim()) {
+            document.getElementById('reasonBox').style.display = 'block';
+            document.getElementById('reasonText').textContent = suspensionReason;
+        }
+
+        // Show a unique reference ID for the user
+        const uid = sessionStorage.getItem('userId') || '';
+        if (uid) {
+            document.getElementById('ticketRef').textContent = 'Account ID: ' + uid.substring(0, 16) + '…';
+        }
+
+        function openSupport() {
+            if (typeof $crisp !== 'undefined') {
+                try { $crisp.push(['do', 'chat:open']); } catch(e) {}
+            } else {
+                setTimeout(function() {
+                    if (typeof $crisp !== 'undefined') {
+                        try { $crisp.push(['do', 'chat:open']); } catch(e) {}
+                    }
+                }, 2000);
+            }
+        }
+
+        function goToLogin() {
+            // Sign out from Firebase then redirect
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+                firebase.auth().signOut().catch(() => {}).finally(() => {
+                    sessionStorage.clear();
+                    window.location.href = 'login.html';
+                });
+            } else {
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Security: if user somehow lands here while active, send them home
+        // (only if Firebase is available)
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (!user) {
+                    // Not logged in — fine to stay on this page
+                    return;
+                }
+                // If logged in, verify they are actually suspended
+                firebase.firestore().collection('users').doc(user.uid)
+                    .get({ source: 'server' })
+                    .then(function(doc) {
+                        if (doc.exists && doc.data().isActive !== false) {
+                            // Not suspended — redirect to homepage
+                            window.location.href = 'homepage.html';
+                        }
+                    }).catch(() => {});
+            });
+        }
+    </script>
+</body>
+</html>
