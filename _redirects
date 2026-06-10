@@ -1,2 +1,2 @@
 # Redirect root to login page (Cloudflare Pages redirect)
-/  /login.html  302
+/  /login.html  301
