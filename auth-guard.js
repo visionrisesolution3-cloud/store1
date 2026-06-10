@@ -27,20 +27,15 @@
     // FIX 2: Guard flag — prevents handleSuspension from running more than once
     let suspensionHandled = false;
 
-    if (!isPublicPage) {
-        checkAuth();
-    }
+    // NOTE: The synchronous sessionStorage guard was REMOVED.
+    // On Cloudflare Pages, sessionStorage is always empty on first load,
+    // so the old guard would redirect to login.html before Firebase auth
+    // could initialize — causing an infinite redirect loop.
+    // Firebase's onAuthStateChanged() below handles auth protection instead.
 
     function checkAuth() {
-        if (isPublicPage) return true;
-        const loginFlag = sessionStorage.getItem('login_flag');
-        const userId = sessionStorage.getItem('userId');
-
-        if (loginFlag !== '1' || !userId) {
-            sessionStorage.setItem('redirectAfterLogin', window.location.href);
-            window.location.href = 'login.html';
-            return false;
-        }
+        // Kept for legacy callers — always returns true now.
+        // Real auth is enforced by onAuthStateChanged below.
         return true;
     }
 
@@ -142,7 +137,10 @@
                 if (!isPublicPage) {
                     sessionStorage.removeItem('login_flag');
                     sessionStorage.removeItem('userId');
-                    sessionStorage.setItem('redirectAfterLogin', window.location.href);
+                    const dest = window.location.href;
+                    if (!dest.includes('login.html')) {
+                        sessionStorage.setItem('redirectAfterLogin', dest);
+                    }
                     window.location.href = 'login.html';
                 }
             } else {
@@ -180,7 +178,9 @@
 
                 // Active user on login page → redirect to homepage or intended destination
                 if (isPublicPage && currentPage === 'login.html') {
-                    const redirectTo = sessionStorage.getItem('redirectAfterLogin') || 'homepage.html';
+                    let redirectTo = sessionStorage.getItem('redirectAfterLogin') || 'index.html';
+                    // Safety: never redirect back to login page (would cause a loop)
+                    if (redirectTo.includes('login.html')) redirectTo = 'index.html';
                     sessionStorage.removeItem('redirectAfterLogin');
                     window.location.href = redirectTo;
                     return;
