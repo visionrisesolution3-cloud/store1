@@ -2443,57 +2443,24 @@ document.getElementById('successModal').addEventListener('click', e => { if(e.ta
 <script src="auth-guard.js"></script>
 <script>
 /* ══════════════════════════════════════════
-   CRITICAL AUTH CHECK - MUST RUN FIRST
+   AUTH CHECK - handled by auth-guard.js
+   This block only manages the loading overlay
+   and triggers data loading once auth-guard
+   confirms the user is authenticated.
 ══════════════════════════════════════════ */
 (function immediateAuthCheck() {
-    // Prevent page from loading data before auth is verified
     window._authVerified = false;
-    
-    // Check if Firebase is loaded
-    if (typeof firebase === 'undefined') {
-        console.error('Firebase not loaded, redirecting to login');
-        window.location.href = 'login.html';
-        return;
-    }
-    
-    // Set a timeout to redirect if auth check takes too long
-    // 15s instead of 5s — Firebase auth on slow connections (mobile/3G) can take >5s.
-    // A 5s timeout fires too early, redirects to login.html, which then redirects
-    // back here, creating an infinite redirect loop that freezes the browser.
-    const authTimeout = setTimeout(function() {
-        if (!window._authVerified) {
-            console.warn('Auth check timeout after 15s, redirecting to login');
-            window.location.href = 'login.html';
-        }
-    }, 15000);
-    
-    // Wait for Firebase auth to initialize
-    firebase.auth().onAuthStateChanged(function(user) {
-        clearTimeout(authTimeout);
-        
-        // Hide loading overlay
-        const overlay = document.getElementById('authLoadingOverlay');
-        const mainWrapper = document.getElementById('mainWrapper');
-        
-        if (!user) {
-            // No user logged in, redirect immediately
-            console.log('No authenticated user, redirecting to login');
-            window.location.href = 'login.html';
-        } else {
-            // User is authenticated, mark as verified
-            window._authVerified = true;
-            sessionStorage.setItem('userId', user.uid);
-            console.log('User authenticated:', user.uid);
-            
-            // Show the main content
-            if (overlay) overlay.style.display = 'none';
-            if (mainWrapper) mainWrapper.style.display = 'block';
-            
-            // Now safe to load data
-            if (window._loadDataAfterAuth) {
-                window._loadDataAfterAuth();
-            }
-        }
+
+    // auth-guard.js fires the 'userDataLoaded' event when user is confirmed.
+    // We listen for that to show content — no duplicate onAuthStateChanged,
+    // no timeout redirect (which was causing the infinite loop).
+    window.addEventListener('userDataLoaded', function() {
+        window._authVerified = true;
+        var overlay = document.getElementById('authLoadingOverlay');
+        var mainWrapper = document.getElementById('mainWrapper');
+        if (overlay) overlay.style.display = 'none';
+        if (mainWrapper) mainWrapper.style.display = 'block';
+        if (window._loadDataAfterAuth) window._loadDataAfterAuth();
     });
 })();
 
